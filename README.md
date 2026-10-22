@@ -3,14 +3,12 @@
 See how any company grows, with the proof.
 
 ```
-/sneak subsplash.com
+/sneak clay.com
 ```
 
-![The top of a Growth Sneak report: the company and its first activity sections](docs/img/overview.png)
+![Scrolling through a Growth Sneak report on clay.com: accounts, posts, ads, content tables, pricing and more](docs/img/scroll.gif)
 
-![An activity section: channel cards, a cited sentence, and the real posts behind it](docs/img/section.png)
-
-*A sample report on subsplash.com. Every number and quote links to its source.*
+*A sample report on clay.com. Every number and quote links to its source.*
 
 Growth Sneak is a Claude Code plugin for founders and growth leads. Give it a company's URL. It collects public
 evidence of how that company gets customers across 18 growth activities, and opens one local HTML report:
@@ -19,7 +17,7 @@ evidence of how that company gets customers across 18 growth activities, and ope
 - **Site traffic**: six months of estimated monthly visits (Similarweb)
 - **Nine sections**: organic social, SEO and AEO, owned content, earned content, paid social, paid search, signup
   and pricing, community and open source, partnerships and referral. Each activity shows what we saw, one cited
-  sentence, the real posts, ads or page screenshots behind it, a few key facts, and links to every source
+  sentence, the real posts, ads, tables or page screenshots behind it, a few key facts, and links to its sources
 - **Tech stack** and **what we could not see**
 
 Every claim links to its source. Anything we could not check is marked "Not covered", never guessed and never
