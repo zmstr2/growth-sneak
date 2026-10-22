@@ -22,6 +22,7 @@ import { readFileSync, writeFileSync, existsSync, statSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { dirname, join, resolve, extname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { isMain } from './ismain.mjs';
 import { normalizeMetrics } from './social.mjs';
 import { execFile } from 'node:child_process';
 import { CHANNELS, CHANNEL_BY_ID, SOURCE_LABELS } from './channels.mjs';
@@ -411,7 +412,7 @@ export function renderDir(dir, { open = false } = {}) {
   return { out, warnings, bytes: Buffer.byteLength(html) };
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (isMain(import.meta.url)) {
   const args = process.argv.slice(2);
   const dir = args.find((a) => !a.startsWith('--'));
   if (!dir) { console.error('usage: node scripts/render.mjs <reports/domain> [--open]'); process.exit(2); }

@@ -27,6 +27,7 @@
 import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { isMain } from './ismain.mjs';
 import { normalizeMetrics } from './social.mjs';
 import { prepare } from './render.mjs';
 
@@ -124,7 +125,7 @@ export function mergeDir(dir) {
   return { items: evidence.items.length, fragments: files.length };
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (isMain(import.meta.url)) {
   const dir = process.argv[2];
   if (!dir) { console.error('usage: node scripts/merge.mjs <reports/domain>'); process.exit(2); }
   try {

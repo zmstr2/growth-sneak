@@ -9,6 +9,7 @@
 
 import { gunzipSync } from 'node:zlib';
 import { fileURLToPath } from 'node:url';
+import { isMain } from './ismain.mjs';
 import { resolve } from 'node:path';
 
 const UA = 'Mozilla/5.0 (compatible; GrowthSneak/0.12; public sitemap reader)';
@@ -246,7 +247,7 @@ export async function crawl(domain, { asOf = new Date().toISOString().slice(0, 1
   return { ...result, ...summarize(english, { domain, asOf }), page_types: classifyPages(english, { asOf }), by_month: updatesByMonth(english, { asOf }) };
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (isMain(import.meta.url)) {
   const args = process.argv.slice(2);
   const domain = args.find((a) => !a.startsWith('--'));
   const asOfIdx = args.indexOf('--as-of');

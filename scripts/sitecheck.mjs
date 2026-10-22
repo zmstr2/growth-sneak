@@ -6,6 +6,7 @@
 //   node scripts/sitecheck.mjs notion.com > sitecheck.json
 
 import { fileURLToPath } from 'node:url';
+import { isMain } from './ismain.mjs';
 import { resolve } from 'node:path';
 
 const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128 Safari/537.36';
@@ -155,7 +156,7 @@ export async function run(domain) {
   return { domain, urls: { robots: `${base}/robots.txt`, llms: `${base}/llms.txt`, home: `${base}/` }, checks: toChecks({ robots, llms, head }) };
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (isMain(import.meta.url)) {
   const domain = process.argv[2];
   if (!domain) { console.error('usage: node scripts/sitecheck.mjs <domain>'); process.exit(2); }
   run(domain).then((r) => console.log(JSON.stringify(r, null, 2))).catch((e) => { console.error(`error: ${e.message}`); process.exit(1); });

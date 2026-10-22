@@ -9,6 +9,7 @@
 // The same text drives the model score (scripts/score.mjs) and the analyst fallback (agents/sneak-analyst.md).
 
 import { fileURLToPath } from 'node:url';
+import { isMain } from './ismain.mjs';
 import { resolve } from 'node:path';
 
 export const LEVEL_NAMES = ['Not seen', 'Light', 'Solid', 'Strong'];
@@ -201,7 +202,7 @@ export function toMarkdown() {
       `### ${a.label} (\`${a.id}\`)`, `*${a.question}*`, '', ...a.levels.map((l, i) => `- **${i}.** ${l}`), ''])])].join('\n');
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (isMain(import.meta.url)) {
   if (process.argv.includes('--md')) console.log(toMarkdown());
   else console.log(JSON.stringify({ activities: ACTIVITIES.length }, null, 2));
 }

@@ -13,6 +13,7 @@
 import { readFileSync, writeFileSync, existsSync, statSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { isMain } from './ismain.mjs';
 import { ACTIVITIES, toPercent, nearestLevel } from './rubric.mjs';
 import { engagementOf, hasMetrics } from './social.mjs';
 
@@ -184,6 +185,6 @@ async function main() {
   console.log(`scored ${n} of ${ACTIVITIES.length} activities (${result.usage?.input_tokens ?? '?'} input tokens) -> ${join(dir, 'scores.json')}`);
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (isMain(import.meta.url)) {
   main().catch((e) => { console.error(`error: ${String(e.message).replace(/Bearer\s+\S+/gi, 'Bearer ***')}`); process.exit(1); });
 }

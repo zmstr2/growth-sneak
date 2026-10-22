@@ -144,9 +144,10 @@ export function classify(input, domain) {
 }
 
 import { fileURLToPath } from 'node:url';
+import { isMain } from './ismain.mjs';
 import { resolve } from 'node:path';
 import { readFileSync } from 'node:fs';
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (isMain(import.meta.url)) {
   const [file, domain] = process.argv.slice(2);
   if (!file || !domain) { console.error('usage: node scripts/techstack.mjs <visit.json> <domain>'); process.exit(2); }
   try { console.log(JSON.stringify(classify(readFileSync(file, 'utf8'), domain), null, 2)); }
