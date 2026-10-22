@@ -1,0 +1,1055 @@
+{
+  "domain": "notion.com",
+  "captured_at": "2026-10-20T03:00:00Z",
+  "note": "TEST FIXTURE. A partial real sample: Google ads, pricing, homepage, sitemaps, robots.txt and one rendered visit. Social, reviews, press and hiring were not collected.",
+  "sources": {
+    "firecrawl": "connected",
+    "exa": "missing",
+    "jev": "missing",
+    "clay": "missing",
+    "apify": "missing"
+  },
+  "cost": {
+    "firecrawl_credits": 21,
+    "note": "ads 5, pricing 10, homepage 6; sitemaps and robots.txt are free"
+  },
+  "items": [
+    {
+      "id": "E001",
+      "collector": "paid",
+      "channel": "google_ads",
+      "status": "observed",
+      "finding": "Google's Ads Transparency Center lists about 600-700 ads for notion.com (all regions).",
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721?region=anywhere",
+      "captured_at": "2026-10-20T03:00:00Z"
+    },
+    {
+      "id": "E002",
+      "collector": "paid",
+      "channel": "google_ads",
+      "status": "observed",
+      "finding": "In a 40-ad sample (most recently shown first): 19 text, 13 video, 8 image. 15 of 40 have no thumbnail from the source (all 13 videos plus 2 others).",
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721?region=anywhere",
+      "captured_at": "2026-10-20T03:00:00Z"
+    },
+    {
+      "id": "E003",
+      "collector": "paid",
+      "channel": "google_ads",
+      "status": "observed",
+      "finding": "Longest-running ad in the sample has been shown for 168 days (since 2026-04-29). 11 of 40 sampled ads have run 120+ days.",
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR10609933036445237249?region=anywhere",
+      "captured_at": "2026-10-20T03:00:00Z"
+    },
+    {
+      "id": "E004",
+      "collector": "paid",
+      "channel": "google_ads",
+      "status": "observed",
+      "finding": "2 of 40 sampled ads first appeared in the last 30 days; the newest started 2026-10-05.",
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721?region=anywhere",
+      "captured_at": "2026-10-20T03:00:00Z"
+    },
+    {
+      "id": "E005",
+      "collector": "paid",
+      "channel": "meta_ads",
+      "status": "couldnt_check",
+      "finding": "Meta ad data was not collected in this sample. Use the library link to look.",
+      "url": "https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=ALL&q=notion&search_type=keyword_unordered",
+      "captured_at": "2026-10-20T03:00:00Z"
+    },
+    {
+      "id": "E006",
+      "collector": "paid",
+      "channel": "linkedin_ads",
+      "status": "couldnt_check",
+      "finding": "LinkedIn ads are link-only: the library has no public API, so we did not look.",
+      "url": "https://www.linkedin.com/ad-library/search?accountOwner=notion",
+      "captured_at": "2026-10-20T03:00:00Z"
+    },
+    {
+      "id": "E007",
+      "collector": "paid",
+      "channel": "tiktok_ads",
+      "status": "couldnt_check",
+      "finding": "TikTok ads are link-only: the library mostly covers EU delivery, so we did not look.",
+      "url": "https://library.tiktok.com/ads?region=all&adv_name=notion",
+      "captured_at": "2026-10-20T03:00:00Z"
+    },
+    {
+      "id": "E008",
+      "collector": "owned",
+      "channel": "pricing_signup",
+      "status": "observed",
+      "finding": "Four plans are listed per seat per month: Free ($0), Plus ($10), Business ($20) and Enterprise (custom pricing, \"Contact Sales\").",
+      "url": "https://www.notion.com/pricing",
+      "captured_at": "2026-10-20T03:00:00Z",
+      "image": "assets/pricing.png",
+      "funnel_step": "pricing"
+    },
+    {
+      "id": "E009",
+      "collector": "owned",
+      "channel": "pricing_signup",
+      "status": "observed",
+      "finding": "Two buttons side by side: \"Get Notion free\" (self-serve signup) and \"Request a demo\" (sales).",
+      "url": "https://www.notion.com/",
+      "captured_at": "2026-10-20T03:00:00Z",
+      "image": "assets/home.png",
+      "funnel_step": "home"
+    },
+    {
+      "id": "E010",
+      "collector": "owned",
+      "channel": "pricing_signup",
+      "status": "stated",
+      "finding": "The Plus plan card offers a \"Trial of Notion AI\". No other plan card mentions a trial.",
+      "url": "https://www.notion.com/pricing",
+      "captured_at": "2026-10-20T03:00:00Z"
+    },
+    {
+      "id": "E011",
+      "collector": "owned",
+      "channel": "seo_content",
+      "status": "observed",
+      "finding": "The template marketplace publishes \"Top 10 ...\" collection pages at scale (for example \"Top 10 Paid Docs Templates\") alongside individual template pages.",
+      "url": "https://www.notion.com/templates/collections/top-10-paid-docs-templates-in-notion",
+      "captured_at": "2026-10-20T03:00:00Z"
+    },
+    {
+      "id": "E012",
+      "collector": "owned",
+      "channel": "comparison",
+      "status": "observed",
+      "finding": "Creator-made \"alternative\" templates live on notion.com (for example \"YNAB Alternative\" and \"Toggl Alternative\"). These are third-party marketplace listings.",
+      "url": "https://www.notion.com/templates/time-tracker-toggl-alternative",
+      "captured_at": "2026-10-20T03:00:00Z"
+    },
+    {
+      "id": "E013",
+      "collector": "owned",
+      "channel": "comparison",
+      "status": "observed",
+      "finding": "Notion's own sitemap lists 9 pages under /compare-against, including Notion vs Confluence and Notion vs Granola.",
+      "url": "https://www.notion.com/compare-against",
+      "captured_at": "2026-10-20T03:00:00Z"
+    },
+    {
+      "id": "E014",
+      "collector": "owned",
+      "channel": "integrations",
+      "status": "observed",
+      "finding": "A connections directory has one page per integration (for example /connections/canva), and a separate developer site documents the API.",
+      "url": "https://www.notion.com/connections/canva",
+      "captured_at": "2026-10-20T03:00:00Z"
+    },
+    {
+      "id": "E015",
+      "collector": "owned",
+      "channel": "integrations",
+      "status": "observed",
+      "finding": "Developer documentation is published at developers.notion.com.",
+      "url": "https://developers.notion.com/guides/get-started/authorization",
+      "captured_at": "2026-10-20T03:00:00Z"
+    },
+    {
+      "id": "E016",
+      "collector": "owned",
+      "channel": "ai_search",
+      "status": "observed",
+      "finding": "Publishes an llms.txt. robots.txt lets GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot, Google-Extended, Applebot-Extended, CCBot in, and blocks meta-externalagent, Amazonbot. Homepage carries Organization, SoftwareApplication, WebSite structured data.",
+      "url": "https://www.notion.com/robots.txt",
+      "captured_at": "2026-10-20T03:00:00Z"
+    },
+    {
+      "id": "E017",
+      "collector": "earned",
+      "channel": "social",
+      "status": "couldnt_check",
+      "finding": "Social profiles were not collected in this sample.",
+      "url": "https://www.notion.com/",
+      "captured_at": "2026-10-20T03:00:00Z"
+    },
+    {
+      "id": "E018",
+      "collector": "earned",
+      "channel": "video",
+      "status": "couldnt_check",
+      "finding": "YouTube and video were not collected in this sample.",
+      "url": "https://www.notion.com/",
+      "captured_at": "2026-10-20T03:00:00Z"
+    },
+    {
+      "id": "E019",
+      "collector": "earned",
+      "channel": "community",
+      "status": "couldnt_check",
+      "finding": "Community channels were not collected in this sample.",
+      "url": "https://www.notion.com/",
+      "captured_at": "2026-10-20T03:00:00Z"
+    },
+    {
+      "id": "E020",
+      "collector": "earned",
+      "channel": "reviews",
+      "status": "couldnt_check",
+      "finding": "Review sites were not collected in this sample.",
+      "url": "https://www.notion.com/",
+      "captured_at": "2026-10-20T03:00:00Z"
+    },
+    {
+      "id": "E021",
+      "collector": "earned",
+      "channel": "press_podcasts",
+      "status": "couldnt_check",
+      "finding": "Press and podcasts were not collected in this sample.",
+      "url": "https://www.notion.com/",
+      "captured_at": "2026-10-20T03:00:00Z"
+    },
+    {
+      "id": "E022",
+      "collector": "earned",
+      "channel": "referral",
+      "status": "couldnt_check",
+      "finding": "Referral and affiliate programs were not checked in this sample.",
+      "url": "https://www.notion.com/",
+      "captured_at": "2026-10-20T03:00:00Z"
+    },
+    {
+      "id": "E023",
+      "collector": "company",
+      "channel": "hiring",
+      "status": "couldnt_check",
+      "finding": "Open roles were not collected in this sample.",
+      "url": "https://www.notion.com/",
+      "captured_at": "2026-10-20T03:00:00Z"
+    },
+    {
+      "id": "E024",
+      "collector": "owned",
+      "channel": "pricing_signup",
+      "status": "observed",
+      "finding": "The homepage headline changed between two captures (\"Where teams and agents Think together.\" and \"The most ambitious companies run on Notion.\"), so it likely rotates or is being tested.",
+      "url": "https://www.notion.com/",
+      "captured_at": "2026-10-20T03:00:00Z"
+    },
+    {
+      "id": "E025",
+      "collector": "owned",
+      "channel": "seo_content",
+      "status": "observed",
+      "finding": "Notion's sitemaps list 4,311 English pages across 12 sitemaps, and the site is translated into 21 other languages.",
+      "url": "https://www.notion.com/sitemap.xml",
+      "captured_at": "2026-10-20T03:00:00Z"
+    },
+    {
+      "id": "E026",
+      "collector": "owned",
+      "channel": "seo_content",
+      "status": "observed",
+      "finding": "2,780 template pages: 2,086 \"collection\" pages and 693 category pages.",
+      "url": "https://sitemaps.notion.com/sitemap-collections.xml",
+      "captured_at": "2026-10-20T03:00:00Z"
+    },
+    {
+      "id": "E027",
+      "collector": "owned",
+      "channel": "seo_content",
+      "status": "observed",
+      "finding": "156 dated release-notes pages; 12 were updated in the last 90 days.",
+      "url": "https://www.notion.com/releases",
+      "captured_at": "2026-10-20T03:00:00Z"
+    },
+    {
+      "id": "E028",
+      "collector": "company",
+      "channel": "martech",
+      "status": "observed",
+      "finding": "A rendered visit loaded Transcend, Sentry, Splunk, Contentful, Google sign-in. No advertising pixels loaded during a visit without clicking the cookie banner. A consent manager is present, so pixels may only load after consent.",
+      "url": "https://www.notion.com/",
+      "captured_at": "2026-10-20T03:00:00Z"
+    },
+    {
+      "id": "E029",
+      "collector": "paid",
+      "channel": "linkedin_ads",
+      "status": "observed",
+      "finding": "Two LinkedIn landing pages in the sitemap, one for new and one for existing customers (/lp/linkedin-new and /lp/linkedin-existing), both updated 13 Aug 2026. We did not see the ads themselves.",
+      "url": "https://www.notion.com/lp/linkedin-new",
+      "captured_at": "2026-10-20T03:00:00Z"
+    },
+    {
+      "id": "E030",
+      "collector": "paid",
+      "channel": "meta_ads",
+      "status": "observed",
+      "finding": "A Meta landing page (/lp/meta) is in the sitemap, updated 10 Aug 2026. We did not see the ads themselves.",
+      "url": "https://www.notion.com/lp/meta",
+      "captured_at": "2026-10-20T03:00:00Z"
+    },
+    {
+      "id": "E031",
+      "collector": "earned",
+      "channel": "video",
+      "status": "observed",
+      "finding": "A YouTube landing page (/lp/yt) is in the sitemap, updated 10 Aug 2026.",
+      "url": "https://www.notion.com/lp/yt",
+      "captured_at": "2026-10-20T03:00:00Z"
+    },
+    {
+      "id": "E032",
+      "collector": "owned",
+      "channel": "comparison",
+      "status": "observed",
+      "finding": "A landing page compares Notion with Airtable (/lp/notion-vs-airtable), updated 30 Sep 2026.",
+      "url": "https://www.notion.com/lp/notion-vs-airtable",
+      "captured_at": "2026-10-20T03:00:00Z"
+    }
+  ],
+  "ads": [
+    {
+      "id": "AD001",
+      "platform": "google",
+      "format": "video",
+      "days_shown": 125,
+      "first_shown": "2026-06-18",
+      "image_url": null,
+      "width": null,
+      "height": null,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR03164246382856896513?region=anywhere"
+    },
+    {
+      "id": "AD002",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 95,
+      "first_shown": "2026-07-15",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/17847446950589526626",
+      "width": 348,
+      "height": 376,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR04759825633809268737?region=anywhere"
+    },
+    {
+      "id": "AD003",
+      "platform": "google",
+      "format": "video",
+      "days_shown": 112,
+      "first_shown": "2026-06-23",
+      "image_url": null,
+      "width": null,
+      "height": null,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR01084999938305163265?region=anywhere"
+    },
+    {
+      "id": "AD004",
+      "platform": "google",
+      "format": "video",
+      "days_shown": 125,
+      "first_shown": "2026-06-18",
+      "image_url": null,
+      "width": null,
+      "height": null,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR11248907003382202369?region=anywhere"
+    },
+    {
+      "id": "AD005",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 51,
+      "first_shown": "2026-08-27",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/432431132657026614",
+      "width": 348,
+      "height": 134,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR04967161915848523777?region=anywhere"
+    },
+    {
+      "id": "AD006",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 17,
+      "first_shown": "2026-09-30",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/2028324348555146160",
+      "width": 348,
+      "height": 134,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR11862750292036550657?region=anywhere"
+    },
+    {
+      "id": "AD007",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 92,
+      "first_shown": "2026-07-14",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/10848538249631193446",
+      "width": 348,
+      "height": 180,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR12283049228913082369?region=anywhere"
+    },
+    {
+      "id": "AD008",
+      "platform": "google",
+      "format": "video",
+      "days_shown": 119,
+      "first_shown": "2026-06-23",
+      "image_url": null,
+      "width": null,
+      "height": null,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR05434251910074859521?region=anywhere"
+    },
+    {
+      "id": "AD009",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 155,
+      "first_shown": "2026-05-13",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/1410220411407626147",
+      "width": 348,
+      "height": 134,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR13739284072742518785?region=anywhere"
+    },
+    {
+      "id": "AD010",
+      "platform": "google",
+      "format": "video",
+      "days_shown": 125,
+      "first_shown": "2026-06-18",
+      "image_url": null,
+      "width": null,
+      "height": null,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR00826878176251609089?region=anywhere"
+    },
+    {
+      "id": "AD011",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 154,
+      "first_shown": "2026-05-13",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/10086399219487294753",
+      "width": 348,
+      "height": 180,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR16550576975291351041?region=anywhere"
+    },
+    {
+      "id": "AD012",
+      "platform": "google",
+      "format": "video",
+      "days_shown": 125,
+      "first_shown": "2026-06-18",
+      "image_url": null,
+      "width": null,
+      "height": null,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR13814133601681276929?region=anywhere"
+    },
+    {
+      "id": "AD013",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 168,
+      "first_shown": "2026-04-29",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/2625255542016342286",
+      "width": 348,
+      "height": 180,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR10609933036445237249?region=anywhere"
+    },
+    {
+      "id": "AD014",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 97,
+      "first_shown": "2026-07-15",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/1846271504710546408",
+      "width": 348,
+      "height": 160,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR15381750072916049921?region=anywhere"
+    },
+    {
+      "id": "AD015",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 13,
+      "first_shown": "2026-10-05",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/9309130160470833349",
+      "width": 348,
+      "height": 134,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR15257794808492589057?region=anywhere"
+    },
+    {
+      "id": "AD016",
+      "platform": "google",
+      "format": "video",
+      "days_shown": 70,
+      "first_shown": "2026-08-11",
+      "image_url": null,
+      "width": null,
+      "height": null,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR09090038324793442305?region=anywhere"
+    },
+    {
+      "id": "AD017",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 40,
+      "first_shown": "2026-09-09",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/15483491403112434161",
+      "width": 348,
+      "height": 180,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR16041080741727043585?region=anywhere"
+    },
+    {
+      "id": "AD018",
+      "platform": "google",
+      "format": "video",
+      "days_shown": 71,
+      "first_shown": "2026-08-11",
+      "image_url": null,
+      "width": null,
+      "height": null,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR04308807613362995201?region=anywhere"
+    },
+    {
+      "id": "AD019",
+      "platform": "google",
+      "format": "video",
+      "days_shown": 70,
+      "first_shown": "2026-08-11",
+      "image_url": null,
+      "width": null,
+      "height": null,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR11112436032459505665?region=anywhere"
+    },
+    {
+      "id": "AD020",
+      "platform": "google",
+      "format": "video",
+      "days_shown": 125,
+      "first_shown": "2026-06-18",
+      "image_url": null,
+      "width": null,
+      "height": null,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR15292440179365642241?region=anywhere"
+    },
+    {
+      "id": "AD021",
+      "platform": "google",
+      "format": "image",
+      "days_shown": 98,
+      "first_shown": "2026-07-14",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/11730186532372875527",
+      "width": 719,
+      "height": 419,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR07039935672886493185?region=anywhere"
+    },
+    {
+      "id": "AD022",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 92,
+      "first_shown": "2026-04-29",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/14534219982525405375",
+      "width": 348,
+      "height": 180,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR00422058610747506689?region=anywhere"
+    },
+    {
+      "id": "AD023",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 92,
+      "first_shown": "2026-07-15",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/13385400508327993578",
+      "width": 364,
+      "height": 233,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR00877462170760118273?region=anywhere"
+    },
+    {
+      "id": "AD024",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 46,
+      "first_shown": "2026-08-27",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/11543514539791152597",
+      "width": 348,
+      "height": 286,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR08780719590498893825?region=anywhere"
+    },
+    {
+      "id": "AD025",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 46,
+      "first_shown": "2026-08-27",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/5758123966802369204",
+      "width": 348,
+      "height": 134,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR09855820513950040065?region=anywhere"
+    },
+    {
+      "id": "AD026",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 97,
+      "first_shown": "2026-07-15",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/8123260494349099667",
+      "width": 364,
+      "height": 213,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR12568723240530214913?region=anywhere"
+    },
+    {
+      "id": "AD027",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 97,
+      "first_shown": "2026-07-15",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/677377384234744141",
+      "width": 348,
+      "height": 200,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR14042307415773282305?region=anywhere"
+    },
+    {
+      "id": "AD028",
+      "platform": "google",
+      "format": "image",
+      "days_shown": 47,
+      "first_shown": "2026-08-26",
+      "image_url": null,
+      "width": null,
+      "height": null,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR06543074339753820161?region=anywhere"
+    },
+    {
+      "id": "AD029",
+      "platform": "google",
+      "format": "image",
+      "days_shown": 47,
+      "first_shown": "2026-08-26",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/12004405650341742899",
+      "width": 721,
+      "height": 509,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR08251917719457234945?region=anywhere"
+    },
+    {
+      "id": "AD030",
+      "platform": "google",
+      "format": "image",
+      "days_shown": 47,
+      "first_shown": "2026-08-26",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/12509198856959930792",
+      "width": 731,
+      "height": 509,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR07857093539283337217?region=anywhere"
+    },
+    {
+      "id": "AD031",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 51,
+      "first_shown": "2026-08-27",
+      "image_url": null,
+      "width": null,
+      "height": null,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR10940122494299799553?region=anywhere"
+    },
+    {
+      "id": "AD032",
+      "platform": "google",
+      "format": "image",
+      "days_shown": 98,
+      "first_shown": "2026-07-14",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/6258572352751309241",
+      "width": 729,
+      "height": 509,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR08180894490983137281?region=anywhere"
+    },
+    {
+      "id": "AD033",
+      "platform": "google",
+      "format": "image",
+      "days_shown": 98,
+      "first_shown": "2026-07-14",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/18036171136623265044",
+      "width": 719,
+      "height": 507,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR02589394078625955841?region=anywhere"
+    },
+    {
+      "id": "AD034",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 54,
+      "first_shown": "2026-07-15",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/9695380105275796196",
+      "width": 348,
+      "height": 483,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR01796214911563464705?region=anywhere"
+    },
+    {
+      "id": "AD035",
+      "platform": "google",
+      "format": "image",
+      "days_shown": 84,
+      "first_shown": "2026-07-22",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/12615906598421840896",
+      "width": 300,
+      "height": 600,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR13977184991327551489?region=anywhere"
+    },
+    {
+      "id": "AD036",
+      "platform": "google",
+      "format": "video",
+      "days_shown": 124,
+      "first_shown": "2026-06-18",
+      "image_url": null,
+      "width": null,
+      "height": null,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR10136236420444979201?region=anywhere"
+    },
+    {
+      "id": "AD037",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 97,
+      "first_shown": "2026-07-15",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/15520365140684142749",
+      "width": 348,
+      "height": 200,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR02872827285545680897?region=anywhere"
+    },
+    {
+      "id": "AD038",
+      "platform": "google",
+      "format": "video",
+      "days_shown": 125,
+      "first_shown": "2026-06-18",
+      "image_url": null,
+      "width": null,
+      "height": null,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR02184150513950392321?region=anywhere"
+    },
+    {
+      "id": "AD039",
+      "platform": "google",
+      "format": "video",
+      "days_shown": 125,
+      "first_shown": "2026-06-18",
+      "image_url": null,
+      "width": null,
+      "height": null,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR00736942523146043393?region=anywhere"
+    },
+    {
+      "id": "AD040",
+      "platform": "google",
+      "format": "image",
+      "days_shown": 97,
+      "first_shown": "2026-07-14",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/16148275146611981324",
+      "width": 175,
+      "height": 87,
+      "url": "https://adstransparency.google.com/advertiser/AR13309761427309854721/creative/CR09968471699328335873?region=anywhere"
+    }
+  ],
+  "ads_total": {
+    "low": 600,
+    "high": 700
+  },
+  "site": {
+    "evidence_id": "E025",
+    "total_urls": 4311,
+    "locales": 21,
+    "sitemaps_read": 12,
+    "as_of": "2026-10-20",
+    "sections": [
+      {
+        "path": "/templates",
+        "urls": 2780,
+        "updated_90d": 110,
+        "examples": [
+          "https://www.notion.com/templates/category/personal",
+          "https://www.notion.com/templates/category/free-personal-templates"
+        ],
+        "children": [
+          {
+            "path": "/templates/collections",
+            "urls": 2086
+          },
+          {
+            "path": "/templates/category",
+            "urls": 693
+          }
+        ]
+      },
+      {
+        "path": "/blog",
+        "urls": 588,
+        "updated_90d": 19,
+        "examples": [
+          "https://www.notion.com/blog",
+          "https://www.notion.com/blog/notion-ai-more-for-less"
+        ],
+        "children": [
+          {
+            "path": "/blog/topic",
+            "urls": 6
+          }
+        ]
+      },
+      {
+        "path": "/help",
+        "urls": 486,
+        "updated_90d": 359,
+        "examples": [
+          "https://www.notion.com/help",
+          "https://www.notion.com/help/reference"
+        ],
+        "children": []
+      },
+      {
+        "path": "/releases",
+        "urls": 156,
+        "updated_90d": 12,
+        "examples": [
+          "https://www.notion.com/releases",
+          "https://www.notion.com/releases/rss.xml"
+        ],
+        "children": []
+      },
+      {
+        "path": "/customers",
+        "urls": 96,
+        "updated_90d": 17,
+        "examples": [
+          "https://www.notion.com/customers",
+          "https://www.notion.com/customers/remote"
+        ],
+        "children": []
+      },
+      {
+        "path": "/use-case",
+        "urls": 39,
+        "updated_90d": 2,
+        "examples": [
+          "https://www.notion.com/use-case/self-improving-answer-bot",
+          "https://www.notion.com/use-case/data-agents"
+        ],
+        "children": []
+      },
+      {
+        "path": "/product",
+        "urls": 37,
+        "updated_90d": 1,
+        "examples": [
+          "https://www.notion.com/product/ai",
+          "https://www.notion.com/product/ai-meeting-notes"
+        ],
+        "children": []
+      },
+      {
+        "path": "/md",
+        "urls": 22,
+        "updated_90d": 10,
+        "examples": [
+          "https://www.notion.com/md/teams",
+          "https://www.notion.com/md/security"
+        ],
+        "children": []
+      },
+      {
+        "path": "/compare-against",
+        "urls": 9,
+        "updated_90d": 0,
+        "examples": [
+          "https://www.notion.com/compare-against",
+          "https://www.notion.com/compare-against/confluence"
+        ],
+        "children": []
+      },
+      {
+        "path": "/feature",
+        "urls": 9,
+        "updated_90d": 0,
+        "examples": [
+          "https://www.notion.com/feature/enterprise-search/the-hidden-cost-of-ill-find-it-later-and-how-to-cut-it",
+          "https://www.notion.com/feature/enterprise-search/enterprise-search-security-the-complete-guide"
+        ],
+        "children": []
+      },
+      {
+        "path": "/lp",
+        "urls": 8,
+        "updated_90d": 6,
+        "examples": [
+          "https://www.notion.com/lp/notion-vs-airtable",
+          "https://www.notion.com/lp/linkedin-existing"
+        ],
+        "children": []
+      },
+      {
+        "path": "/partners",
+        "urls": 7,
+        "updated_90d": 1,
+        "examples": [
+          "https://www.notion.com/partners/solutions-partner-program",
+          "https://www.notion.com/partners/ai-sales-demo"
+        ],
+        "children": []
+      },
+      {
+        "path": "other",
+        "urls": 74,
+        "updated_90d": 1,
+        "examples": [
+          "https://www.notion.com",
+          "https://www.notion.com/login"
+        ],
+        "children": [],
+        "grouped": 63
+      }
+    ]
+  },
+  "site_checks": {
+    "evidence_id": "E016",
+    "checks": [
+      {
+        "check": "robots.txt",
+        "result": "yes",
+        "detail": "8 rule groups, 12 sitemaps declared"
+      },
+      {
+        "check": "llms.txt",
+        "result": "yes",
+        "detail": "Published (75 lines)"
+      },
+      {
+        "check": "AI crawlers allowed",
+        "result": "yes",
+        "detail": "GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot, Google-Extended, Applebot-Extended, CCBot"
+      },
+      {
+        "check": "AI crawlers blocked",
+        "result": "yes",
+        "detail": "meta-externalagent, Amazonbot"
+      },
+      {
+        "check": "SEO tool crawlers blocked",
+        "result": "yes",
+        "detail": "AhrefsBot, SemrushBot, DotBot, BLEXBot"
+      },
+      {
+        "check": "Homepage readable without JavaScript",
+        "result": "yes",
+        "detail": "2,732 characters of text in the raw HTML"
+      },
+      {
+        "check": "Meta description",
+        "result": "yes",
+        "detail": "“Build Custom Agents, search across all your apps, and automate busywo…”"
+      },
+      {
+        "check": "Canonical URL",
+        "result": "yes",
+        "detail": "https://www.notion.com/"
+      },
+      {
+        "check": "Structured data (JSON-LD)",
+        "result": "yes",
+        "detail": "Organization, SoftwareApplication, WebSite"
+      },
+      {
+        "check": "Language versions (hreflang)",
+        "result": "yes",
+        "detail": "24 alternates"
+      }
+    ]
+  },
+  "tech": {
+    "evidence_id": "E028",
+    "tools": [
+      {
+        "tool": "Transcend",
+        "category": "Consent"
+      },
+      {
+        "tool": "Sentry",
+        "category": "Monitoring"
+      },
+      {
+        "tool": "Splunk",
+        "category": "Monitoring"
+      },
+      {
+        "tool": "Contentful",
+        "category": "Content & media"
+      },
+      {
+        "tool": "Google sign-in",
+        "category": "Sign-in & payments"
+      }
+    ],
+    "notes": [
+      "No advertising pixels loaded during a visit without clicking the cookie banner. A consent manager is present, so pixels may only load after consent.",
+      "A Google-style data layer exists but no tag manager loaded during the visit."
+    ]
+  },
+  "pricing": {
+    "evidence_id": "E008",
+    "billing": "monthly",
+    "plans": [
+      {
+        "name": "Free",
+        "price": "$0",
+        "unit": "per seat / month",
+        "cta": "Sign up",
+        "free_trial": null,
+        "audience": "For individuals to organize personal projects and life.",
+        "key_points": [
+          "Free plan for individuals",
+          "Limited blocks",
+          "5 MB file upload limit"
+        ]
+      },
+      {
+        "name": "Plus",
+        "price": "$10",
+        "unit": "per seat / month",
+        "cta": "Get started",
+        "free_trial": "Trial of Notion AI",
+        "audience": "For small teams and professionals to work together.",
+        "key_points": [
+          "Includes Trial AI capabilities",
+          "Unlimited collaborative blocks",
+          "Custom forms"
+        ]
+      },
+      {
+        "name": "Business",
+        "price": "$20",
+        "unit": "per seat / month",
+        "cta": "Get started",
+        "free_trial": null,
+        "audience": "For growing businesses to streamline teamwork.",
+        "key_points": [
+          "Everything in Plus",
+          "Notion Agent",
+          "Unlimited charts"
+        ]
+      },
+      {
+        "name": "Enterprise",
+        "price": "Custom pricing",
+        "unit": null,
+        "cta": "Contact Sales",
+        "free_trial": null,
+        "audience": "For organizations to operate with scalability, control, and security.",
+        "key_points": [
+          "Everything in Business",
+          "Custom Agents",
+          "Zero data retention with LLM providers"
+        ]
+      }
+    ],
+    "add_ons": [
+      "Notion Credits"
+    ]
+  }
+}

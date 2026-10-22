@@ -1,0 +1,60 @@
+{
+  "domain": "exa.ai",
+  "urls": {
+    "robots": "https://exa.ai/robots.txt",
+    "llms": "https://exa.ai/llms.txt",
+    "home": "https://www.exa.ai/"
+  },
+  "checks": [
+    {
+      "check": "robots.txt",
+      "result": "yes",
+      "detail": "1 rule groups, 2 sitemaps declared"
+    },
+    {
+      "check": "llms.txt",
+      "result": "yes",
+      "detail": "Published (185 lines)"
+    },
+    {
+      "check": "AI crawlers allowed",
+      "result": "yes",
+      "detail": "GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot, Google-Extended, Applebot-Extended, meta-externalagent, Amazonbot, CCBot"
+    },
+    {
+      "check": "AI crawlers blocked",
+      "result": "no",
+      "detail": "None"
+    },
+    {
+      "check": "SEO tool crawlers blocked",
+      "result": "no",
+      "detail": "None"
+    },
+    {
+      "check": "Homepage readable without JavaScript",
+      "result": "yes",
+      "detail": "6,236 characters of text in the raw HTML"
+    },
+    {
+      "check": "Meta description",
+      "result": "yes",
+      "detail": "“Search API for AI agents that need real-time web data, deep research,…”"
+    },
+    {
+      "check": "Canonical URL",
+      "result": "yes",
+      "detail": "https://exa.ai"
+    },
+    {
+      "check": "Structured data (JSON-LD)",
+      "result": "yes",
+      "detail": "Organization, WebAPI, WebPage"
+    },
+    {
+      "check": "Language versions (hreflang)",
+      "result": "no",
+      "detail": "None"
+    }
+  ]
+}

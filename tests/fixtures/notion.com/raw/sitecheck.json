@@ -1,0 +1,60 @@
+{
+  "domain": "notion.com",
+  "urls": {
+    "robots": "https://notion.com/robots.txt",
+    "llms": "https://notion.com/llms.txt",
+    "home": "https://www.notion.com/"
+  },
+  "checks": [
+    {
+      "check": "robots.txt",
+      "result": "yes",
+      "detail": "8 rule groups, 12 sitemaps declared"
+    },
+    {
+      "check": "llms.txt",
+      "result": "yes",
+      "detail": "Published (75 lines)"
+    },
+    {
+      "check": "AI crawlers allowed",
+      "result": "yes",
+      "detail": "GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot, Google-Extended, Applebot-Extended, CCBot"
+    },
+    {
+      "check": "AI crawlers blocked",
+      "result": "yes",
+      "detail": "meta-externalagent, Amazonbot"
+    },
+    {
+      "check": "SEO tool crawlers blocked",
+      "result": "yes",
+      "detail": "AhrefsBot, SemrushBot, DotBot, BLEXBot"
+    },
+    {
+      "check": "Homepage readable without JavaScript",
+      "result": "yes",
+      "detail": "2,732 characters of text in the raw HTML"
+    },
+    {
+      "check": "Meta description",
+      "result": "yes",
+      "detail": "“Build Custom Agents, search across all your apps, and automate busywo…”"
+    },
+    {
+      "check": "Canonical URL",
+      "result": "yes",
+      "detail": "https://www.notion.com/"
+    },
+    {
+      "check": "Structured data (JSON-LD)",
+      "result": "yes",
+      "detail": "Organization, SoftwareApplication, WebSite"
+    },
+    {
+      "check": "Language versions (hreflang)",
+      "result": "yes",
+      "detail": "24 alternates"
+    }
+  ]
+}

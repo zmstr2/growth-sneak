@@ -1,0 +1,171 @@
+{
+  "company": {
+    "name": "Notion",
+    "domain": "notion.com",
+    "one_liner": "The AI workspace that works for you."
+  },
+  "summary": {
+    "text": "Notion grows through a free, self-serve product with a sales path beside it, backed by search at scale. A free plan and \"Get Notion free\" sit next to \"Request a demo\". Its site carries about 2,800 template pages, 588 blog posts and 9 comparison pages in 22 languages, and on Google it runs roughly 600-700 ads, many live for four months or more, with separate landing pages for LinkedIn, Meta and YouTube traffic.",
+    "evidence_ids": [
+      "E009",
+      "E008",
+      "E026",
+      "E025",
+      "E013",
+      "E001",
+      "E003",
+      "E029",
+      "E030",
+      "E031"
+    ]
+  },
+  "channels": [
+    {
+      "channel": "google_ads",
+      "strength": "heavy",
+      "read": "About 600-700 ads are listed. 11 of the 40 we sampled have run 120+ days, so many ads are kept, not rotated out.",
+      "evidence_ids": [
+        "E001",
+        "E003",
+        "E004"
+      ]
+    },
+    {
+      "channel": "seo_content",
+      "strength": "heavy",
+      "read": "About 2,800 template pages, 588 blog posts and 486 help articles, translated into 21 languages.",
+      "evidence_ids": [
+        "E025",
+        "E026",
+        "E011"
+      ]
+    },
+    {
+      "channel": "pricing_signup",
+      "strength": "active",
+      "read": "A free plan and a self-serve signup button share the first screen with a demo request.",
+      "evidence_ids": [
+        "E008",
+        "E009"
+      ]
+    },
+    {
+      "channel": "comparison",
+      "strength": "active",
+      "read": "9 Notion-written comparison pages, a Notion vs Airtable landing page, and creator-made \"alternative\" templates.",
+      "evidence_ids": [
+        "E013",
+        "E032",
+        "E012"
+      ]
+    },
+    {
+      "channel": "linkedin_ads",
+      "strength": "light",
+      "read": "Separate LinkedIn landing pages for new and existing customers, updated in August. We did not pull the ads.",
+      "evidence_ids": [
+        "E029"
+      ]
+    },
+    {
+      "channel": "meta_ads",
+      "strength": "light",
+      "read": "A Meta landing page updated in August. We did not pull the ads.",
+      "evidence_ids": [
+        "E030"
+      ]
+    },
+    {
+      "channel": "integrations",
+      "strength": "active",
+      "read": "A connections directory and a developer site give integrations and the API their own pages.",
+      "evidence_ids": [
+        "E014",
+        "E015"
+      ]
+    },
+    {
+      "channel": "ai_search",
+      "strength": "active",
+      "read": "Publishes llms.txt and lets OpenAI, Anthropic, Perplexity and Google AI crawlers in, while blocking Meta and Amazon.",
+      "evidence_ids": [
+        "E016"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "text": "From the first screen a visitor can start free or ask for a demo, and the pricing page leads with the free plan.",
+      "evidence_ids": [
+        "E008",
+        "E009"
+      ]
+    }
+  ],
+  "notable_plays": [
+    {
+      "text": "Templates are the SEO engine: about 2,800 indexable template pages, most of them \"collection\" pages that bundle creator templates for a search term.",
+      "evidence_ids": [
+        "E026",
+        "E011"
+      ]
+    },
+    {
+      "text": "Paid landing pages are split by channel and audience: LinkedIn has one page for new customers and another for existing ones, alongside pages for Meta, YouTube and a Notion vs Airtable comparison.",
+      "evidence_ids": [
+        "E029",
+        "E030",
+        "E031",
+        "E032"
+      ]
+    },
+    {
+      "text": "Comparison pages target newer rivals as well as incumbents: there is a Notion vs Granola page beside Notion vs Confluence.",
+      "evidence_ids": [
+        "E013"
+      ]
+    },
+    {
+      "text": "It welcomes AI answer engines: an llms.txt plus open access for ChatGPT, Claude and Perplexity crawlers.",
+      "evidence_ids": [
+        "E016"
+      ]
+    },
+    {
+      "text": "The homepage headline is not fixed: two captures on the same day showed different hero lines.",
+      "evidence_ids": [
+        "E024"
+      ]
+    }
+  ],
+  "not_doing": [],
+  "couldnt_see": [
+    {
+      "text": "The Meta, LinkedIn and TikTok ads themselves. We found landing pages for LinkedIn and Meta, but did not pull those ad libraries.",
+      "evidence_ids": [
+        "E005",
+        "E006",
+        "E007"
+      ]
+    },
+    {
+      "text": "Whether ad pixels load after cookie consent.",
+      "evidence_ids": [
+        "E028"
+      ]
+    },
+    {
+      "text": "Social, video, community, reviews, press, referral and hiring.",
+      "evidence_ids": [
+        "E017",
+        "E018",
+        "E019",
+        "E020",
+        "E021",
+        "E022",
+        "E023"
+      ]
+    }
+  ],
+  "recent_changes": []
+}

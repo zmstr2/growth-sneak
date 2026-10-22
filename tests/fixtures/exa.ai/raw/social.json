@@ -1,0 +1,165 @@
+{
+  "domain": "exa.ai",
+  "homepage": "https://exa.ai/",
+  "accounts": [
+    {
+      "platform": "discord",
+      "handle": "HCShtBqbfV",
+      "url": "https://discord.gg/HCShtBqbfV"
+    },
+    {
+      "platform": "github",
+      "handle": "exa-labs",
+      "url": "https://github.com/exa-labs"
+    },
+    {
+      "platform": "linkedin",
+      "handle": "company/exa-ai",
+      "url": "https://www.linkedin.com/company/exa-ai/"
+    },
+    {
+      "platform": "x",
+      "handle": "exaailabs",
+      "url": "https://x.com/exaailabs"
+    }
+  ],
+  "github": {
+    "org": "exa-labs",
+    "repos": 50,
+    "stars": 8545,
+    "top": [
+      {
+        "name": "exa-mcp-server",
+        "url": "https://github.com/exa-labs/exa-mcp-server",
+        "stars": 5151,
+        "pushed": "2026-10-19",
+        "description": "Exa MCP for web search and web crawling!"
+      },
+      {
+        "name": "company-researcher",
+        "url": "https://github.com/exa-labs/company-researcher",
+        "stars": 1517,
+        "pushed": "2026-09-27",
+        "description": "Company Researcher tool helps you instantly understand any company inside out."
+      },
+      {
+        "name": "exa-deepseek-chat",
+        "url": "https://github.com/exa-labs/exa-deepseek-chat",
+        "stars": 728,
+        "pushed": "2025-10-10",
+        "description": "A simple open-source chat app that uses Exa's API for web search and Deepseek R1 for reasoning"
+      },
+      {
+        "name": "exa-hallucination-detector",
+        "url": "https://github.com/exa-labs/exa-hallucination-detector",
+        "stars": 333,
+        "pushed": "2025-11-12",
+        "description": "Hallucination Detector is a free and open-source tool that helps you verify the accuracy of your LLM generated content instantly."
+      },
+      {
+        "name": "exa-py",
+        "url": "https://github.com/exa-labs/exa-py",
+        "stars": 234,
+        "pushed": "2026-10-19",
+        "description": "The Official Exa Python Package"
+      },
+      {
+        "name": "exa-js",
+        "url": "https://github.com/exa-labs/exa-js",
+        "stars": 131,
+        "pushed": "2026-10-19",
+        "description": "The Official Exa Javascript SDK"
+      },
+      {
+        "name": "agent-skills",
+        "url": "https://github.com/exa-labs/agent-skills",
+        "stars": 60,
+        "pushed": "2026-10-19",
+        "description": "Official skills for the Exa API."
+      },
+      {
+        "name": "jfk-files-app",
+        "url": "https://github.com/exa-labs/jfk-files-app",
+        "stars": 44,
+        "pushed": "2025-03-19",
+        "description": "Chat with JFK assassination files using Exa."
+      }
+    ]
+  },
+  "discord": {
+    "invite": "HCShtBqbfV",
+    "name": "Exa",
+    "members": 5115,
+    "online": 340
+  },
+  "hacker_news": {
+    "domain": "exa.ai",
+    "stories": 23,
+    "top": [
+      {
+        "title": "Exa-d: How to store the web in S3",
+        "url": "https://exa.ai/blog/exa-d",
+        "hn_url": "https://news.ycombinator.com/item?id=46611063",
+        "points": 46,
+        "comments": 4,
+        "published": "2026-01-14"
+      },
+      {
+        "title": "Show HN: Exa (YC S21) – embeddings search agent with >20x recall than Google",
+        "url": "https://websets.exa.ai/",
+        "hn_url": "https://news.ycombinator.com/item?id=43175781",
+        "points": 28,
+        "comments": 4,
+        "published": "2025-02-25"
+      },
+      {
+        "title": "Exa, 35 person startup building a new search engine, raises $85M Series B",
+        "url": "https://exa.ai/blog/announcing-series-b",
+        "hn_url": "https://news.ycombinator.com/item?id=45118788",
+        "points": 16,
+        "comments": 10,
+        "published": "2025-09-03"
+      },
+      {
+        "title": "We need superknowledge before superintelligence",
+        "url": "https://exa.ai/blog/superknowledge",
+        "hn_url": "https://news.ycombinator.com/item?id=40948680",
+        "points": 14,
+        "comments": 13,
+        "published": "2024-07-12"
+      },
+      {
+        "title": "Exa.ai: Search Content by Meaning",
+        "url": "https://exa.ai/search?c=all",
+        "hn_url": "https://news.ycombinator.com/item?id=40495342",
+        "points": 7,
+        "comments": 1,
+        "published": "2024-05-27"
+      },
+      {
+        "title": "exa-code: fast, efficient web context for coding agents",
+        "url": "https://exa.ai/blog/exa-code",
+        "hn_url": "https://news.ycombinator.com/item?id=45376018",
+        "points": 5,
+        "comments": 1,
+        "published": "2025-09-25"
+      },
+      {
+        "title": "Exa Websets",
+        "url": "https://exa.ai/websets",
+        "hn_url": "https://news.ycombinator.com/item?id=42315844",
+        "points": 4,
+        "comments": 3,
+        "published": "2024-12-04"
+      },
+      {
+        "title": "ATLAS: Evaluating Agents on Search-Intensive Tasks",
+        "url": "https://exa.ai/blog/atlas-benchmark",
+        "hn_url": "https://news.ycombinator.com/item?id=50008857",
+        "points": 4,
+        "comments": 0,
+        "published": "2026-10-08"
+      }
+    ]
+  }
+}

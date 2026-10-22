@@ -1,0 +1,193 @@
+{
+  "domain": "notion.com",
+  "as_of": "2026-10-20",
+  "robots_url": "https://notion.com/robots.txt",
+  "sitemaps_read": 12,
+  "sitemaps_failed": [],
+  "locales": [
+    "ar",
+    "da",
+    "de",
+    "en-gb",
+    "es",
+    "es-es",
+    "fi",
+    "fr",
+    "he",
+    "id",
+    "it",
+    "ja",
+    "ko",
+    "nb",
+    "nl",
+    "pt",
+    "sv",
+    "th",
+    "vi",
+    "zh-cn",
+    "zh-tw"
+  ],
+  "capped": false,
+  "declared": [
+    "https://www.notion.com/sitemap.xml",
+    "https://sitemaps.notion.com/sitemap-categories.xml",
+    "https://sitemaps.notion.com/sitemap-collections.xml",
+    "https://www.notion.com/sitemap-root.xml",
+    "https://www.notion.com/blog/sitemap.xml",
+    "https://www.notion.com/customers/sitemap.xml",
+    "https://www.notion.com/help/sitemap.xml",
+    "https://www.notion.com/md/sitemap.xml",
+    "https://www.notion.com/releases/sitemap.xml",
+    "https://www.notion.com/use-case/sitemap.xml",
+    "https://www.notion.com/feature/sitemap.xml",
+    "https://www.notion.com/front-static/sitemap.xml"
+  ],
+  "total_urls": 4311,
+  "sections": [
+    {
+      "path": "/templates",
+      "urls": 2780,
+      "updated_90d": 110,
+      "examples": [
+        "https://www.notion.com/templates/category/personal",
+        "https://www.notion.com/templates/category/free-personal-templates"
+      ],
+      "children": [
+        {
+          "path": "/templates/collections",
+          "urls": 2086
+        },
+        {
+          "path": "/templates/category",
+          "urls": 693
+        }
+      ]
+    },
+    {
+      "path": "/blog",
+      "urls": 588,
+      "updated_90d": 19,
+      "examples": [
+        "https://www.notion.com/blog",
+        "https://www.notion.com/blog/notion-ai-more-for-less"
+      ],
+      "children": [
+        {
+          "path": "/blog/topic",
+          "urls": 6
+        }
+      ]
+    },
+    {
+      "path": "/help",
+      "urls": 486,
+      "updated_90d": 359,
+      "examples": [
+        "https://www.notion.com/help",
+        "https://www.notion.com/help/reference"
+      ],
+      "children": []
+    },
+    {
+      "path": "/releases",
+      "urls": 156,
+      "updated_90d": 12,
+      "examples": [
+        "https://www.notion.com/releases",
+        "https://www.notion.com/releases/rss.xml"
+      ],
+      "children": []
+    },
+    {
+      "path": "/customers",
+      "urls": 96,
+      "updated_90d": 17,
+      "examples": [
+        "https://www.notion.com/customers",
+        "https://www.notion.com/customers/remote"
+      ],
+      "children": []
+    },
+    {
+      "path": "/use-case",
+      "urls": 39,
+      "updated_90d": 2,
+      "examples": [
+        "https://www.notion.com/use-case/self-improving-answer-bot",
+        "https://www.notion.com/use-case/data-agents"
+      ],
+      "children": []
+    },
+    {
+      "path": "/product",
+      "urls": 37,
+      "updated_90d": 1,
+      "examples": [
+        "https://www.notion.com/product/ai",
+        "https://www.notion.com/product/ai-meeting-notes"
+      ],
+      "children": []
+    },
+    {
+      "path": "/md",
+      "urls": 22,
+      "updated_90d": 10,
+      "examples": [
+        "https://www.notion.com/md/teams",
+        "https://www.notion.com/md/security"
+      ],
+      "children": []
+    },
+    {
+      "path": "/compare-against",
+      "urls": 9,
+      "updated_90d": 0,
+      "examples": [
+        "https://www.notion.com/compare-against",
+        "https://www.notion.com/compare-against/confluence"
+      ],
+      "children": []
+    },
+    {
+      "path": "/feature",
+      "urls": 9,
+      "updated_90d": 0,
+      "examples": [
+        "https://www.notion.com/feature/enterprise-search/the-hidden-cost-of-ill-find-it-later-and-how-to-cut-it",
+        "https://www.notion.com/feature/enterprise-search/enterprise-search-security-the-complete-guide"
+      ],
+      "children": []
+    },
+    {
+      "path": "/lp",
+      "urls": 8,
+      "updated_90d": 6,
+      "examples": [
+        "https://www.notion.com/lp/notion-vs-airtable",
+        "https://www.notion.com/lp/linkedin-existing"
+      ],
+      "children": []
+    },
+    {
+      "path": "/partners",
+      "urls": 7,
+      "updated_90d": 1,
+      "examples": [
+        "https://www.notion.com/partners/solutions-partner-program",
+        "https://www.notion.com/partners/ai-sales-demo"
+      ],
+      "children": []
+    },
+    {
+      "path": "other",
+      "urls": 74,
+      "updated_90d": 1,
+      "examples": [
+        "https://www.notion.com",
+        "https://www.notion.com/login"
+      ],
+      "children": [],
+      "grouped": 63
+    }
+  ]
+}

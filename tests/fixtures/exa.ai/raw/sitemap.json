@@ -1,0 +1,117 @@
+{
+  "domain": "exa.ai",
+  "as_of": "2026-10-20",
+  "robots_url": "https://exa.ai/robots.txt",
+  "sitemaps_read": 2,
+  "sitemaps_failed": [],
+  "locales": [],
+  "capped": false,
+  "declared": [
+    "https://exa.ai/sitemap.xml",
+    "https://exa.ai/docs/sitemap.xml"
+  ],
+  "total_urls": 379,
+  "sections": [
+    {
+      "path": "/docs",
+      "urls": 163,
+      "updated_90d": 162,
+      "examples": [
+        "https://exa.ai/docs/admin/billing",
+        "https://exa.ai/docs/admin/error-codes"
+      ],
+      "children": []
+    },
+    {
+      "path": "/blog",
+      "urls": 68,
+      "updated_90d": 34,
+      "examples": [
+        "https://exa.ai/blog",
+        "https://exa.ai/blog/exa-3"
+      ],
+      "children": []
+    },
+    {
+      "path": "/integrations",
+      "urls": 56,
+      "updated_90d": 0,
+      "examples": [
+        "https://exa.ai/integrations",
+        "https://exa.ai/integrations/langchain"
+      ],
+      "children": []
+    },
+    {
+      "path": "/library",
+      "urls": 20,
+      "updated_90d": 20,
+      "examples": [
+        "https://exa.ai/library",
+        "https://exa.ai/library/person"
+      ],
+      "children": []
+    },
+    {
+      "path": "/customers",
+      "urls": 15,
+      "updated_90d": 0,
+      "examples": [
+        "https://exa.ai/customers",
+        "https://exa.ai/customers/11x"
+      ],
+      "children": []
+    },
+    {
+      "path": "/versus",
+      "urls": 10,
+      "updated_90d": 1,
+      "examples": [
+        "https://exa.ai/versus",
+        "https://exa.ai/versus/brave"
+      ],
+      "children": []
+    },
+    {
+      "path": "/alternatives",
+      "urls": 9,
+      "updated_90d": 9,
+      "examples": [
+        "https://exa.ai/alternatives/brave-search-api",
+        "https://exa.ai/alternatives/exa"
+      ],
+      "children": []
+    },
+    {
+      "path": "/use-cases",
+      "urls": 5,
+      "updated_90d": 0,
+      "examples": [
+        "https://exa.ai/use-cases/ai-assistants",
+        "https://exa.ai/use-cases/gtm"
+      ],
+      "children": []
+    },
+    {
+      "path": "/webinars",
+      "urls": 5,
+      "updated_90d": 0,
+      "examples": [
+        "https://exa.ai/webinars",
+        "https://exa.ai/webinars/rl-search-outcomes"
+      ],
+      "children": []
+    },
+    {
+      "path": "other",
+      "urls": 28,
+      "updated_90d": 1,
+      "examples": [
+        "https://exa.ai/",
+        "https://exa.ai/mcp"
+      ],
+      "children": [],
+      "grouped": 22
+    }
+  ]
+}

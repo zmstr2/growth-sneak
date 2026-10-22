@@ -1,0 +1,411 @@
+{
+  "company": {
+    "name": "Exa",
+    "domain": "exa.ai",
+    "one_liner": "Search API for AI agents that need real-time web data."
+  },
+  "summary": {
+    "text": "Exa grows as a developer platform. A free API tier, an MCP server and SDKs get developers building, and it rides other platforms people already use: Vercel, Codex, ChatGPT and Firefox. It ships something every week or two and announces each launch on X and LinkedIn, where the CEO's posts draw the biggest numbers. Search ads and comparison pages catch people already shopping for a search API.",
+    "evidence_ids": [
+      "E009",
+      "E019",
+      "E024",
+      "E015",
+      "E016",
+      "E017",
+      "E004",
+      "E012"
+    ]
+  },
+  "channels": [
+    {
+      "channel": "founder_social",
+      "strength": "heavy",
+      "read": "The CEO's X posts get the biggest numbers of any account we sampled; his $100m revenue post drew about 40 times his usual engagement.",
+      "activity": "X: 9 posts in 2 weeks sampled · LinkedIn: 11.5k followers",
+      "evidence_ids": [
+        "E016",
+        "E018",
+        "E031"
+      ]
+    },
+    {
+      "channel": "open_source",
+      "strength": "heavy",
+      "read": "50 public repos with 8,545 stars. The MCP server and two demo apps built on the API carry most of them.",
+      "activity": "4 of the top repos pushed this month",
+      "evidence_ids": [
+        "E019"
+      ]
+    },
+    {
+      "channel": "partnerships",
+      "strength": "heavy",
+      "read": "Three platform launches in two months put Exa inside tools developers already use: Vercel, Codex and ChatGPT, and Firefox.",
+      "activity": "3 partnership launches since 18 Aug",
+      "evidence_ids": [
+        "E024"
+      ]
+    },
+    {
+      "channel": "social",
+      "strength": "active",
+      "read": "The company announces launches as X threads and LinkedIn posts every few days. The Exa 3.0 launch thread drew about 35 times the account's usual engagement on X.",
+      "activity": "LinkedIn: 14 posts in 9 weeks",
+      "evidence_ids": [
+        "E015",
+        "E017"
+      ]
+    },
+    {
+      "channel": "google_ads",
+      "strength": "active",
+      "read": "A steady search-ad program: 22 ads running now, all started in October, replacing ads that ran for most of a year.",
+      "activity": "52 listed · 22 running · 22 started in Oct",
+      "evidence_ids": [
+        "E001",
+        "E002",
+        "E003"
+      ]
+    },
+    {
+      "channel": "comparison",
+      "strength": "active",
+      "read": "10 \"versus\" and 9 \"alternatives\" pages, with every alternatives page refreshed in the last 90 days.",
+      "evidence_ids": [
+        "E012"
+      ]
+    },
+    {
+      "channel": "seo_content",
+      "strength": "active",
+      "read": "A docs-heavy site: 163 docs pages, 68 blog pages and a data library. Half the blog was updated in the last 90 days.",
+      "evidence_ids": [
+        "E011"
+      ]
+    },
+    {
+      "channel": "pricing_signup",
+      "strength": "active",
+      "read": "One button on the homepage, \"Try API for free\", straight into the dashboard with $10 of free credits a month.",
+      "evidence_ids": [
+        "E010",
+        "E009"
+      ]
+    },
+    {
+      "channel": "events",
+      "strength": "active",
+      "read": "Four webinars and meetups since mid-August, three of them between 30 Sep and 15 Oct, mostly co-hosted with another company (Crunchbase, Aaru, Gemini).",
+      "evidence_ids": [
+        "E023"
+      ]
+    },
+    {
+      "channel": "community",
+      "strength": "active",
+      "read": "A 5,115-member Discord; Hacker News attention is modest.",
+      "evidence_ids": [
+        "E020",
+        "E021"
+      ]
+    },
+    {
+      "channel": "integrations",
+      "strength": "active",
+      "read": "56 integration pages.",
+      "evidence_ids": [
+        "E013"
+      ]
+    },
+    {
+      "channel": "ai_search",
+      "strength": "active",
+      "read": "An llms.txt and open access for every AI crawler.",
+      "evidence_ids": [
+        "E014"
+      ]
+    },
+    {
+      "channel": "linkedin_ads",
+      "strength": "light",
+      "read": "At least one launch post was promoted as a paid LinkedIn post.",
+      "evidence_ids": [
+        "E007"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "text": "Launches travel through every owned channel at once: an X thread, a LinkedIn post, a blog post and, for the biggest launch, a paid LinkedIn boost.",
+      "evidence_ids": [
+        "E015",
+        "E017",
+        "E011",
+        "E007"
+      ]
+    }
+  ],
+  "notable_plays": [
+    {
+      "text": "Open-source demo apps double as marketing: a company-research tool and a DeepSeek chat app built on the API have 1,517 and 728 stars.",
+      "evidence_ids": [
+        "E019"
+      ]
+    },
+    {
+      "text": "The site identifies who visits: RB2B and Common Room name visiting companies, Default routes inbound leads, and Tolt runs an affiliate program.",
+      "evidence_ids": [
+        "E026",
+        "E025"
+      ]
+    },
+    {
+      "text": "Search ads go after buyers outside the core developer audience too, such as people searching for a people or phone-number lookup API.",
+      "evidence_ids": [
+        "E004"
+      ]
+    }
+  ],
+  "messaging": [
+    {
+      "theme": "Built for AI agents, not people",
+      "read": "The core pitch: Exa is search designed for software to use.",
+      "evidence_ids": [
+        "E010",
+        "E004",
+        "E018"
+      ],
+      "examples": [
+        {
+          "quote": "The world's data for AI agents",
+          "where": "site",
+          "url": "https://exa.ai/"
+        },
+        {
+          "quote": "An API, Not a Search Engine - Deep Search API for LLMs",
+          "where": "google_ads",
+          "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR04769995394811691009?region=anywhere"
+        },
+        {
+          "quote": "Agents don't search like humans.",
+          "where": "x",
+          "url": "https://x.com/WilliamBryk/status/2110058915589464192"
+        }
+      ]
+    },
+    {
+      "theme": "Benchmarks and research as proof",
+      "read": "Claims are backed with their own benchmarks and research posts rather than customer quotes.",
+      "evidence_ids": [
+        "E015",
+        "E016",
+        "E017"
+      ],
+      "examples": [
+        {
+          "quote": "Exa is now #1 on every benchmark we tested",
+          "where": "x",
+          "url": "https://x.com/ExaAILabs/status/2112218730952601719"
+        },
+        {
+          "quote": "ATLAS is the hardest search eval in the world.",
+          "where": "x",
+          "url": "https://x.com/WilliamBryk/status/2108306578076299726"
+        },
+        {
+          "quote": "We built a time machine for the web.",
+          "where": "linkedin",
+          "url": "https://www.linkedin.com/posts/exa-ai_introducing-exa-snapshot-a-new-way-to-search-activity-7506401688518311937-uUtC"
+        }
+      ]
+    },
+    {
+      "theme": "Cheaper and more efficient",
+      "read": "Price and token efficiency are pushed hard, with a concrete number each time.",
+      "evidence_ids": [
+        "E004",
+        "E015"
+      ],
+      "examples": [
+        {
+          "quote": "Semantic search across 100B documents. Fast, auto and deep modes. From $4/1k.",
+          "where": "google_ads",
+          "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR04769995394811691009?region=anywhere"
+        },
+        {
+          "quote": "We're also launching Exa Lite, our new search type at $4/1k, built for cost-sensitive apps.",
+          "where": "x",
+          "url": "https://x.com/ExaAILabs/status/2112218738011652336"
+        },
+        {
+          "quote": "using 95% fewer tokens than full text",
+          "where": "x",
+          "url": "https://x.com/ExaAILabs/status/2112218761877230051"
+        }
+      ]
+    },
+    {
+      "theme": "Social proof from AI leaders and scale",
+      "read": "Customer logos and growth numbers stand in for testimonials.",
+      "evidence_ids": [
+        "E005",
+        "E018"
+      ],
+      "examples": [
+        {
+          "quote": "Used in production at Cursor, Cognition, HubSpot and monday.com.",
+          "where": "google_ads",
+          "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR05207196402387517441?region=anywhere"
+        },
+        {
+          "quote": "Exa just passed $100m in annualized revenue.",
+          "where": "x",
+          "url": "https://x.com/WilliamBryk/status/2110058915589464192"
+        }
+      ]
+    },
+    {
+      "theme": "Data for sales and GTM teams",
+      "read": "A second audience beyond developers: teams building lead lists and enriching contacts.",
+      "evidence_ids": [
+        "E004",
+        "E023"
+      ],
+      "examples": [
+        {
+          "quote": "People Search API - Phone Number Lookup API",
+          "where": "google_ads",
+          "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR14927447991626235905?region=anywhere"
+        },
+        {
+          "quote": "50+ sources for leads in one tool",
+          "where": "google_ads",
+          "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR00491889874127814657?region=anywhere"
+        },
+        {
+          "quote": "Bring your toughest GTM challenges and the team will solve them live on stage!",
+          "where": "linkedin",
+          "url": "https://www.linkedin.com/posts/exa-ai_join-us-in-sf-on-wednesday-october-7th-along-activity-7512934370291163136-5gOk"
+        }
+      ]
+    }
+  ],
+  "timeline": [
+    {
+      "date": "2026-10-19",
+      "kind": "launch",
+      "text": "Exa 3.0 and Exa Lite ($4 per 1,000 searches)",
+      "evidence_ids": [
+        "E015"
+      ]
+    },
+    {
+      "date": "2026-10-13",
+      "kind": "milestone",
+      "text": "CEO announces $100m in annualized revenue",
+      "evidence_ids": [
+        "E018"
+      ]
+    },
+    {
+      "date": "2026-10-12",
+      "kind": "campaign",
+      "text": "Second batch of new Google search ads (12-15 Oct), after one on 1 Oct",
+      "evidence_ids": [
+        "E003"
+      ]
+    },
+    {
+      "date": "2026-10-09",
+      "kind": "content",
+      "text": "Interview with 3Blue1Brown",
+      "evidence_ids": [
+        "E028"
+      ]
+    },
+    {
+      "date": "2026-10-08",
+      "kind": "research",
+      "text": "ATLAS search benchmark",
+      "evidence_ids": [
+        "E017"
+      ]
+    },
+    {
+      "date": "2026-10-06",
+      "kind": "launch",
+      "text": "211 million places added to the index",
+      "evidence_ids": [
+        "E017"
+      ]
+    },
+    {
+      "date": "2026-10-01",
+      "kind": "event",
+      "text": "Arrived at OpenAI DevDay in a DeLorean to promote Snapshot",
+      "evidence_ids": [
+        "E017"
+      ]
+    },
+    {
+      "date": "2026-09-25",
+      "kind": "launch",
+      "text": "Agent Ultra",
+      "evidence_ids": [
+        "E017"
+      ]
+    },
+    {
+      "date": "2026-09-17",
+      "kind": "launch",
+      "text": "Exa Snapshot, boosted as a paid LinkedIn post",
+      "evidence_ids": [
+        "E007"
+      ]
+    },
+    {
+      "date": "2026-08-26",
+      "kind": "partnership",
+      "text": "Exa on Vercel (marketplace and AI Gateway)",
+      "evidence_ids": [
+        "E024"
+      ]
+    },
+    {
+      "date": "2026-08-20",
+      "kind": "partnership",
+      "text": "Exa plugin in Codex and ChatGPT",
+      "evidence_ids": [
+        "E024"
+      ]
+    },
+    {
+      "date": "2026-08-18",
+      "kind": "partnership",
+      "text": "Firefox partnership",
+      "evidence_ids": [
+        "E024"
+      ]
+    }
+  ],
+  "not_doing": [],
+  "couldnt_see": [
+    {
+      "text": "Meta and TikTok ads.",
+      "evidence_ids": [
+        "E006",
+        "E008"
+      ]
+    },
+    {
+      "text": "Reddit (search was blocked), YouTube and review sites.",
+      "evidence_ids": [
+        "E022",
+        "E029",
+        "E030"
+      ]
+    }
+  ],
+  "recent_changes": []
+}

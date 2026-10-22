@@ -1,0 +1,21 @@
+{
+  "_note": "Real Upspring responses for mudwtr.com (advertisers/by-domain 100 credits, ads/browse 50 credits), trimmed to the fields Growth Sneak uses. Captured 2026-10-21.",
+  "meta_ads": {
+    "source": "Upspring",
+    "advertiser": { "id": "172538983355501", "name": "MUD\\WTR" },
+    "active_ads": 226,
+    "as_of": "2026-10-19",
+    "spend": { "grade": "A", "floor": "≥ $400K/mo", "estimated": true },
+    "creative_mix": {
+      "media": [{ "label": "Video", "share": 0.872 }, { "label": "Image", "share": 0.128 }],
+      "funnel": [{ "label": "Consideration", "share": 0.566 }, { "label": "Awareness", "share": 0.296 }, { "label": "Conversion", "share": 0.138 }],
+      "mechanisms": [{ "label": "Contrarian truth reveal", "share": 0.37 }, { "label": "Anti-category defection", "share": 0.143 }]
+    },
+    "ads": [
+      { "id": "85d438a915b0", "media_type": "video", "is_active": true, "started_at": "2026-10-09", "one_line": "A video promotes mushroom coffee alternative starter kit.", "hook_text": "FREE bag of Pumpkin Spice Latte!?", "impressions": 5, "url": "https://www.facebook.com/ads/library/?id=1504486961489556", "thumbnail_url": "https://storage.googleapis.com/the-core-assets/the-core/assets/f1ce68de457e/thumb_480.webp", "width": 320, "height": 568 },
+      { "id": "e790aee571ff", "media_type": "video", "is_active": true, "started_at": "2026-10-02", "one_line": "A video promotes mushroom coffee as a caffeine alternative.", "hook_text": "Brought to you by Fix Your Fix.", "impressions": 5, "url": "https://www.facebook.com/ads/library/?id=1596106018959156", "thumbnail_url": "https://storage.googleapis.com/the-core-assets/the-core/assets/b516810bfffe/thumb_480.webp", "width": 608, "height": 1080 },
+      { "id": "9c38463aceb2", "media_type": "video", "is_active": true, "started_at": "2026-09-27", "one_line": "A presenter discusses MUD/WTR beverage.", "hook_text": "Whenever you find yourself on the side of the majority, it is time to pause and reflect.", "impressions": 5, "url": "https://www.facebook.com/ads/library/?id=2600209570416491", "thumbnail_url": "https://storage.googleapis.com/the-core-assets/the-core/assets/9aa467418873/thumb_480.webp", "width": 1080, "height": 1920 },
+      { "id": "41f6a58908bc", "media_type": "video", "is_active": true, "started_at": "2026-09-25", "one_line": "A presenter discusses mushroom powder.", "hook_text": "Do mushrooms freak you out? These won't.", "impressions": 5, "url": "https://www.facebook.com/ads/library/?id=1507779244703679", "thumbnail_url": "https://storage.googleapis.com/the-core-assets/the-core/assets/f7c3716ee578/thumb_480.webp", "width": 1080, "height": 1920 }
+    ]
+  }
+}

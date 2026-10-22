@@ -1,0 +1,12 @@
+node_modules/
+reports/
+# generated output
+tests/fixtures/*/report.html
+.DS_Store
+.env
+*.env
+.typesafe*
+
+# working notes, not part of the published plugin
+docs/design-log.md
+.impeccable/

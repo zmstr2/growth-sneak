@@ -1,0 +1,1744 @@
+{
+  "domain": "exa.ai",
+  "captured_at": "2026-10-20T19:00:00Z",
+  "note": "SAMPLE RUN on exa.ai. X posts are a 10-post sample per account and LinkedIn posts come from search, not a full export. Reddit was blocked; Meta, TikTok, YouTube and reviews were not collected.",
+  "sources": {
+    "firecrawl": "connected",
+    "exa": "connected",
+    "jev": "missing",
+    "clay": "missing",
+    "apify": "missing"
+  },
+  "cost": {
+    "firecrawl_credits": 76,
+    "note": "ads 5, pricing 5, homepage 5, X samples 60, docs 1; sitemaps, robots.txt, GitHub, Discord and Hacker News are free"
+  },
+  "items": [
+    {
+      "id": "E001",
+      "collector": "paid",
+      "channel": "google_ads",
+      "status": "observed",
+      "finding": "Google's Ads Transparency Center lists 52 ads for exa.ai (all regions).",
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857?region=anywhere",
+      "captured_at": "2026-10-20T19:00:00Z"
+    },
+    {
+      "id": "E002",
+      "collector": "paid",
+      "channel": "google_ads",
+      "status": "observed",
+      "finding": "Of the 40 most recently shown ads, 22 are running now; 38 are search (text) ads and 2 are image ads.",
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857?region=anywhere",
+      "captured_at": "2026-10-20T19:00:00Z"
+    },
+    {
+      "id": "E003",
+      "collector": "paid",
+      "channel": "google_ads",
+      "status": "observed",
+      "finding": "4 search ads ran 274-321 days from mid-2025 until about 1 Oct 2026, when a new batch began: 22 ads started between 1 and 15 Oct 2026.",
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857?region=anywhere",
+      "captured_at": "2026-10-20T19:00:00Z"
+    },
+    {
+      "id": "E004",
+      "collector": "paid",
+      "channel": "google_ads",
+      "status": "observed",
+      "finding": "Search-ad headlines target category and use-case searches: \"AI Search Engine\", \"Web Search API for LLMs\", \"People Search API - Phone Number Lookup API\", \"Deep Research API\" and \"An API, Not a Search Engine ... From $4/1k\". One carries an \"Exa vs Brave vs Perplexity\" sitelink.",
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR14246313801078013953?region=anywhere",
+      "captured_at": "2026-10-20T19:00:00Z"
+    },
+    {
+      "id": "E005",
+      "collector": "paid",
+      "channel": "google_ads",
+      "status": "observed",
+      "finding": "A brand search ad (\"Exa Official Site - Exa Pricing and Plans\") says the API is \"Used in production at Cursor, Cognition, HubSpot and monday.com\".",
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR05207196402387517441?region=anywhere",
+      "captured_at": "2026-10-20T19:00:00Z"
+    },
+    {
+      "id": "E006",
+      "collector": "paid",
+      "channel": "meta_ads",
+      "status": "couldnt_check",
+      "finding": "Meta ad data was not collected in this run. Use the library link to look.",
+      "url": "https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=ALL&q=exa&search_type=keyword_unordered",
+      "captured_at": "2026-10-20T19:00:00Z"
+    },
+    {
+      "id": "E007",
+      "collector": "paid",
+      "channel": "linkedin_ads",
+      "status": "observed",
+      "finding": "The Exa Snapshot launch post on LinkedIn (17 Sep) links with utm_medium=paid and a \"Multiply-ThoughtLeadership\" campaign tag, so it was promoted as a paid post.",
+      "url": "https://www.linkedin.com/posts/exa-ai_introducing-exa-snapshot-a-new-way-to-search-activity-7506401688518311937-uUtC",
+      "captured_at": "2026-10-20T19:00:00Z"
+    },
+    {
+      "id": "E008",
+      "collector": "paid",
+      "channel": "tiktok_ads",
+      "status": "couldnt_check",
+      "finding": "TikTok ads are link-only: the library mostly covers EU delivery, so we did not look.",
+      "url": "https://library.tiktok.com/ads?region=all&adv_name=exa",
+      "captured_at": "2026-10-20T19:00:00Z"
+    },
+    {
+      "id": "E009",
+      "collector": "owned",
+      "channel": "pricing_signup",
+      "status": "observed",
+      "finding": "Three plans: Starter (free, $10 of credits a month), Developer (pay as you go) and Enterprise (custom, \"Talk to sales\"). Search is priced from $4 per 1,000 requests.",
+      "url": "https://exa.ai/pricing",
+      "captured_at": "2026-10-20T19:00:00Z",
+      "image": "assets/pricing.jpg",
+      "funnel_step": "pricing"
+    },
+    {
+      "id": "E010",
+      "collector": "owned",
+      "channel": "pricing_signup",
+      "status": "observed",
+      "finding": "Headline \"The world's data for AI agents\" with one main button, \"Try API for free\", which goes straight to the dashboard.",
+      "url": "https://exa.ai/",
+      "captured_at": "2026-10-20T19:00:00Z",
+      "image": "assets/home.jpg",
+      "funnel_step": "home"
+    },
+    {
+      "id": "E011",
+      "collector": "owned",
+      "channel": "seo_content",
+      "status": "observed",
+      "finding": "The sitemaps list 379 pages: 163 docs pages, 68 blog pages (34 updated in the last 90 days) and a 20-page data library.",
+      "url": "https://exa.ai/sitemap.xml",
+      "captured_at": "2026-10-20T19:00:00Z"
+    },
+    {
+      "id": "E012",
+      "collector": "owned",
+      "channel": "comparison",
+      "status": "observed",
+      "finding": "10 \"versus\" pages and 9 \"alternatives\" pages (for example Brave Search API alternatives); 9 of the 9 alternatives pages were updated in the last 90 days.",
+      "url": "https://exa.ai/alternatives/brave-search-api",
+      "captured_at": "2026-10-20T19:00:00Z"
+    },
+    {
+      "id": "E013",
+      "collector": "owned",
+      "channel": "integrations",
+      "status": "observed",
+      "finding": "56 integration pages in the sitemap.",
+      "url": "https://exa.ai/integrations",
+      "captured_at": "2026-10-20T19:00:00Z"
+    },
+    {
+      "id": "E014",
+      "collector": "owned",
+      "channel": "ai_search",
+      "status": "observed",
+      "finding": "Publishes an llms.txt (185 lines) and lets every major AI crawler in, including Meta's and Amazon's. Homepage structured data: Organization, WebAPI, WebPage.",
+      "url": "https://exa.ai/llms.txt",
+      "captured_at": "2026-10-20T19:00:00Z"
+    },
+    {
+      "id": "E015",
+      "collector": "earned",
+      "channel": "social",
+      "status": "observed",
+      "finding": "A 10-post sample of @ExaAILabs on X (8-19 Oct 2026), with likes, reposts and replies.",
+      "url": "https://x.com/ExaAILabs",
+      "captured_at": "2026-10-20T19:00:00Z"
+    },
+    {
+      "id": "E016",
+      "collector": "earned",
+      "channel": "founder_social",
+      "status": "observed",
+      "finding": "A 9-post sample of CEO Will Bryk (@WilliamBryk) on X (6-19 Oct 2026), with likes, reposts and replies.",
+      "url": "https://x.com/WilliamBryk",
+      "captured_at": "2026-10-20T19:00:00Z"
+    },
+    {
+      "id": "E017",
+      "collector": "earned",
+      "channel": "social",
+      "status": "observed",
+      "finding": "14 LinkedIn posts from the Exa company page (14 Aug - 12 Oct 2026) with reaction counts, found through Exa search.",
+      "url": "https://www.linkedin.com/company/exa-ai/",
+      "captured_at": "2026-10-20T19:00:00Z"
+    },
+    {
+      "id": "E018",
+      "collector": "earned",
+      "channel": "founder_social",
+      "status": "stated",
+      "finding": "The CEO says Exa \"just passed $100m in annualized revenue\", has \"grown almost exactly 10x per year for 3 years\" and handles \"2 billion requests a month from 200k+ teams\".",
+      "url": "https://x.com/WilliamBryk/status/2110058915589464192",
+      "captured_at": "2026-10-20T19:00:00Z"
+    },
+    {
+      "id": "E019",
+      "collector": "earned",
+      "channel": "open_source",
+      "status": "observed",
+      "finding": "GitHub org exa-labs: 50 public repos with 8,545 stars; exa-mcp-server has 5,151 and company-researcher has 1,517.",
+      "url": "https://github.com/exa-labs",
+      "captured_at": "2026-10-20T19:00:00Z"
+    },
+    {
+      "id": "E020",
+      "collector": "earned",
+      "channel": "community",
+      "status": "observed",
+      "finding": "Discord server \"Exa\" has 5,115 members (340 online when checked).",
+      "url": "https://discord.gg/HCShtBqbfV",
+      "captured_at": "2026-10-20T19:00:00Z"
+    },
+    {
+      "id": "E021",
+      "collector": "earned",
+      "channel": "community",
+      "status": "observed",
+      "finding": "23 Hacker News stories link to exa.ai; the highest scored 46 points (\"Exa-d: How to store the web in S3\").",
+      "url": "https://news.ycombinator.com/item?id=46611063",
+      "captured_at": "2026-10-20T19:00:00Z"
+    },
+    {
+      "id": "E022",
+      "collector": "earned",
+      "channel": "community",
+      "status": "couldnt_check",
+      "finding": "Reddit search was blocked (HTTP 403), so Reddit activity is unknown.",
+      "url": "https://www.reddit.com/search/?q=exa.ai",
+      "captured_at": "2026-10-20T19:00:00Z"
+    },
+    {
+      "id": "E023",
+      "collector": "earned",
+      "channel": "events",
+      "status": "observed",
+      "finding": "LinkedIn promotes a steady run of events: a Crunchbase webinar (12 Oct), a \"GTM On the Edge\" meetup in SF (7 Oct), an Aaru webinar (1 Oct) and a Gemini hack lab (Aug). The sitemap has 5 webinar pages.",
+      "url": "https://www.linkedin.com/posts/exa-ai_want-to-predict-who-will-raise-funding-next-activity-7515442005867446274-fI0O",
+      "captured_at": "2026-10-20T19:00:00Z"
+    },
+    {
+      "id": "E024",
+      "collector": "earned",
+      "channel": "partnerships",
+      "status": "observed",
+      "finding": "Partnership launches on LinkedIn: Vercel marketplace and AI Gateway (26 Aug), an Exa plugin in Codex and ChatGPT (20 Aug), and Firefox's AI window (18 Aug). The pricing page lists an MCP server, a Claude Connector and a ChatGPT plugin.",
+      "url": "https://www.linkedin.com/posts/exa-ai_exa-is-now-officially-on-vercel-were-proud-activity-7498424810838966273-W3n7",
+      "captured_at": "2026-10-20T19:00:00Z"
+    },
+    {
+      "id": "E025",
+      "collector": "earned",
+      "channel": "referral",
+      "status": "observed",
+      "finding": "The homepage loads Tolt, an affiliate and referral platform.",
+      "url": "https://exa.ai/",
+      "captured_at": "2026-10-20T19:00:00Z"
+    },
+    {
+      "id": "E026",
+      "collector": "company",
+      "channel": "martech",
+      "status": "observed",
+      "finding": "A rendered visit of the homepage loaded LinkedIn Insight Tag, Reddit Pixel, X (Twitter) Pixel, Common Room, RB2B, Google tag, Google Tag Manager, HubSpot, Tolt, Default, Sanity.",
+      "url": "https://exa.ai/",
+      "captured_at": "2026-10-20T19:00:00Z"
+    },
+    {
+      "id": "E027",
+      "collector": "company",
+      "channel": "hiring",
+      "status": "observed",
+      "finding": "Hiring posts on LinkedIn (Head of Security, 3 Sep) and from staff (\"Product team at Exa is hiring\", 14 Oct).",
+      "url": "https://www.linkedin.com/posts/exa-ai_were-hiring-a-head-of-security-at-exa-activity-7501364819930046464-LYks",
+      "captured_at": "2026-10-20T19:00:00Z"
+    },
+    {
+      "id": "E028",
+      "collector": "earned",
+      "channel": "press_podcasts",
+      "status": "observed",
+      "finding": "Exa promoted an interview with 3Blue1Brown on its research vision (9 Oct).",
+      "url": "https://x.com/ExaAILabs/status/2108597265317450154",
+      "captured_at": "2026-10-20T19:00:00Z"
+    },
+    {
+      "id": "E029",
+      "collector": "earned",
+      "channel": "video",
+      "status": "couldnt_check",
+      "finding": "YouTube was not collected in this run.",
+      "url": "https://exa.ai/",
+      "captured_at": "2026-10-20T19:00:00Z"
+    },
+    {
+      "id": "E030",
+      "collector": "earned",
+      "channel": "reviews",
+      "status": "couldnt_check",
+      "finding": "Review sites were not collected in this run.",
+      "url": "https://exa.ai/",
+      "captured_at": "2026-10-20T19:00:00Z"
+    },
+    {
+      "id": "E031",
+      "collector": "earned",
+      "channel": "founder_social",
+      "status": "observed",
+      "finding": "Will Bryk's LinkedIn profile shows 11,547 followers.",
+      "url": "https://www.linkedin.com/in/william-bryk",
+      "captured_at": "2026-10-20T19:00:00Z"
+    }
+  ],
+  "ads": [
+    {
+      "id": "AD001",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 8,
+      "first_shown": "2026-10-12",
+      "last_shown": "2026-10-20",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/12213449700824397029",
+      "width": 364,
+      "height": 233,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR05207196402387517441?region=anywhere",
+      "headline": "Exa Official Site - Exa Pricing and Plans - The World's Data for AI"
+    },
+    {
+      "id": "AD002",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 5,
+      "first_shown": "2026-10-15",
+      "last_shown": "2026-10-20",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/16235185773347886515",
+      "width": 364,
+      "height": 213,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR12180661984580075521?region=anywhere",
+      "headline": "Deep Research API - One API, Full Research Loop"
+    },
+    {
+      "id": "AD003",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 19,
+      "first_shown": "2026-10-01",
+      "last_shown": "2026-10-20",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/12817324950978413230",
+      "width": 348,
+      "height": 347,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR09027842628502159361?region=anywhere",
+      "headline": "Deep Research API"
+    },
+    {
+      "id": "AD004",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 8,
+      "first_shown": "2026-10-12",
+      "last_shown": "2026-10-20",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/15353894857311060680",
+      "width": 348,
+      "height": 180,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR04769995394811691009?region=anywhere",
+      "headline": "An API, Not a Search Engine - Deep Search API for LLMs"
+    },
+    {
+      "id": "AD005",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 19,
+      "first_shown": "2026-10-01",
+      "last_shown": "2026-10-20",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/16548195619122876460",
+      "width": 348,
+      "height": 130,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR07268735624490778625?region=anywhere"
+    },
+    {
+      "id": "AD006",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 8,
+      "first_shown": "2026-10-12",
+      "last_shown": "2026-10-20",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/15748304818374996168",
+      "width": 360,
+      "height": 253,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR16252723089257791489?region=anywhere"
+    },
+    {
+      "id": "AD007",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 8,
+      "first_shown": "2026-10-12",
+      "last_shown": "2026-10-20",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/12795356856125560522",
+      "width": 348,
+      "height": 341,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR01722366865918918657?region=anywhere"
+    },
+    {
+      "id": "AD008",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 8,
+      "first_shown": "2026-10-12",
+      "last_shown": "2026-10-20",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/3839293928863940999",
+      "width": 348,
+      "height": 134,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR03676937900290736129?region=anywhere"
+    },
+    {
+      "id": "AD009",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 19,
+      "first_shown": "2026-10-01",
+      "last_shown": "2026-10-20",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/5467743384005190050",
+      "width": 348,
+      "height": 240,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR07782326301917970433?region=anywhere"
+    },
+    {
+      "id": "AD010",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 19,
+      "first_shown": "2026-10-01",
+      "last_shown": "2026-10-20",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/11852186235601260926",
+      "width": 364,
+      "height": 213,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR17227208700083568641?region=anywhere"
+    },
+    {
+      "id": "AD011",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 19,
+      "first_shown": "2026-10-01",
+      "last_shown": "2026-10-20",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/13452386588258600310",
+      "width": 348,
+      "height": 483,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR10710791959615635457?region=anywhere"
+    },
+    {
+      "id": "AD012",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 19,
+      "first_shown": "2026-10-01",
+      "last_shown": "2026-10-20",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/16207425437768230400",
+      "width": 364,
+      "height": 207,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR11429806593483472897?region=anywhere"
+    },
+    {
+      "id": "AD013",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 8,
+      "first_shown": "2026-10-12",
+      "last_shown": "2026-10-20",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/5568413641395471582",
+      "width": 348,
+      "height": 160,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR08402973128006828033?region=anywhere"
+    },
+    {
+      "id": "AD014",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 19,
+      "first_shown": "2026-10-01",
+      "last_shown": "2026-10-20",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/17270638736805267167",
+      "width": 348,
+      "height": 378,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR09928854474313433089?region=anywhere"
+    },
+    {
+      "id": "AD015",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 19,
+      "first_shown": "2026-10-01",
+      "last_shown": "2026-10-20",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/11930950486406469197",
+      "width": 348,
+      "height": 130,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR08774626749892788225?region=anywhere"
+    },
+    {
+      "id": "AD016",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 8,
+      "first_shown": "2026-10-13",
+      "last_shown": "2026-10-20",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/4717662758257161759",
+      "width": 348,
+      "height": 134,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR18137162873963544577?region=anywhere"
+    },
+    {
+      "id": "AD017",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 8,
+      "first_shown": "2026-10-13",
+      "last_shown": "2026-10-20",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/14179224858780448165",
+      "width": 348,
+      "height": 468,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR07314669921764376577?region=anywhere"
+    },
+    {
+      "id": "AD018",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 8,
+      "first_shown": "2026-10-13",
+      "last_shown": "2026-10-20",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/3134711309294601285",
+      "width": 348,
+      "height": 134,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR04314540295191527425?region=anywhere"
+    },
+    {
+      "id": "AD019",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 19,
+      "first_shown": "2026-10-01",
+      "last_shown": "2026-10-20",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/1007420867746305149",
+      "width": 348,
+      "height": 266,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR17827605270767861761?region=anywhere"
+    },
+    {
+      "id": "AD020",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 8,
+      "first_shown": "2026-10-13",
+      "last_shown": "2026-10-20",
+      "image_url": null,
+      "width": null,
+      "height": null,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR04286799616822738945?region=anywhere"
+    },
+    {
+      "id": "AD021",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 8,
+      "first_shown": "2026-10-13",
+      "last_shown": "2026-10-19",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/7826414821189068322",
+      "width": 348,
+      "height": 134,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR12434248948363821057?region=anywhere"
+    },
+    {
+      "id": "AD022",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 19,
+      "first_shown": "2026-10-01",
+      "last_shown": "2026-10-19",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/5124729012118014262",
+      "width": 348,
+      "height": 246,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR00549614019837689857?region=anywhere"
+    },
+    {
+      "id": "AD023",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 35,
+      "first_shown": "2026-08-29",
+      "last_shown": "2026-10-01",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/13531725712697227286",
+      "width": 364,
+      "height": 207,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR11993030222220886017?region=anywhere"
+    },
+    {
+      "id": "AD024",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 34,
+      "first_shown": "2026-08-29",
+      "last_shown": "2026-10-01",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/4415093677386125178",
+      "width": 364,
+      "height": 213,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR06998245215618203649?region=anywhere"
+    },
+    {
+      "id": "AD025",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 35,
+      "first_shown": "2026-08-29",
+      "last_shown": "2026-10-01",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/5457016567940682206",
+      "width": 348,
+      "height": 180,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR04491250952149401601?region=anywhere"
+    },
+    {
+      "id": "AD026",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 34,
+      "first_shown": "2026-08-29",
+      "last_shown": "2026-10-01",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/16718091162248477406",
+      "width": 348,
+      "height": 134,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR03577869050769833985?region=anywhere"
+    },
+    {
+      "id": "AD027",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 35,
+      "first_shown": "2026-08-29",
+      "last_shown": "2026-10-01",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/9121947743853722659",
+      "width": 348,
+      "height": 370,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR06605712967432404993?region=anywhere"
+    },
+    {
+      "id": "AD028",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 317,
+      "first_shown": "2025-07-30",
+      "last_shown": "2026-10-01",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/12457373142807659404",
+      "width": 348,
+      "height": 431,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR04273362562529099777?region=anywhere",
+      "headline": "AI-Powered Search API - Faster Web Crawling API (sitelink: Exa vs Brave vs Perplexity)"
+    },
+    {
+      "id": "AD029",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 321,
+      "first_shown": "2025-07-29",
+      "last_shown": "2026-10-01",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/15845568189462724410",
+      "width": 348,
+      "height": 451,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR14246313801078013953?region=anywhere",
+      "headline": "AI Search Engine - AI-Powered Web Search"
+    },
+    {
+      "id": "AD030",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 35,
+      "first_shown": "2026-08-29",
+      "last_shown": "2026-10-01",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/14002705887044016630",
+      "width": 348,
+      "height": 410,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR03918913471529353217?region=anywhere"
+    },
+    {
+      "id": "AD031",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 308,
+      "first_shown": "2025-08-10",
+      "last_shown": "2026-09-30",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/1500311092202207551",
+      "width": 381,
+      "height": 306,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR14927447991626235905?region=anywhere",
+      "headline": "People Search API - Phone Number Lookup API"
+    },
+    {
+      "id": "AD032",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 274,
+      "first_shown": "2025-07-30",
+      "last_shown": "2026-08-29",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/11122517389632241563",
+      "width": 400,
+      "height": 400,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR12605594581283635201?region=anywhere",
+      "headline": "Web Search API for LLMs - LLM Search + Retrieval API"
+    },
+    {
+      "id": "AD033",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 179,
+      "first_shown": "2025-07-30",
+      "last_shown": "2026-08-21",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/8625068776497201153",
+      "width": 380,
+      "height": 248,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR04068986990425538561?region=anywhere"
+    },
+    {
+      "id": "AD034",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 102,
+      "first_shown": "2025-08-10",
+      "last_shown": "2026-02-13",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/8722357958860271272",
+      "width": 348,
+      "height": 133,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR06024811631261777921?region=anywhere"
+    },
+    {
+      "id": "AD035",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 239,
+      "first_shown": "2025-05-06",
+      "last_shown": "2025-12-31",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/183302362883853164",
+      "width": 380,
+      "height": 505,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR06006583145812459521?region=anywhere"
+    },
+    {
+      "id": "AD036",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 3,
+      "first_shown": "2025-11-25",
+      "last_shown": "2025-11-27",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/11154369891828505095",
+      "width": 400,
+      "height": 400,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR08871025272216879105?region=anywhere"
+    },
+    {
+      "id": "AD037",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 3,
+      "first_shown": "2025-11-25",
+      "last_shown": "2025-11-27",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/14180787114030910817",
+      "width": 400,
+      "height": 400,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR01633327254660448257?region=anywhere"
+    },
+    {
+      "id": "AD038",
+      "platform": "google",
+      "format": "image",
+      "days_shown": 31,
+      "first_shown": "2025-10-20",
+      "last_shown": "2025-11-25",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/10553138224026774080",
+      "width": 724,
+      "height": 511,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR00491889874127814657?region=anywhere",
+      "headline": "Websets: 50+ sources for leads in one tool"
+    },
+    {
+      "id": "AD039",
+      "platform": "google",
+      "format": "text",
+      "days_shown": 31,
+      "first_shown": "2025-10-23",
+      "last_shown": "2025-11-25",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/9456311274819120266",
+      "width": 381,
+      "height": 260,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR04555658462108844033?region=anywhere"
+    },
+    {
+      "id": "AD040",
+      "platform": "google",
+      "format": "image",
+      "days_shown": 31,
+      "first_shown": "2025-10-20",
+      "last_shown": "2025-11-25",
+      "image_url": "https://tpc.googlesyndication.com/archive/simgad/2221163522667231284",
+      "width": 724,
+      "height": 423,
+      "url": "https://adstransparency.google.com/advertiser/AR12348457191374585857/creative/CR02211183012341612545?region=anywhere"
+    }
+  ],
+  "ads_total": {
+    "low": 52,
+    "high": 52
+  },
+  "posts": [
+    {
+      "id": "X2112220452559229364",
+      "platform": "x",
+      "account": "ExaAILabs",
+      "owner": "company",
+      "url": "https://x.com/ExaAILabs/status/2112220452559229364",
+      "published": "2026-10-19",
+      "text": "Exa 3.0, Exa Lite, upgraded highlights, and our expanded index are available today through the API. Read more: https://exa.ai/blog/exa-3",
+      "metrics": {
+        "likes": 40,
+        "reposts": 1,
+        "replies": 0
+      },
+      "evidence_id": "E015"
+    },
+    {
+      "id": "X2112218761877230051",
+      "platform": "x",
+      "account": "ExaAILabs",
+      "owner": "company",
+      "url": "https://x.com/ExaAILabs/status/2112218761877230051",
+      "published": "2026-10-19",
+      "text": "Exa 3.0 highlights make agents more accurate on search tasks, using 95% fewer tokens than full text.",
+      "metrics": {
+        "likes": 49,
+        "reposts": 0,
+        "replies": 5
+      },
+      "evidence_id": "E015"
+    },
+    {
+      "id": "X2112218744189849638",
+      "platform": "x",
+      "account": "ExaAILabs",
+      "owner": "company",
+      "url": "https://x.com/ExaAILabs/status/2112218744189849638",
+      "published": "2026-10-19",
+      "text": "Exa 3.0 expands our index for AI assistants: 1.27B ecommerce listings, 211M+ businesses, real-time news, sports, weather and market data.",
+      "metrics": {
+        "likes": 45,
+        "reposts": 1,
+        "replies": 1
+      },
+      "evidence_id": "E015"
+    },
+    {
+      "id": "X2112218738011652336",
+      "platform": "x",
+      "account": "ExaAILabs",
+      "owner": "company",
+      "url": "https://x.com/ExaAILabs/status/2112218738011652336",
+      "published": "2026-10-19",
+      "text": "We're also launching Exa Lite, our new search type at $4/1k, built for cost-sensitive apps.",
+      "metrics": {
+        "likes": 78,
+        "reposts": 0,
+        "replies": 2
+      },
+      "evidence_id": "E015"
+    },
+    {
+      "id": "X2112218732496130306",
+      "platform": "x",
+      "account": "ExaAILabs",
+      "owner": "company",
+      "url": "https://x.com/ExaAILabs/status/2112218732496130306",
+      "published": "2026-10-19",
+      "text": "Exa 3.0's gains come from upgrades across our retrieval stack, including our largest embedding model and Dynamic Highlights.",
+      "metrics": {
+        "likes": 89,
+        "reposts": 0,
+        "replies": 1
+      },
+      "evidence_id": "E015"
+    },
+    {
+      "id": "X2112218730952601719",
+      "platform": "x",
+      "account": "ExaAILabs",
+      "owner": "company",
+      "url": "https://x.com/ExaAILabs/status/2112218730952601719",
+      "published": "2026-10-19",
+      "text": "Introducing Exa 3.0: our largest ever improvement to search quality. Exa is now #1 on every benchmark we tested, from public evals to verticals like coding and GTM intelligence.",
+      "metrics": {
+        "likes": 2118,
+        "reposts": 156,
+        "replies": 91
+      },
+      "evidence_id": "E015"
+    },
+    {
+      "id": "X2110099946364121407",
+      "platform": "x",
+      "account": "ExaAILabs",
+      "owner": "company",
+      "url": "https://x.com/ExaAILabs/status/2110099946364121407",
+      "published": "2026-10-13",
+      "text": "💪 (quote of the $100m ARR announcement)",
+      "metrics": {
+        "likes": 76,
+        "reposts": 0,
+        "replies": 7
+      },
+      "evidence_id": "E015"
+    },
+    {
+      "id": "X2108597265317450154",
+      "platform": "x",
+      "account": "ExaAILabs",
+      "owner": "company",
+      "url": "https://x.com/ExaAILabs/status/2108597265317450154",
+      "published": "2026-10-09",
+      "text": "We sat down with @3blue1brown to discuss our research vision of \"Attention over all the world's information.\"",
+      "metrics": {
+        "likes": 189,
+        "reposts": 30,
+        "replies": 9
+      },
+      "evidence_id": "E015"
+    },
+    {
+      "id": "X2108245590962475040",
+      "platform": "x",
+      "account": "ExaAILabs",
+      "owner": "company",
+      "url": "https://x.com/ExaAILabs/status/2108245590962475040",
+      "published": "2026-10-08",
+      "text": "Even the top search agents set to the highest effort modes cannot find 1/3 of the verified information. (ATLAS thread)",
+      "metrics": {
+        "likes": 12,
+        "reposts": 0,
+        "replies": 0
+      },
+      "evidence_id": "E015"
+    },
+    {
+      "id": "X2108245589196718463",
+      "platform": "x",
+      "account": "ExaAILabs",
+      "owner": "company",
+      "url": "https://x.com/ExaAILabs/status/2108245589196718463",
+      "published": "2026-10-08",
+      "text": "ATLAS tasks require many sources to retrieve fresh or niche information. (ATLAS thread)",
+      "metrics": {
+        "likes": 11,
+        "reposts": 0,
+        "replies": 1
+      },
+      "evidence_id": "E015"
+    },
+    {
+      "id": "X2112286651787641135",
+      "platform": "x",
+      "account": "WilliamBryk",
+      "owner": "founder",
+      "url": "https://x.com/WilliamBryk/status/2112286651787641135",
+      "published": "2026-10-19",
+      "text": "Around 500,000 B200 GPU-hours were used for making this. Plus tens of billions of new data records from special sources.",
+      "metrics": {
+        "likes": 198,
+        "reposts": 5,
+        "replies": 19
+      },
+      "evidence_id": "E016"
+    },
+    {
+      "id": "X2110600385463566348",
+      "platform": "x",
+      "account": "WilliamBryk",
+      "owner": "founder",
+      "url": "https://x.com/WilliamBryk/status/2110600385463566348",
+      "published": "2026-10-15",
+      "text": "huge congrats!",
+      "metrics": {
+        "likes": 1,
+        "reposts": 0,
+        "replies": 0
+      },
+      "evidence_id": "E016"
+    },
+    {
+      "id": "X2110058915589464192",
+      "platform": "x",
+      "account": "WilliamBryk",
+      "owner": "founder",
+      "url": "https://x.com/WilliamBryk/status/2110058915589464192",
+      "published": "2026-10-13",
+      "text": "Exa just passed $100m in annualized revenue. We've grown almost exactly 10x per year for 3 years. We now handle 2 billion requests a month from 200k+ teams.",
+      "metrics": {
+        "likes": 2037,
+        "reposts": 120,
+        "replies": 225
+      },
+      "evidence_id": "E016"
+    },
+    {
+      "id": "X2108659846744797233",
+      "platform": "x",
+      "account": "WilliamBryk",
+      "owner": "founder",
+      "url": "https://x.com/WilliamBryk/status/2108659846744797233",
+      "published": "2026-10-09",
+      "text": "information retrieval blessed by pope",
+      "metrics": {
+        "likes": 56,
+        "reposts": 0,
+        "replies": 3
+      },
+      "evidence_id": "E016"
+    },
+    {
+      "id": "X2108306578076299726",
+      "platform": "x",
+      "account": "WilliamBryk",
+      "owner": "founder",
+      "url": "https://x.com/WilliamBryk/status/2108306578076299726",
+      "published": "2026-10-08",
+      "text": "ATLAS is the hardest search eval in the world. We created hundreds of real-world valuable search tasks that frontier models score <50%.",
+      "metrics": {
+        "likes": 75,
+        "reposts": 3,
+        "replies": 12
+      },
+      "evidence_id": "E016"
+    },
+    {
+      "id": "X2107695561466089750",
+      "platform": "x",
+      "account": "WilliamBryk",
+      "owner": "founder",
+      "url": "https://x.com/WilliamBryk/status/2107695561466089750",
+      "published": "2026-10-07",
+      "text": "it's kept fresh through regular updates",
+      "metrics": {
+        "likes": 1,
+        "reposts": 0,
+        "replies": 1
+      },
+      "evidence_id": "E016"
+    },
+    {
+      "id": "X2107626689157378486",
+      "platform": "x",
+      "account": "WilliamBryk",
+      "owner": "founder",
+      "url": "https://x.com/WilliamBryk/status/2107626689157378486",
+      "published": "2026-10-07",
+      "text": "been a wild journey @tecoker 🫡",
+      "metrics": {
+        "likes": 3,
+        "reposts": 0,
+        "replies": 1
+      },
+      "evidence_id": "E016"
+    },
+    {
+      "id": "X2107626331462869145",
+      "platform": "x",
+      "account": "WilliamBryk",
+      "owner": "founder",
+      "url": "https://x.com/WilliamBryk/status/2107626331462869145",
+      "published": "2026-10-07",
+      "text": "was a ton of fun chatting! Might need to take commission on your fantasy wins",
+      "metrics": {
+        "likes": 3,
+        "reposts": 0,
+        "replies": 1
+      },
+      "evidence_id": "E016"
+    },
+    {
+      "id": "X2107562409993134540",
+      "platform": "x",
+      "account": "WilliamBryk",
+      "owner": "founder",
+      "url": "https://x.com/WilliamBryk/status/2107562409993134540",
+      "published": "2026-10-06",
+      "text": "We just added hundreds of millions of places to our index. Let us know if there are more types of data you'd like your agents to have access to!",
+      "metrics": {
+        "likes": 185,
+        "reposts": 7,
+        "replies": 14
+      },
+      "evidence_id": "E016"
+    },
+    {
+      "id": "LI1",
+      "platform": "linkedin",
+      "account": "exa-ai",
+      "owner": "company",
+      "url": "https://www.linkedin.com/posts/exa-ai_want-to-predict-who-will-raise-funding-next-activity-7515442005867446274-fI0O",
+      "published": "2026-10-12",
+      "text": "Want to predict who will raise funding next? Live session with Crunchbase and Exa's Chief Economist on financial research with AI agents.",
+      "kind": "event",
+      "paid": false,
+      "metrics": {
+        "reactions": 39
+      },
+      "evidence_id": "E017"
+    },
+    {
+      "id": "LI2",
+      "platform": "linkedin",
+      "account": "exa-ai",
+      "owner": "company",
+      "url": "https://www.linkedin.com/posts/exa-ai_atlas-is-a-new-way-to-evaluate-agents-on-activity-7514014116018024448-1feS",
+      "published": "2026-10-08",
+      "text": "ATLAS is a new way to evaluate agents on search-intensive tasks.",
+      "kind": "research",
+      "paid": false,
+      "metrics": {
+        "reactions": 82,
+        "comments": 2
+      },
+      "evidence_id": "E017"
+    },
+    {
+      "id": "LI3",
+      "platform": "linkedin",
+      "account": "exa-ai",
+      "owner": "company",
+      "url": "https://www.linkedin.com/posts/exa-ai_we-just-added-211-million-restaurants-museums-activity-7513299675978850304-tNnu",
+      "published": "2026-10-06",
+      "text": "We just added 211 million restaurants, museums, and parks to Exa's index.",
+      "kind": "launch",
+      "paid": false,
+      "metrics": {
+        "reactions": 164
+      },
+      "evidence_id": "E017"
+    },
+    {
+      "id": "LI4",
+      "platform": "linkedin",
+      "account": "exa-ai",
+      "owner": "company",
+      "url": "https://www.linkedin.com/posts/exa-ai_join-us-in-sf-on-wednesday-october-7th-along-activity-7512934370291163136-5gOk",
+      "published": "2026-10-05",
+      "text": "Join us in SF for \"GTM On the Edge\": bring your toughest GTM challenges and the team will solve them live on stage.",
+      "kind": "event",
+      "paid": false,
+      "metrics": {
+        "reactions": 17
+      },
+      "evidence_id": "E017"
+    },
+    {
+      "id": "LI5",
+      "platform": "linkedin",
+      "account": "exa-ai",
+      "owner": "company",
+      "url": "https://www.linkedin.com/posts/exa-ai_we-pulled-up-to-openai-devday-in-a-delorean-activity-7511519837173678081-kcGL",
+      "published": "2026-10-01",
+      "text": "We pulled up to OpenAI DevDay in a DeLorean. Why? Because we built a time machine for the web.",
+      "kind": "stunt",
+      "paid": false,
+      "metrics": {
+        "reactions": 169
+      },
+      "evidence_id": "E017"
+    },
+    {
+      "id": "LI6",
+      "platform": "linkedin",
+      "account": "exa-ai",
+      "owner": "company",
+      "url": "https://www.linkedin.com/posts/exa-ai_were-excited-to-have-shashank-vemuri-from-activity-7511169914011836416--6cS",
+      "published": "2026-09-30",
+      "text": "Webinar with Shashank Vemuri from Aaru on predicting world events with Exa Snapshot.",
+      "kind": "event",
+      "paid": false,
+      "metrics": {
+        "reactions": 104
+      },
+      "evidence_id": "E017"
+    },
+    {
+      "id": "LI7",
+      "platform": "linkedin",
+      "account": "exa-ai",
+      "owner": "company",
+      "url": "https://www.linkedin.com/posts/exa-ai_introducing-agent-ultra-a-step-change-in-activity-7509303990191349760-Iw0v",
+      "published": "2026-09-25",
+      "text": "Introducing Agent Ultra, a step change in deep research.",
+      "kind": "launch",
+      "paid": false,
+      "metrics": {
+        "reactions": 158
+      },
+      "evidence_id": "E017"
+    },
+    {
+      "id": "LI8",
+      "platform": "linkedin",
+      "account": "exa-ai",
+      "owner": "company",
+      "url": "https://www.linkedin.com/posts/exa-ai_introducing-exa-snapshot-a-new-way-to-search-activity-7506401688518311937-uUtC",
+      "published": "2026-09-17",
+      "text": "We built a time machine for the web. Introducing Exa Snapshot: an index of 400 billion historical snapshots of webpages.",
+      "kind": "launch",
+      "paid": true,
+      "metrics": {
+        "reactions": 356
+      },
+      "evidence_id": "E017"
+    },
+    {
+      "id": "LI9",
+      "platform": "linkedin",
+      "account": "exa-ai",
+      "owner": "company",
+      "url": "https://www.linkedin.com/posts/exa-ai_were-hiring-a-head-of-security-at-exa-activity-7501364819930046464-LYks",
+      "published": "2026-09-03",
+      "text": "We're hiring a Head of Security at Exa.",
+      "kind": "hiring",
+      "paid": false,
+      "metrics": {
+        "reactions": 35
+      },
+      "evidence_id": "E017"
+    },
+    {
+      "id": "LI10",
+      "platform": "linkedin",
+      "account": "exa-ai",
+      "owner": "company",
+      "url": "https://www.linkedin.com/posts/exa-ai_were-releasing-a-research-preview-of-a-capability-activity-7499157123470307328-yoGK",
+      "published": "2026-08-28",
+      "text": "Research preview of dynamic highlights: reducing token usage by an average of 95%.",
+      "kind": "launch",
+      "paid": false,
+      "metrics": {
+        "reactions": 45
+      },
+      "evidence_id": "E017"
+    },
+    {
+      "id": "LI11",
+      "platform": "linkedin",
+      "account": "exa-ai",
+      "owner": "company",
+      "url": "https://www.linkedin.com/posts/exa-ai_exa-is-now-officially-on-vercel-were-proud-activity-7498424810838966273-W3n7",
+      "published": "2026-08-26",
+      "text": "Exa is now officially on Vercel: Vercel Eve, AI Gateway and the Agent Marketplace.",
+      "kind": "partnership",
+      "paid": false,
+      "metrics": {
+        "reactions": 157
+      },
+      "evidence_id": "E017"
+    },
+    {
+      "id": "LI12",
+      "platform": "linkedin",
+      "account": "exa-ai",
+      "owner": "company",
+      "url": "https://www.linkedin.com/posts/exa-ai_introducing-exa-in-codex-chatgpt-give-activity-7496240976097628162-cMhs",
+      "published": "2026-08-20",
+      "text": "Introducing Exa in Codex & ChatGPT! Open Codex -> Plugins -> Exa -> Install.",
+      "kind": "partnership",
+      "paid": false,
+      "metrics": {
+        "reactions": 105
+      },
+      "evidence_id": "E017"
+    },
+    {
+      "id": "LI13",
+      "platform": "linkedin",
+      "account": "exa-ai",
+      "owner": "company",
+      "url": "https://www.linkedin.com/posts/exa-ai_exa-is-partnering-with-firefox-to-power-search-activity-7495530754177724416-rC5P",
+      "published": "2026-08-18",
+      "text": "Exa is partnering with Firefox to power search for the new kind of AI browser.",
+      "kind": "partnership",
+      "paid": false,
+      "metrics": {
+        "reactions": 112
+      },
+      "evidence_id": "E017"
+    },
+    {
+      "id": "LI14",
+      "platform": "linkedin",
+      "account": "exa-ai",
+      "owner": "company",
+      "url": "https://www.linkedin.com/posts/exa-ai_come-moonlight-with-us-join-gemini-activity-7494161501025488896-S6YN",
+      "published": "2026-08-14",
+      "text": "Join Gemini + Exa for an exclusive AI hack lab in SF.",
+      "kind": "event",
+      "paid": false,
+      "metrics": {
+        "reactions": 63
+      },
+      "evidence_id": "E017"
+    }
+  ],
+  "accounts": [
+    {
+      "platform": "x",
+      "handle": "ExaAILabs",
+      "url": "https://x.com/ExaAILabs",
+      "owner": "company",
+      "followers": null,
+      "evidence_id": "E015"
+    },
+    {
+      "platform": "x",
+      "handle": "WilliamBryk",
+      "url": "https://x.com/WilliamBryk",
+      "owner": "founder",
+      "followers": null,
+      "evidence_id": "E016"
+    },
+    {
+      "platform": "linkedin",
+      "handle": "company/exa-ai",
+      "url": "https://www.linkedin.com/company/exa-ai/",
+      "owner": "company",
+      "followers": null,
+      "evidence_id": "E017"
+    },
+    {
+      "platform": "linkedin",
+      "handle": "in/william-bryk",
+      "url": "https://www.linkedin.com/in/william-bryk",
+      "owner": "founder",
+      "followers": 11547,
+      "evidence_id": "E031"
+    }
+  ],
+  "oss": {
+    "evidence_id": "E019",
+    "org": "exa-labs",
+    "url": "https://github.com/exa-labs",
+    "repos": 50,
+    "stars": 8545,
+    "top": [
+      {
+        "name": "exa-mcp-server",
+        "url": "https://github.com/exa-labs/exa-mcp-server",
+        "stars": 5151,
+        "pushed": "2026-10-19",
+        "description": "Exa MCP for web search and web crawling!"
+      },
+      {
+        "name": "company-researcher",
+        "url": "https://github.com/exa-labs/company-researcher",
+        "stars": 1517,
+        "pushed": "2026-09-27",
+        "description": "Company Researcher tool helps you instantly understand any company inside out."
+      },
+      {
+        "name": "exa-deepseek-chat",
+        "url": "https://github.com/exa-labs/exa-deepseek-chat",
+        "stars": 728,
+        "pushed": "2025-10-10",
+        "description": "A simple open-source chat app that uses Exa's API for web search and Deepseek R1 for reasoning"
+      },
+      {
+        "name": "exa-hallucination-detector",
+        "url": "https://github.com/exa-labs/exa-hallucination-detector",
+        "stars": 333,
+        "pushed": "2025-11-12",
+        "description": "Hallucination Detector is a free and open-source tool that helps you verify the accuracy of your LLM generated content instantly."
+      },
+      {
+        "name": "exa-py",
+        "url": "https://github.com/exa-labs/exa-py",
+        "stars": 234,
+        "pushed": "2026-10-19",
+        "description": "The Official Exa Python Package"
+      },
+      {
+        "name": "exa-js",
+        "url": "https://github.com/exa-labs/exa-js",
+        "stars": 131,
+        "pushed": "2026-10-19",
+        "description": "The Official Exa Javascript SDK"
+      },
+      {
+        "name": "agent-skills",
+        "url": "https://github.com/exa-labs/agent-skills",
+        "stars": 60,
+        "pushed": "2026-10-19",
+        "description": "Official skills for the Exa API."
+      },
+      {
+        "name": "jfk-files-app",
+        "url": "https://github.com/exa-labs/jfk-files-app",
+        "stars": 44,
+        "pushed": "2025-03-19",
+        "description": "Chat with JFK assassination files using Exa."
+      }
+    ]
+  },
+  "community": {
+    "discord": {
+      "evidence_id": "E020",
+      "invite": "HCShtBqbfV",
+      "name": "Exa",
+      "members": 5115,
+      "online": 340
+    },
+    "hacker_news": {
+      "evidence_id": "E021",
+      "stories": 23,
+      "top": [
+        {
+          "title": "Exa-d: How to store the web in S3",
+          "url": "https://exa.ai/blog/exa-d",
+          "hn_url": "https://news.ycombinator.com/item?id=46611063",
+          "points": 46,
+          "comments": 4,
+          "published": "2026-01-14"
+        },
+        {
+          "title": "Show HN: Exa (YC S21) – embeddings search agent with >20x recall than Google",
+          "url": "https://websets.exa.ai/",
+          "hn_url": "https://news.ycombinator.com/item?id=43175781",
+          "points": 28,
+          "comments": 4,
+          "published": "2025-02-25"
+        },
+        {
+          "title": "Exa, 35 person startup building a new search engine, raises $85M Series B",
+          "url": "https://exa.ai/blog/announcing-series-b",
+          "hn_url": "https://news.ycombinator.com/item?id=45118788",
+          "points": 16,
+          "comments": 10,
+          "published": "2025-09-03"
+        },
+        {
+          "title": "We need superknowledge before superintelligence",
+          "url": "https://exa.ai/blog/superknowledge",
+          "hn_url": "https://news.ycombinator.com/item?id=40948680",
+          "points": 14,
+          "comments": 13,
+          "published": "2024-07-12"
+        },
+        {
+          "title": "Exa.ai: Search Content by Meaning",
+          "url": "https://exa.ai/search?c=all",
+          "hn_url": "https://news.ycombinator.com/item?id=40495342",
+          "points": 7,
+          "comments": 1,
+          "published": "2024-05-27"
+        },
+        {
+          "title": "exa-code: fast, efficient web context for coding agents",
+          "url": "https://exa.ai/blog/exa-code",
+          "hn_url": "https://news.ycombinator.com/item?id=45376018",
+          "points": 5,
+          "comments": 1,
+          "published": "2025-09-25"
+        },
+        {
+          "title": "Exa Websets",
+          "url": "https://exa.ai/websets",
+          "hn_url": "https://news.ycombinator.com/item?id=42315844",
+          "points": 4,
+          "comments": 3,
+          "published": "2024-12-04"
+        },
+        {
+          "title": "ATLAS: Evaluating Agents on Search-Intensive Tasks",
+          "url": "https://exa.ai/blog/atlas-benchmark",
+          "hn_url": "https://news.ycombinator.com/item?id=50008857",
+          "points": 4,
+          "comments": 0,
+          "published": "2026-10-08"
+        }
+      ]
+    }
+  },
+  "site": {
+    "evidence_id": "E011",
+    "total_urls": 379,
+    "locales": 0,
+    "sitemaps_read": 2,
+    "as_of": "2026-10-20",
+    "sections": [
+      {
+        "path": "/docs",
+        "urls": 163,
+        "updated_90d": 162,
+        "examples": [
+          "https://exa.ai/docs/admin/billing",
+          "https://exa.ai/docs/admin/error-codes"
+        ],
+        "children": []
+      },
+      {
+        "path": "/blog",
+        "urls": 68,
+        "updated_90d": 34,
+        "examples": [
+          "https://exa.ai/blog",
+          "https://exa.ai/blog/exa-3"
+        ],
+        "children": []
+      },
+      {
+        "path": "/integrations",
+        "urls": 56,
+        "updated_90d": 0,
+        "examples": [
+          "https://exa.ai/integrations",
+          "https://exa.ai/integrations/langchain"
+        ],
+        "children": []
+      },
+      {
+        "path": "/library",
+        "urls": 20,
+        "updated_90d": 20,
+        "examples": [
+          "https://exa.ai/library",
+          "https://exa.ai/library/person"
+        ],
+        "children": []
+      },
+      {
+        "path": "/customers",
+        "urls": 15,
+        "updated_90d": 0,
+        "examples": [
+          "https://exa.ai/customers",
+          "https://exa.ai/customers/11x"
+        ],
+        "children": []
+      },
+      {
+        "path": "/versus",
+        "urls": 10,
+        "updated_90d": 1,
+        "examples": [
+          "https://exa.ai/versus",
+          "https://exa.ai/versus/brave"
+        ],
+        "children": []
+      },
+      {
+        "path": "/alternatives",
+        "urls": 9,
+        "updated_90d": 9,
+        "examples": [
+          "https://exa.ai/alternatives/brave-search-api",
+          "https://exa.ai/alternatives/exa"
+        ],
+        "children": []
+      },
+      {
+        "path": "/use-cases",
+        "urls": 5,
+        "updated_90d": 0,
+        "examples": [
+          "https://exa.ai/use-cases/ai-assistants",
+          "https://exa.ai/use-cases/gtm"
+        ],
+        "children": []
+      },
+      {
+        "path": "/webinars",
+        "urls": 5,
+        "updated_90d": 0,
+        "examples": [
+          "https://exa.ai/webinars",
+          "https://exa.ai/webinars/rl-search-outcomes"
+        ],
+        "children": []
+      },
+      {
+        "path": "other",
+        "urls": 28,
+        "updated_90d": 1,
+        "examples": [
+          "https://exa.ai/",
+          "https://exa.ai/mcp"
+        ],
+        "children": [],
+        "grouped": 22
+      }
+    ]
+  },
+  "site_checks": {
+    "evidence_id": "E014",
+    "checks": [
+      {
+        "check": "robots.txt",
+        "result": "yes",
+        "detail": "1 rule groups, 2 sitemaps declared"
+      },
+      {
+        "check": "llms.txt",
+        "result": "yes",
+        "detail": "Published (185 lines)"
+      },
+      {
+        "check": "AI crawlers allowed",
+        "result": "yes",
+        "detail": "GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot, Google-Extended, Applebot-Extended, meta-externalagent, Amazonbot, CCBot"
+      },
+      {
+        "check": "AI crawlers blocked",
+        "result": "no",
+        "detail": "None"
+      },
+      {
+        "check": "SEO tool crawlers blocked",
+        "result": "no",
+        "detail": "None"
+      },
+      {
+        "check": "Homepage readable without JavaScript",
+        "result": "yes",
+        "detail": "6,236 characters of text in the raw HTML"
+      },
+      {
+        "check": "Meta description",
+        "result": "yes",
+        "detail": "“Search API for AI agents that need real-time web data, deep research,…”"
+      },
+      {
+        "check": "Canonical URL",
+        "result": "yes",
+        "detail": "https://exa.ai"
+      },
+      {
+        "check": "Structured data (JSON-LD)",
+        "result": "yes",
+        "detail": "Organization, WebAPI, WebPage"
+      },
+      {
+        "check": "Language versions (hreflang)",
+        "result": "no",
+        "detail": "None"
+      }
+    ]
+  },
+  "tech": {
+    "evidence_id": "E026",
+    "tools": [
+      {
+        "tool": "LinkedIn Insight Tag",
+        "category": "Advertising pixels"
+      },
+      {
+        "tool": "Reddit Pixel",
+        "category": "Advertising pixels"
+      },
+      {
+        "tool": "X (Twitter) Pixel",
+        "category": "Advertising pixels"
+      },
+      {
+        "tool": "Common Room",
+        "category": "Visitor identification"
+      },
+      {
+        "tool": "RB2B",
+        "category": "Visitor identification"
+      },
+      {
+        "tool": "Google tag",
+        "category": "Analytics"
+      },
+      {
+        "tool": "Google Tag Manager",
+        "category": "Analytics"
+      },
+      {
+        "tool": "HubSpot",
+        "category": "Marketing automation"
+      },
+      {
+        "tool": "Tolt",
+        "category": "Affiliate & referral"
+      },
+      {
+        "tool": "Default",
+        "category": "Chat & sales"
+      },
+      {
+        "tool": "Sanity",
+        "category": "Content & media"
+      }
+    ],
+    "notes": [
+      "Runs visitor-identification tools, which name the companies (or people) visiting the site so sales can follow up.",
+      "Loads an affiliate or referral platform, so partners are likely paid for referrals."
+    ]
+  },
+  "pricing": {
+    "evidence_id": "E009",
+    "billing": null,
+    "plans": [
+      {
+        "name": "Starter",
+        "price": "Free",
+        "unit": "$10 credits per month",
+        "cta": "Start building for free",
+        "free_trial": null,
+        "audience": null,
+        "key_points": [
+          "Free $10 credits per month",
+          "MCP server access",
+          "Claude Connector",
+          "ChatGPT plugin",
+          "50+ integrations"
+        ]
+      },
+      {
+        "name": "Developer",
+        "price": "Pay as you go",
+        "unit": "usage-based",
+        "cta": "Get an API key",
+        "free_trial": null,
+        "audience": null,
+        "key_points": [
+          "PAYGO usage-based billing",
+          "Up to 25 Search QPS",
+          "SOC 2 Type II"
+        ]
+      },
+      {
+        "name": "Enterprise",
+        "price": "Custom",
+        "unit": null,
+        "cta": "Talk to sales",
+        "free_trial": null,
+        "audience": null,
+        "key_points": [
+          "Zero data retention",
+          "SSO and SCIM",
+          "Enterprise support with dedicated Slack channel"
+        ]
+      }
+    ],
+    "add_ons": [
+      "Search from $4/1k requests",
+      "Agent $0.012–$1.00/run",
+      "Contents $1/1k pages per content type",
+      "Deep Search $12/1k requests",
+      "Monitors $15/1k requests"
+    ]
+  }
+}
