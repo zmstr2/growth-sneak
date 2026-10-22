@@ -1,6 +1,6 @@
 {
   "name": "growth-sneak",
-  "version": "0.13.0",
+  "version": "0.13.1",
   "description": "Give it a company's URL and get a local HTML report on how that company grows: 18 growth activities, the real posts, ads and pages behind each one, site traffic, tech stack, and moves a founder or growth lead can borrow. Every claim links to its source.",
   "author": {
     "name": "Zac Masters"
