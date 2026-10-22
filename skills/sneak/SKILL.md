@@ -38,11 +38,14 @@ evidence", "Step 4 of 5: writing the short reads", "Step 5 of 5: building the re
 The plugin reads two API keys from the environment: `FIRECRAWL_API_KEY` and `EXA_API_KEY`. Before anything else:
 
 1. Run `node "$P/scripts/setup.mjs" check`. It says, for each key, whether it is set and where. It never prints a key.
-2. Look at which tools this session has (tool names ending in `firecrawl_scrape` and `web_search_exa`).
-   - **Both connected:** setup is done. Go to step 0.
-   - **A key is set but its tools are missing:** the connection was made before the key was saved. Tell the user to
-     restart Claude Code (or reload plugins), then run the same `/sneak` command again. Stop.
-   - **A key is not set:** run the onboarding below. Stop afterwards; the keys only take effect after a restart.
+2. Decide from that, not from which tools the session lists: the plugin's connections show as connected even with
+   no key, and every call then fails.
+   - **Firecrawl key set** (environment or settings file): setup is done. If this session has no tool ending in
+     `firecrawl_scrape`, the connection was made before the key was saved: tell the user to restart Claude Code (or
+     reload plugins) and run the same `/sneak` command again, then stop. Otherwise go to step 0. If the Exa key
+     is not set, carry on without it and say so in the closing message (step 6): founders' posts, press and reviews
+     are thinner without Exa, and the keys page is https://dashboard.exa.ai/api-keys.
+   - **Firecrawl key not set:** run the onboarding below and stop afterwards; keys only take effect after a restart.
 
 **Onboarding.** Send one message, in plain words, with both links:
 
@@ -169,6 +172,7 @@ Reply in chat with:
 - two or three things that stand out from the reads (the activities with the most evidence)
 - what wasn't covered and which missing source would cover it
 - the run cost: Firecrawl credits (Alexandria calls included, with the providers used)
+- if the Exa key was not set: one line saying so, with the link to get one
 
 Do not paste the whole report into chat.
 
