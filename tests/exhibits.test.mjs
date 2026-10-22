@@ -4,12 +4,12 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { renderReport } from '../scripts/render.mjs';
-import { emphasize, esc } from '../scripts/util.mjs';
+import { esc } from '../scripts/util.mjs';
 import { postCard, metricParts } from '../scripts/exhibits.mjs';
 import { accountStats, hasMetrics, engagementOf } from '../scripts/social.mjs';
 import { merge } from '../scripts/merge.mjs';
 import { updatesByMonth } from '../scripts/sitemap.mjs';
-import { allScores, paneOf, stripOf, stripItems, sectionOf } from './helpers.mjs';
+import { dropActivities, paneOf, stripOf, stripItems, sectionOf } from './helpers.mjs';
 import { SECTIONS } from '../scripts/scoreboard.mjs';
 
 const FIX = join(dirname(fileURLToPath(import.meta.url)), 'fixtures', 'exa.ai');
@@ -17,19 +17,10 @@ const load = () => ({
   evidence: JSON.parse(readFileSync(join(FIX, 'evidence.json'), 'utf8')),
   analysis: JSON.parse(readFileSync(join(FIX, 'analysis.json'), 'utf8')),
 });
-const render = (ev, an, over) => renderReport(ev, an, { baseDir: FIX, scores: allScores(ev, over) });
+const render = (ev, an, over) => renderReport(ev, an, { baseDir: FIX });
 
 // ---------- typography that points ----------
 
-test('figures get a highlighter; digits inside entities and ids are left alone', () => {
-  const out = emphasize(esc("It's $2.6M, 60,120 followers, 97% and 7 comparison pages; see E012 and A&B"));
-  assert.match(out, /<b class="fig">\$2\.6M<\/b>/);
-  assert.match(out, /<b class="fig">60,120<\/b>/);
-  assert.match(out, /<b class="fig">97%<\/b>/);
-  assert.match(out, /<b class="fig">7 comparison pages<\/b>/);
-  assert.ok(out.includes('it&#39;s') || out.includes('It&#39;s'), 'entity kept intact');
-  assert.ok(!/E<b/.test(out), 'ids are not highlighted');
-});
 
 // ---------- post numbers are never invented ----------
 
@@ -151,7 +142,7 @@ test('the best company post is drawn once, in the strip; the strip keeps only th
 
 test('the rail: every nav href is an id on the page, entries follow the page order, and the skip link lands on the report', () => {
   const { evidence, analysis } = load();
-  const { html } = renderReport(evidence, analysis, { baseDir: FIX, scores: SCORES });
+  const { html } = renderReport(evidence, analysis, { baseDir: FIX });
   const rail = html.split('<nav class="rail"')[1].split('</nav>')[0];
   assert.match(rail, /^ aria-label="Sections"><ol>(<li><a href="#[^"]+"><span>[^<]+<\/span>(<b class="rs s-[gn]"><span class="sr-only">top score <\/span>\d+<\/b>)?<\/a><\/li>)+<\/ol>$/, 'a plain list of links');
   const hrefs = [...rail.matchAll(/href="#([^"]+)"/g)].map((m) => m[1]);
@@ -169,38 +160,19 @@ test('the rail: every nav href is an id on the page, entries follow the page ord
   assert.match(html, /<a class="skip" href="#report">/);
   assert.match(html, /<main id="report">/);
   assert.match(html, /\.rail\{position:sticky;top:0/);
-  // A section with nothing to show has no rail entry: no scores, no activity entries at all.
-  const bare = renderReport(evidence, analysis, { baseDir: FIX, scores: null }).html;
-  const bareRail = bare.split('<nav class="rail"')[1].split('</nav>')[0];
-  assert.ok(!/href="#s-/.test(bareRail));
 });
 
-const railEntries = (html) => [...html.split('<nav class="rail"')[1].split('</nav>')[0].matchAll(/<li><a href="#([^"]+)"><span>([^<]+)<\/span>(?:<b class="rs (s-[gn])"><span class="sr-only">top score <\/span>(\d+)<\/b>)?<\/a><\/li>/g)]
-  .map((m) => ({ id: m[1], label: m[2], cls: m[3] ?? null, num: m[4] === undefined ? null : Number(m[4]) }));
+const railEntries = (html) => [...html.split('<nav class="rail"')[1].split('</nav>')[0].matchAll(/<li><a href="#([^"]+)"><span>([^<]+)<\/span><\/a><\/li>/g)]
+  .map((m) => ({ id: m[1], label: m[2] }));
 
-test('the rail: a section number is its top scored activity, green only from 70; unscored sections and fixed entries have none', () => {
+test('the rail: plain section names with no numbers, one entry per link', () => {
   const { evidence, analysis } = load();
-  const entries = railEntries(renderReport(evidence, analysis, { baseDir: FIX, scores: SCORES }).html);
-  const by = Object.fromEntries(entries.map((e) => [e.id, e]));
-  assert.equal(by['s-paid-search'].num, 70);
-  assert.equal(by['s-paid-search'].cls, 's-g', '70 is strong');
-  assert.equal(by['s-seo'].num, 40);
-  assert.equal(by['s-seo'].cls, 's-n', 'below 70 is not green');
-  for (const e of entries) if (e.num === null) assert.equal(e.cls, null);
-  for (const id of ['summary', 'take', 'traffic', 'tech', 'gaps', 's-organic', 's-owned', 's-earned']) if (by[id]) assert.equal(by[id].num, null, `${id} has no number`);
-  assert.ok(!entries.some((e) => e.num !== null && !['s-paid-search', 's-seo'].includes(e.id)), 'only sections with a scored activity are numbered');
-  // The number is the max over the section's scored activities, with the 70 cut-off exact on both sides.
-  const act = (score) => ({ score, confidence: 0.9, basis: 'jev', evidence_ids: ['E001'] });
-  const seoRail = (activities) => railEntries(renderReport(evidence, analysis, { baseDir: FIX, scores: { activities } }).html).find((x) => x.id === 's-seo');
-  const hi = seoRail({ aeo: act(55), seo_content: act(82) });
-  assert.deepEqual([hi.num, hi.cls], [82, 's-g'], 'the max of two scored activities');
-  const lo = seoRail({ aeo: act(69), seo_content: act(31) });
-  assert.deepEqual([lo.num, lo.cls], [69, 's-n'], '69 is not strong');
-  const edge = seoRail({ aeo: act(70) });
-  assert.deepEqual([edge.num, edge.cls], [70, 's-g'], '70 is strong');
+  const html = renderReport(evidence, analysis, { baseDir: FIX }).html;
+  const rail = html.split('<nav class="rail"')[1].split('</nav>')[0];
+  const entries = railEntries(html);
+  assert.equal(entries.length, (rail.match(/<li>/g) ?? []).length, 'every rail entry is a plain link with a label');
+  assert.ok(!/<b class="rs|top score/.test(rail), 'no score marks in the rail');
 });
-
-const SCORES = { activities: { google_ads: { score: 70, confidence: 0.9, basis: 'jev', evidence_ids: ['E001'] }, seo_content: { score: 40, confidence: 0.9, basis: 'jev', evidence_ids: ['E011'] } } };
 
 test('activity blocks have no folds: no details element, no "Findings and sources", nothing starts open', () => {
   const { evidence, analysis } = load();
@@ -212,26 +184,25 @@ test('activity blocks have no folds: no details element, no "Findings and source
   for (const id of ['organic_social', 'google_ads', 'pricing', 'aeo', 'seo_content', 'open_source']) assert.ok(!paneOf(html, id).includes('<details'), `${id}: no details element`);
   assert.ok(!/<summary>/.test(sectionOf(html, 'gaps')), 'the gaps card has no folds');
 });
-test('page order: hero, takeaways, traffic, the sections in SECTIONS order, tech stack, gaps, footer', () => {
+test('page order: hero, traffic, the sections in SECTIONS order, tech stack, gaps', () => {
   const { evidence, analysis } = load();
-  analysis.takeaways = [{ activity: 'google_ads', move: 'Test more angles.', observed: 'Many ads run for months.', evidence_ids: [evidence.items[0].id] }];
   evidence.traffic = { evidence_id: evidence.items[0].id, label: 'Monthly visits', points: [{ month: '2026-07', value: 1000 }, { month: '2026-08', value: 1500 }] };
-  const html = renderReport(evidence, analysis, { baseDir: FIX, scores: allScores(evidence) }).html;
+  const html = renderReport(evidence, analysis, { baseDir: FIX }).html;
   const at = (needle) => { const i = html.indexOf(needle); assert.ok(i >= 0, `missing ${needle}`); return i; };
-  const order = ['id="summary"', 'id="take"', 'id="traffic"', ...SECTIONS.map((x) => `id="s-${x.id}"`), 'id="tech"', 'id="gaps"', '<footer class="about'].map(at);
+  const order = ['id="summary"', 'id="traffic"', ...SECTIONS.map((x) => `id="s-${x.id}"`), 'id="tech"', 'id="gaps"'].map(at);
   assert.deepEqual(order, [...order].sort((a, b) => a - b));
 });
 
-test('palette: light gray page, white panels, green only for scores of 70 and up, no amber, only declared tokens carry colour, no dark mode, no external scripts', () => {
+test('palette: light gray page, white panels, no amber, only declared tokens carry colour, no dark mode, no external scripts', () => {
   const { evidence, analysis } = load();
   const html = render(evidence, analysis).html;
   const css = html.split('</style>')[0];
   const root = css.match(/:root\{([\s\S]*?)\n\}/)[1];
   const tok = (n) => root.match(new RegExp(`--${n}:\\s*([^;\\n]+)`))[1].trim();
-  assert.equal(tok('bg'), '#f4f4f4', 'light gray page');
+  assert.equal(tok('bg'), '#eeeef0', 'light gray page');
   assert.equal(tok('panel'), '#ffffff', 'white panels');
-  assert.equal(tok('hi'), '#15803d', 'green marks a strong score');
-  assert.equal(tok('mid'), '#4b4b4b', 'a steady score is gray, not amber');
+  assert.equal(tok('hi'), '#15803d', 'green is the chart accent');
+  assert.equal(tok('mid'), '#4b4b4b', 'the mid tone is gray, not amber');
   assert.ok(!/#a16207|amber/i.test(css), 'no amber anywhere');
   // Outside the :root token block, colour is gray unless it is one of the declared semantic colours.
   const rest = css.replace(root, '');
@@ -260,38 +231,36 @@ test('palette: light gray page, white panels, green only for scores of 70 and up
   assert.ok(!/\son[a-z]+="/i.test(body), 'no inline event handlers');
 });
 
-test('a section with nothing scored is not painted as an alarm: every block says Not covered, no number', () => {
+test('a section with nothing seen is not painted as an alarm: every block says Not covered', () => {
   const { evidence, analysis } = load();
-  const scores = allScores(evidence, { google_ads: null, paid_social: null });
-  const html = renderReport(evidence, analysis, { baseDir: FIX, scores }).html;
+  const html = renderReport(dropActivities(evidence, ['google_ads', 'paid_social']), analysis, { baseDir: FIX }).html;
   for (const sec of ['paid-social', 'paid-search']) {
     const s = sectionOf(html, `s-${sec}`);
-    assert.equal((s.match(/<span class="ascore word">Not covered<\/span>/g) ?? []).length, 1, sec);
-    assert.ok(!/class="ascore s-/.test(s), 'no number');
+    assert.equal((s.match(/<span class="state state-none">Not covered<\/span>/g) ?? []).length, 1, sec);
   }
   assert.ok(!/class="[^"]*\balarm\b/.test(html));
 });
 test('headings carry no footnote marks; sections are named', () => {
   const { evidence, analysis } = load();
-  const html = renderReport(evidence, analysis, { baseDir: FIX, scores: SCORES }).html;
+  const html = renderReport(evidence, analysis, { baseDir: FIX }).html;
   const body = html.split('<main')[1];
   assert.ok(!/<h[23][^>]*>[^<]*<sup/.test(body), 'footnote marks stay out of headings');
   for (const m of body.matchAll(/<section id="([^"]+)"[^>]*aria-labelledby="([^"]+)"/g)) assert.ok(body.includes(`id="${m[2]}"`), `${m[1]} points at a missing heading`);
   assert.ok((body.match(/aria-labelledby=/g) ?? []).length >= 3, 'the main sections are named');
 });
 
-test('closing section is a plain card of what we could not see: not scored, not covered, the analyst\'s list; no folds', () => {
+test('closing section is a plain card of what we could not see: not covered, the analyst\'s list; no folds', () => {
   const { evidence, analysis } = load();
-  const html = renderReport(evidence, analysis, { baseDir: FIX, scores: allScores(evidence, { video: null }) }).html;
+  const html = renderReport(evidence, analysis, { baseDir: FIX }).html;
   const gaps = sectionOf(html, 'gaps');
-  assert.match(gaps, /<section id="gaps" class="block card" aria-labelledby="gaps-h">/);
+  assert.match(gaps, /<section id="gaps" class="block" aria-labelledby="gaps-h">/);
   assert.match(gaps, /<h2 id="gaps-h">What we could not see<\/h2>/);
-  assert.match(gaps, /<p class="gapline"><b>Not scored:<\/b>[^<]*Video/);
+  assert.match(gaps, /<p class="gapline"><b>Activities not covered:<\/b>[^<]*Video/);
   assert.match(gaps, /<p class="gapline"><b>Not covered:<\/b>/);
   for (const c of analysis.couldnt_see) assert.ok(gaps.includes(c.text.replace(/&/g, '&amp;')), 'the analyst\'s list is shown');
   assert.ok(!/<details|<summary|How to see more|Checked and not found/.test(gaps));
   assert.ok(html.indexOf('id="gaps"') > html.indexOf('id="tech"'), 'it closes the report, after the tech stack and before the footer');
-  assert.ok(html.indexOf('id="gaps"') < html.indexOf('<footer class="about'));
+  assert.ok(!html.includes('<footer class="about'), 'nothing follows the gaps card');
 });
 
 // ---------- screenshots ----------
@@ -308,13 +277,11 @@ test('screenshots enlarge in a dialog and carry a link to the live page', () => 
 
 // ---------- accessibility and print ----------
 
-test('print hides the rail and the source panels; footnote targets are big enough', () => {
+test('print hides the rail', () => {
   const { evidence, analysis } = load();
   const html = render(evidence, analysis).html;
   const print = html.split('@media print{')[1].split('\n}')[0];
   assert.match(print, /\.rail,\.skip,\.zclose\{display:none!important\}/);
-  assert.match(print, /\.srcs\{display:none\}/);
-  assert.match(html, /\.fn,\.fnlink\{[^}]*min-width:1\.5rem;min-height:1\.5rem/);
 });
 
 test('post cards carry a platform mark: decorative on generic cards, a labelled mark on native LinkedIn and X cards', () => {
@@ -362,4 +329,137 @@ test('screenshots and ad creatives are shown in colour, never filtered gray', ()
   const css = html.split('</style>')[0];
   assert.ok(!/grayscale\(/.test(css), 'no grayscale filter anywhere');
   assert.ok(!/\.(frame|thumb|zoom) img\{[^}]*filter:/.test(css), 'images carry no filter');
+});
+
+// ---------- native Meta ads ----------
+
+import { nativeMetaAd, metaAdCard } from '../scripts/exhibits.mjs';
+
+const nad = (o = {}) => ({ id: '1', advertiser: 'Acme', primary_text: 'Stop juggling apps.', display_link: 'https://acme.test/apps', headline: 'One app', cta: 'Learn more', description: 'Learn More', started_at: '2026-07-06', url: 'https://www.facebook.com/ads/library/?id=1', ...o });
+
+test('native Meta ad: advertiser, Sponsored, text, creative, then domain, headline and button, as Meta lays it out', () => {
+  const h = nativeMetaAd(nad({ image_src: 'data:image/jpeg;base64,AAAA', avatar_src: 'data:image/jpeg;base64,BBBB' }), { asOf: '2026-10-22T00:00:00Z' });
+  const order = ['nad-top', 'nad-text', 'nad-media', 'nad-link'].map((c) => h.indexOf(`class="${c}`));
+  assert.ok(order.every((i) => i > 0) && order.join() === [...order].sort((a, b) => a - b).join(), 'parts appear in Meta\'s order');
+  assert.match(h, /<b>Acme<\/b><span>Sponsored<\/span>/);
+  assert.match(h, /<p class="nad-text">Stop juggling apps\.<\/p>/);
+  assert.match(h, /<img alt="Ad creative: One app" src="data:image\/jpeg;base64,AAAA"/);
+  assert.match(h, /<span class="nad-dom">ACME\.TEST\/APPS<\/span><b>One app<\/b>/, 'domain without the scheme, upper-cased, then the headline');
+  assert.match(h, /<span class="nad-cta">Learn more<\/span>/);
+  assert.ok(!/nad-desc/.test(h), 'a description that only repeats the button is dropped');
+  assert.match(h, /Running 108 days<\/b> · since 6 Jul/);
+  assert.match(h, /class="ext" href="https:\/\/www\.facebook\.com\/ads\/library\/\?id=1"/);
+});
+
+test('native Meta ad: a video ad says so and links to the library; no creative means no made-up picture; hostile text is escaped', () => {
+  const v = nativeMetaAd(nad({ is_video: true }));
+  assert.match(v, /class="nad-media nad-video"[^>]*href="https:\/\/www\.facebook\.com\/ads\/library\/\?id=1"/);
+  assert.match(v, /Video ad/);
+  assert.ok(!/<img [^>]*Ad creative/.test(v));
+  assert.match(v, /nad-ini[^>]*>A</, 'no avatar file: the first letter, not a broken image');
+  const plain = nativeMetaAd(nad());
+  assert.ok(!/nad-media/.test(plain), 'neither image nor video: no media panel');
+  const bad = nativeMetaAd(nad({ advertiser: '<b>x</b>', primary_text: '<img src=x onerror=alert(1)>', headline: '"><script>', description: 'A real description' }));
+  assert.ok(!/<img src=x|<script>|<b>x<\/b>/.test(bad));
+  assert.match(bad, /nad-desc">A real description</);
+});
+
+test('metaAdCard: an Upspring-style ad keeps its old card; a library ad gets the native one', () => {
+  assert.match(metaAdCard({ id: 'u', media_type: 'video', one_line: 'Hook', hook_text: 'Hook', url: 'https://x.test/', impressions: 4 }), /delivery strength 4\/5/);
+  assert.match(metaAdCard(nad()), /class="xad nad"/);
+});
+
+test('rendering a Meta Ad Library block: images come from the report folder, a missing one is a warning not a crash, and the strip is native', () => {
+  const { evidence, analysis } = load();
+  const id = evidence.items[0].id;
+  evidence.items.push({ id: 'E200', collector: 'paid', channel: 'meta_ads', status: 'observed', finding: 'Meta Ad Library first screen: 2 own ads.', url: 'https://www.facebook.com/ads/library/?q=x', captured_at: '2026-10-20T03:00:00Z' });
+  evidence.meta_ads = { source: 'Meta Ad Library', advertiser: { id: 'acme', name: 'Acme' }, evidence_id: 'E200', ads: [nad({ image: 'assets/missing-creative.jpg' }), nad({ id: '2', url: 'https://www.facebook.com/ads/library/?id=2', is_video: true })] };
+  const r = renderReport(evidence, analysis, { baseDir: FIX });
+  const pane = paneOf(r.html, 'paid_social');
+  assert.equal((pane.match(/<figure class="xad nad">/g) ?? []).length, 2);
+  assert.match(pane, /strip-item nativead/);
+  assert.match(pane, /Meta ads running now/);
+  assert.ok(r.warnings.some((w) => /image file missing, skipped: assets\/missing-creative\.jpg/.test(w)));
+  assert.ok(id);
+});
+
+// ---------- pieces of content, ratings and the redesigned blocks ----------
+
+import { pieceTable, ratingPills } from '../scripts/proof.mjs';
+
+const piece = (o = {}) => ({ title: 'A launch', url: 'https://news.example/a', kind: 'press', outlet: 'News Example', date: '2026-07-29', ...o });
+
+test('pieceTable: newest first, a type pill, a linked title, outlet and date; a column no row fills is left out', () => {
+  const html = pieceTable([piece({ title: 'Old', date: '2025-01-02', url: 'https://x.example/old' }), piece({ title: 'New', date: '2026-09-02', url: 'https://x.example/new' }), piece({ title: 'Undated', date: undefined, url: 'https://x.example/u' })]);
+  assert.match(html, /<table class="egrid">/);
+  assert.deepEqual([...html.matchAll(/<td class="et"><a href="([^"]+)"/g)].map((m) => m[1]), ['https://x.example/new', 'https://x.example/old', 'https://x.example/u'], 'newest first, undated last');
+  assert.match(html, /<span class="kind">Press release<\/span>/);
+  assert.match(html, /<th scope="col">Outlet<\/th>/);
+  assert.match(html, /2 Sep 2026/);
+  const bare = pieceTable([{ title: 'Just a title', url: 'https://x.example/t' }]);
+  assert.ok(!/<th scope="col">(Outlet|Date)/.test(bare), 'no empty columns');
+  assert.match(bare, /<span class="kind">Other<\/span>/);
+});
+
+test('pieceTable: links open safely, text is escaped, bad links and untitled rows are dropped, long lists are capped, upcoming dates are marked', () => {
+  const html = pieceTable([piece({ title: '<img src=x onerror=alert(1)>' }), piece({ url: 'javascript:alert(1)' }), piece({ title: '' }), piece({ title: 'Soon', date: '2026-12-01', kind: 'webinar', url: 'https://x.example/soon' })], { asOf: '2026-10-22T00:00:00Z' });
+  assert.ok(!html.includes('<img src=x') && html.includes('&lt;img src=x'));
+  assert.ok(!html.includes('javascript:'));
+  assert.equal((html.match(/<tr><td class="ek">/g) ?? []).length, 2);
+  assert.match(html, /rel="noopener noreferrer"/);
+  assert.match(html, /<span class="kind soon">Upcoming<\/span>/);
+  const many = pieceTable(Array.from({ length: 15 }, (_, i) => piece({ title: `P${i}`, url: `https://x.example/${i}` })));
+  assert.equal((many.match(/<tr><td class="ek">/g) ?? []).length, 12);
+  assert.match(many, /And 3 more\./);
+  assert.equal(pieceTable([]), '');
+});
+
+test('ratingPills: source, rating and review count, linked when there is a url; a missing rating is not drawn', () => {
+  const html = ratingPills([{ source: 'Capterra', rating: 4.6, count: 157, url: 'https://c.example/' }, { source: 'G2', rating: 4, url: 'https://g.example/' }, { source: 'Nope' }]);
+  assert.match(html, /<b>4\.6<\/b><span class="rsrc">Capterra<\/span><span class="rcount">157 reviews<\/span>/);
+  assert.match(html, /<b>4<\/b><span class="rsrc">G2<\/span><\/a>/, 'no count, no "0 reviews"');
+  assert.ok(!html.includes('Nope'));
+  assert.equal(ratingPills([]), '');
+});
+
+test('blog and guides, earned content and ratings render from their blocks; their blocks need real links and evidence', () => {
+  const { evidence, analysis } = load();
+  const E = evidence.items[0].id;
+  evidence.items.push({ id: 'E300', collector: 'owned', channel: 'owned_content', status: 'observed', finding: 'Blog and resources.', url: 'https://x.example/blog', captured_at: '2026-10-20T00:00:00Z' });
+  evidence.content = { evidence_id: 'E300', items: [{ title: 'How we grew', url: 'https://x.example/blog/grew', kind: 'blog', date: '2026-09-01', author: 'Ann' }] };
+  evidence.earned = { evidence_id: E, items: [piece(), piece({ title: 'Webinar', kind: 'webinar', url: 'https://x.example/w' }), piece({ title: 'Podcast', kind: 'podcast', url: 'https://x.example/p' })] };
+  evidence.items.push({ id: 'E301', collector: 'social', channel: 'reviews', status: 'observed', finding: 'Capterra 4.6.', url: 'https://c.example/', captured_at: '2026-10-20T00:00:00Z' });
+  evidence.ratings = { evidence_id: 'E301', items: [{ source: 'Capterra', rating: 4.6, count: 157, url: 'https://c.example/' }] };
+  const html = render(evidence, analysis).html;
+  assert.match(paneOf(html, 'owned_content'), /How we grew/);
+  assert.match(paneOf(html, 'owned_content'), /<th scope="col">By<\/th>/);
+  const press = paneOf(html, 'press'), events = paneOf(html, 'events');
+  assert.ok(press.includes('A launch') && press.includes('Podcast') && !press.includes('Webinar'), 'press and podcasts exclude events');
+  assert.ok(events.includes('Webinar') && !events.includes('A launch'), 'events hold webinars, conferences and events only');
+  assert.match(paneOf(html, 'customer_proof'), /<span class="rsrc">Capterra<\/span>/);
+  const bad = (mutate) => { const c = load(); mutate(c.evidence); return () => render(c.evidence, c.analysis); };
+  assert.throws(bad((ev) => { ev.content = { evidence_id: E, items: [{ title: 'x', url: 'javascript:alert(1)' }] }; }), /content\.items\[0\]: needs an http\(s\) "url"/);
+  assert.throws(bad((ev) => { ev.earned = { evidence_id: E, items: [{ url: 'https://x.example/' }] }; }), /earned\.items\[0\]: needs a "title"/);
+  assert.throws(bad((ev) => { ev.ratings = { evidence_id: E, items: [{ source: 'G2', rating: 'high', url: 'https://x.example/' }] }; }), /ratings\.items\[0\]: needs a "source" and a numeric "rating"/);
+  assert.throws(bad((ev) => { ev.earned = { evidence_id: 'E999', items: [] }; }), /earned: "evidence_id" must name an existing evidence item/);
+});
+
+test('layout: a block whose examples link to the originals has no source line; one without keeps it; a section with one same-named activity has no repeated heading; a gap is one quiet line', () => {
+  const { evidence, analysis } = load();
+  const html = render(dropActivities(evidence, ['video']), analysis).html;
+  assert.ok(!/class="srcline"/.test(paneOf(html, 'organic_social')), 'posts link to their originals');
+  assert.match(paneOf(html, 'aeo'), /class="srcline"/, 'a checklist has nothing to click, so it keeps its sources');
+  const solo = sectionOf(html, 's-paid-search');
+  assert.ok(/<article class="act solo" id="a-google_ads">/.test(solo) || /<h3>Google ads<\/h3>/.test(solo));
+  const paidSocial = sectionOf(html, 's-paid-social');
+  assert.ok(!/<h3>Paid social<\/h3>/.test(paidSocial), 'the section heading is enough');
+  assert.match(paneOf(html, 'video'), /^\s*<header class="ahead"><h3>Video<\/h3><span class="state state-none">Not covered<\/span><\/header>/);
+  assert.ok(!/findings?<\/p>/.test(html), 'no finding counts anywhere');
+});
+
+test('layout: a state pill appears only for "checked, none found" and "not covered"; a seen block has none', () => {
+  const { evidence, analysis } = load();
+  const html = render(dropActivities(evidence, ['events']), analysis).html;
+  assert.ok(!/class="state/.test(paneOf(html, 'google_ads')));
+  assert.match(paneOf(html, 'events'), /state state-none">Not covered/);
 });

@@ -60,16 +60,13 @@ Rules the renderer enforces (a broken rule is a hard error, not a warning):
 ```jsonc
 {
   "company":   { "name": "Recall.ai" },
-  "headline":  { "text": "Grows through founder-led LinkedIn posts, comparison pages and a Zoom partnership.", "evidence_ids": ["E020", "E006"] },
   "reads":     [ { "activity": "comparison", "read": "Seven comparison pages, all updated in 90 days.", "evidence_ids": ["E006"] } ],
-  "plays":     [ { "activity": "comparison" }, { "activity": "founder_social" } ],
-  "takeaways": [ { "activity": "comparison", "observed": "...", "move": "Write ...", "evidence_ids": ["E006"] } ],
-  "couldnt_see": [ { "text": "Meta ads: Upspring has no data for this brand.", "evidence_ids": ["E002"] } ],
-  "activity_levels": [ { "activity": "comparison", "level": 3, "evidence_ids": ["E006"] } ]   // only without a TypeSafe key
+  "couldnt_see": [ { "text": "LinkedIn ads: LinkedIn's Ad Library blocks automated reads.", "evidence_ids": ["E002"] } ]
 }
 ```
-Activity ids are the ones in `scripts/rubric.mjs`. Anything uncited is dropped; an unknown evidence id stops the
-render. Older files may carry `summary` (used only if there is no headline) and other fields that are ignored.
+Activity ids are the ones in `scripts/activities.mjs`. Nothing is scored; whether an activity was seen, checked and
+not found, or not covered is worked out from `evidence.json` by `scripts/coverage.mjs`. Anything uncited is dropped; an unknown evidence id stops the
+render. Older files may carry `headline`, `summary`, `plays`, `takeaways` and other fields; they are ignored.
 
 ## Exhibits
 Every post, ad and screenshot in `evidence.json` has an id (`P001…`, `AD001…`, `S01…`, assigned by `merge.mjs`).
@@ -81,24 +78,16 @@ twice. A post with no readable numbers says "Engagement not visible", never zero
 - Follower counts: put the source and date in the item `finding`; there is no separate field.
 - `tech` is written only by the `company` layer; the `owned` layer never writes it.
 
-## `scores.json` (written by `scripts/score.mjs`; read by the renderer)
-
-```jsonc
-{ "model": "jev-1.13.0", "scored_at": "...", "usage": { "input_tokens": 6478, "output_tokens": 70 },
-  "activities": {
-    "comparison": { "score": 100, "level": 3, "raw": 2.98, "confidence": 1.0,
-                    "probabilities": { "0": 0, "1": 0, "2": 0.01, "3": 0.99 },
-                    "basis": "jev", "evidence_ids": ["E006"] },
-    "google_ads": { "score": 0, "level": 0, "confidence": null, "basis": "checked_absence", "evidence_ids": ["E001"] },
-    "paid_social": { "score": null, "basis": "not_covered" } } }
-```
-
-`basis` is `jev` (model score), `analyst` (fallback level), `checked_absence` (a plain 0, only with a recorded
-check), `not_covered` (nothing to score: shown as "Not covered", never as 0) or `no_answer`. A low `confidence`
-(under about 0.5) means the picture is mixed or thin; the report shows it.
-
 ## traffic (evidence.json)
 `traffic`: `{ metric: 'visits', label, points: [{ month: 'YYYY-MM', value }], source, source_url, last_updated?, evidence_id }`. Estimates from Similarweb via Alexandria; the renderer draws a line chart and the cited finding, in the Site traffic section. Needs a `traffic` channel evidence item.
 
+## content, earned and ratings (evidence.json)
+Three optional blocks, each `{ items: [...], evidence_id }` with a real evidence item behind it:
+- `content` (owned layer): `{ title, url, kind?, date?, author? }`, shown as a table under Blog and guides.
+- `earned` (social layer): `{ title, url, kind, outlet?, date?, upcoming? }`; `kind` `press`, `article`, `podcast`, `award`
+  or `video` fills Press and podcasts, `webinar`, `conference` or `event` fills Events and webinars.
+- `ratings` (social layer): `{ source, rating, count?, url }`, shown as pills under Customer proof.
+A missing title, a non-http url or a non-numeric rating stops the build. Dates are `YYYY-MM-DD`.
+
 ## meta_ads (evidence.json)
-`meta_ads`: `{ source, advertiser: { id, name }, active_ads?, as_of?, spend?: { grade, floor, estimated }, creative_mix?: { media, funnel, mechanisms: [{ label, share }] }, ads: [{ id, media_type, is_active, started_at, one_line, hook_text?, impressions?, url, thumbnail_url? }], evidence_id }`. From Upspring via Alexandria. Shown in the Paid social block: a row of ad previews, a facts line (estimates, labelled) and library links. Instagram and TikTok posts use the normal `posts` entries (add `thumbnail_url` to show a preview) and `accounts` entries with `followers`.
+`meta_ads`: `{ source, advertiser: { id, name }, active_ads?, active_ads_label?, as_of?, spend?: { grade, floor, estimated }, creative_mix?: { media, funnel, mechanisms: [{ label, share }] }, ads: [{ id, media_type, is_active, started_at, one_line, hook_text?, impressions?, url, thumbnail_url? }], evidence_id }`. By default from Meta's public Ad Library through Firecrawl (`source: "Meta Ad Library"`: the company's own ads on the first screen, each with its library link; no spend or impressions). Optionally from Upspring (estimates, labelled). Shown in the Paid social block: a row of ad cards, a facts line and library links. Instagram and TikTok posts use the normal `posts` entries (add `thumbnail_url` to show a preview) and `accounts` entries with `followers`.

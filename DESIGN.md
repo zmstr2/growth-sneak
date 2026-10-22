@@ -6,37 +6,36 @@ describes how it looks and why. The structure is in `references/taxonomy.md`.
 ## Layout
 - A fixed contents list on the left; it highlights the section in view.
 - The report column on the right, about 960px wide. Designed for desktop.
-- Order: Overview, What you can take from this, Site traffic, the nine activity sections, Tech stack, What we
-  could not see, footer (sources used, scoring model, cost).
+- Order: Overview, Site traffic, the nine activity sections, Tech stack, What we could not see. No footer.
 
 ## Overview
-The company's logo (its favicon) and name, the domain and capture date, then the analyst's one-line headline. Below
-it, up to six cards for the strongest growth plays: activity name, score, one cited sentence, "See details". The
-analyst chooses the plays by judgement; without a choice the renderer uses the takeaways' activities, then the
-highest non-hygiene scores, at most two per section.
+The company's logo (its favicon) and name, then the domain and capture date. Nothing else: no headline, no summary
+cards, no advice. The reader goes straight to the activity sections and decides what to take from them.
 
 ## An activity block
-Two columns:
-- **Left:** the activity name, the score out of 100 with a thin bar, and a note when needed ("Low confidence",
-  "Checked, none found", "Nothing found in what we collected"). Not covered shows the words and a dashed bar,
-  never a number.
-- **Right, top to bottom:** the cited sentence; a key-facts panel of labelled rows (plans, comparison pages,
-  active Meta ads...); the AEO checklist where it applies; a sideways-scrolling row of examples (posts styled like
-  the platform they came from, ad creatives, page screenshots that enlarge on click); the sources as small links.
+Each section is a white card; each activity inside it is a lightly shaded panel, and the proof sits on white inside
+the panel, so there are three quiet levels and no heavy borders. Top to bottom:
+- the activity name with a small pill only when it matters ("Checked, none found" or "Not covered"). A section with
+  one activity named like itself shows no second heading. A gap is one dashed line, not a full panel.
+- one cited sentence;
+- the proof, full width: key facts as small label-over-value tiles, ratings and link pills, a table for pieces of
+  content (type, title, outlet or author, date, newest first), the AEO checklist as small tiles, and a
+  sideways-scrolling row of posts, ads (drawn like Meta draws them) and page screenshots that enlarge on click;
+- sources as small links, only where nothing above links to the original.
 
-Organic social opens with one card per account (platform, handle, company or founder, followers, posts sampled,
-typical engagement, latest post).
+Organic social opens with one compact chip per account: platform mark, handle, follower count and a small
+Company, Founder or Team tag. Details sit in the chip's tooltip.
 
 ## Visual system
 - Light gray page (#f4f4f4), white panels with hairline borders and soft shadows.
 - Inter for text, Bricolage Grotesque for headings and numbers.
-- Colour is kept for meaning: green for a score of 70 or more; gray otherwise. Platform marks use the platform's
+- Colour is kept for meaning: green only for the traffic chart; gray otherwise. Platform marks use the platform's
   own colour. No red: the report describes, it does not flag weaknesses.
 - Type sizes 13, 15, 17, 20 and 28px; muted text at least 4.5:1.
 
 ## Honesty in the design
 - Every sentence written per company carries sources; uncited ones are dropped before render.
-- Not covered is never 0. A checked absence is a labelled 0.
+- Not covered is never "none found". Only a recorded check can say "Checked, none found", and it shows what was checked.
 - Estimates (Similarweb traffic, Upspring spend) are labelled as estimates with their source.
 - A post with no readable numbers says "Engagement not visible".
 - Each post, ad and screenshot appears once.

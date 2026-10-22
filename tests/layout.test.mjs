@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { renderReport } from '../scripts/render.mjs';
 import { CHANNEL_BY_ID } from '../scripts/channels.mjs';
 import { merge } from '../scripts/merge.mjs';
-import { allScores, paneOf, sectionOf } from './helpers.mjs';
+import { paneOf, sectionOf } from './helpers.mjs';
 
 // The new sections: site traffic, tech stack and the inline AEO checklist.
 const FIX = join(dirname(fileURLToPath(import.meta.url)), 'fixtures', 'exa.ai');
@@ -14,7 +14,7 @@ const load = () => ({
   evidence: JSON.parse(readFileSync(join(FIX, 'evidence.json'), 'utf8')),
   analysis: JSON.parse(readFileSync(join(FIX, 'analysis.json'), 'utf8')),
 });
-const render = (ev, an, scores = allScores(ev)) => renderReport(ev, an, { baseDir: FIX, scores });
+const render = (ev, an) => renderReport(ev, an, { baseDir: FIX });
 const traffic = (ev, points, extra = {}) => ({ evidence_id: ev.items[0].id, label: 'Monthly visits', source: 'Similarweb', points, ...extra });
 const pts = (...vals) => vals.map((value, i) => ({ month: `2026-${String(i + 5).padStart(2, '0')}`, value }));
 
@@ -145,13 +145,13 @@ test('the AEO checklist is an inline ul.ck in a .inl block, with ticks, crosses 
   assert.match(block, /<div class="inl"><ul class="ck">/);
   assert.ok(!block.includes('<details'), 'the checklist is visible without opening anything');
   assert.ok(!block.includes('<h4>'), 'no sub-heading: the block is only the checklist');
-  const items = [...block.matchAll(/<li><span class="gl gl-(yes|no|unknown)" aria-hidden="true">(.)<\/span><span><b>([^<]+)<\/b> <span class="muted">([^<]+)<\/span>/g)];
-  assert.equal(items.length, evidence.site_checks.checks.length, 'one line per check');
+  const items = [...block.matchAll(/<li><span class="gl gl-(yes|no|unknown)" aria-hidden="true">(.)<\/span><span class="ckt"><b>([^<]+)<\/b><span class="sr-only">: ([^<]+)<\/span>/g)];
+  assert.equal(items.length, evidence.site_checks.checks.length, 'one tile per check');
   const glyph = { yes: '✓', no: '✕', unknown: '?' };
-  const word = { yes: /^Yes/, no: /^No/, unknown: /^Couldn't check/ };
+  const word = { yes: /^Yes$/, no: /^No$/, unknown: /^Couldn't check$/ };
   for (const [, result, g, , text] of items) {
     assert.equal(g, glyph[result]);
-    assert.match(text, word[result], 'the answer is written, never colour or a glyph alone');
+    assert.match(text, word[result], 'the answer is written for screen readers, never colour or a glyph alone');
   }
   assert.ok(items.some((m) => m[1] === 'yes') && items.some((m) => m[1] === 'no') && items.some((m) => m[1] === 'unknown'));
   assert.match(block, /<p class="srcline"><span class="slab">Sources<\/span>/, 'the evidence behind it is linked below');

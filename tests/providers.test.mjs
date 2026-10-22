@@ -8,7 +8,7 @@ import { merge } from '../scripts/merge.mjs';
 import { STRIP_MAX } from '../scripts/proof.mjs';
 import { engagementOf } from '../scripts/social.mjs';
 import { renderChannelCards, personName } from '../scripts/proof.mjs';
-import { allScores, paneOf, stripOf, stripItems, sectionOf, kfRows, chanCards } from './helpers.mjs';
+import { paneOf, stripOf, stripItems, sectionOf, kfRows, chanCards } from './helpers.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const FIX = join(HERE, 'fixtures', 'exa.ai');
@@ -18,7 +18,7 @@ const load = () => ({
   evidence: JSON.parse(readFileSync(join(FIX, 'evidence.json'), 'utf8')),
   analysis: JSON.parse(readFileSync(join(FIX, 'analysis.json'), 'utf8')),
 });
-const render = (ev, an) => renderReport(ev, an, { baseDir: FIX, scores: allScores(ev) });
+const render = (ev, an) => renderReport(ev, an, { baseDir: FIX });
 const metaEv = (ev) => ev.items.find((i) => i.channel === 'meta_ads');
 // The fixture's evidence with Upspring's meta_ads attached, captured 2026-10-20 so day counts are exact.
 function withMeta(mod) {
@@ -145,7 +145,7 @@ test('without meta_ads the paid_social block still shows the ad-library links li
   const pane = paid(evidence, analysis);
   const rows = kfRows(pane);
   assert.deepEqual([...rows.keys()], ['Ad libraries'], 'no Meta numbers without Meta data');
-  assert.match(rows.get('Ad libraries'), /<a href="https:\/\/[^"]+" target="_blank" rel="noopener noreferrer">Meta<\/a>/);
+  assert.match(rows.get('Ad libraries'), /<a class="lpill" href="https:\/\/[^"]+" target="_blank" rel="noopener noreferrer">Meta<\/a>/);
   assert.equal(stripOf(pane), '');
   assert.ok(!pane.includes('Upspring') && !pane.includes('Active Meta ads'));
 });
@@ -268,10 +268,10 @@ test('channel cards: one card per account with a safe url, company before founde
   assert.equal(cards[2].handle, 'Jane Doe', 'a linkedin handle loses its in/ prefix, gets no @ and reads as a name');
   // An unsafe url is a build error upstream; the card renderer also refuses it, so it can never become a link.
   assert.throws(() => render(...Object.values(withPosts([], [acct('x', 'evil', 'company', 5000, { url: 'javascript:alert(1)' })]))), /"url" must be an http\(s\) link/);
-  for (const c of cards) assert.match(c.html, /^ href="https:\/\/[^"]+" target="_blank" rel="noopener noreferrer">/, 'external, opens safely');
+  for (const c of cards) assert.match(c.html, /^ href="https:\/\/[^"]+" target="_blank" rel="noopener noreferrer" title="/, 'external, opens safely');
 });
 
-test('channel cards: unknown followers say "Followers not visible", never 0; a handle keeps its written case', () => {
+test('channel cards: unknown followers show no count, never 0; a handle keeps its written case', () => {
   const { evidence, analysis } = withPosts([], [
     acct('instagram', 'a', 'company', null),
     acct('tiktok', 'b', 'company', 0),
@@ -281,12 +281,12 @@ test('channel cards: unknown followers say "Followers not visible", never 0; a h
   const cards = chanCards(organic(evidence, analysis));
   assert.equal(cards.length, 4);
   for (const c of cards) {
-    assert.match(c.followers, /^<span class="muted">Followers not visible<\/span>$/, `${c.name} ${c.handle}`);
-    assert.ok(!/<b>/.test(c.followers) && !/\b0\b/.test(c.followers), 'no number, least of all 0');
+    assert.match(c.followers, /^<span class="muted">[A-Za-z]+<\/span>$/, `${c.name} ${c.handle}: the platform name, no follower count`);
+    assert.ok(!/<b>/.test(c.followers) && !/\d/.test(c.followers), 'no number, least of all 0');
     assert.match(c.stats, /^No posts collected$/);
   }
   assert.ok(cards.some((c) => c.handle === '@ExaAILabs'), 'the handle is shown as the account writes it');
-  assert.ok(!/Followers:/.test(sectionOf(render(evidence, analysis).html, 's-organic')), 'the old per-activity Followers line is gone');
+  assert.ok(!/Followers not visible|Followers:/.test(sectionOf(render(evidence, analysis).html, 's-organic')), 'no placeholder text for a missing count');
 });
 
 test('channel cards: stats come from the posts we sampled (count, typical or best engagement, latest date), matched by platform and handle', () => {

@@ -53,6 +53,16 @@ feature (the company's and each founder's most recent 8 to 10, and any post a fi
 - Reviews (G2, Capterra, Trustpilot, app stores): Exa `site:` searches; record rating and review count
   only if shown. Otherwise `couldnt_check`.
 
+## The `earned` and `ratings` blocks (shown as tables and pills)
+Besides the items above, list every piece you found, one row each, so the report can show them as a table:
+`"earned": { "items": [{ "title": "<headline or event name>", "url": "<deep link>", "kind": "press|article|podcast|award|video|webinar|conference|event", "outlet": "<publisher, show, or venue>", "date": "YYYY-MM-DD", "upcoming": true }], "evidence_ref": "<the press item's ref>" }`.
+Press, articles, podcasts, awards and videos fill Press and podcasts; webinars, conferences and events fill Events and
+webinars (include upcoming ones with `upcoming: true`). Keep each title as written, `outlet` short, and leave `date`
+out when the page shows none. Older pieces are fine here; the table sorts newest first and shows 12.
+`"ratings": { "items": [{ "source": "Capterra", "rating": 4.6, "count": 157, "url": "<the listing>" }], "evidence_ref": "<the reviews item's ref>" }`:
+one entry per review site or app store whose page showed a rating; `count` only if shown. Different sources are not
+averaged. You write both blocks in the `social` layer; the `owned` layer never writes them.
+
 ## When the homepage gives no accounts
 `$R/raw/social.json` has an empty `accounts` list when the homepage is rendered by JavaScript. Then find the
 accounts yourself, cheaply and in this order, before spending Firecrawl credits on any post query:

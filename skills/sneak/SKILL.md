@@ -1,6 +1,6 @@
 ---
 name: sneak
-description: Take a sneak peek at how a company grows. Give it a URL and it collects public evidence of the company's distribution (ads, social posts and their performance, SEO and AI-search readiness, comparison pages, customer proof, pricing and signup, press, events, partnerships, community, site traffic, tech stack), scores 17 growth activities from 0 to 100, and renders a local HTML report with their strongest plays, the real posts, ads and page screenshots behind each score, moves a founder or growth lead can borrow, and what we couldn't see. Use when the user says "/sneak <url>", "how does <company> grow", "sneak on <company>", "what's <company>'s distribution strategy", or "show me <company>'s ads and social".
+description: Take a sneak peek at how a company grows. Give it a URL and it collects public evidence of the company's distribution (ads, social posts and their performance, SEO and AI-search readiness, comparison pages, customer proof, pricing and signup, press, events, partnerships, community, site traffic, tech stack), covers 17 growth activities, and renders a local HTML report with a short cited read per activity, the real posts, ads and page screenshots behind each one, and what we couldn't see. Use when the user says "/sneak <url>", "how does <company> grow", "sneak on <company>", "what's <company>'s distribution strategy", or "show me <company>'s ads and social".
 argument-hint: <company url or domain>
 ---
 
@@ -11,14 +11,15 @@ writes the read, and scripts do everything mechanical. Your job is to run the st
 in one go, without pausing for confirmation, and finish with the report open.
 
 **The rules that matter:**
-- Every claim, score and recommendation rests on cited evidence. Nothing is invented.
+- Every claim and recommendation rests on cited evidence. Nothing is invented. Nothing is scored: the report says
+  what we saw, with the proof.
 - Never state that something is absent unless a recorded check found it absent. "We couldn't check" is always
   allowed and always honest, and is shown as "Not covered", never as 0.
-- Commentary and recommendations are welcome, but only in the analyst's short reads and takeaways, written in
-  the voice of `$P/references/voice.md` and drawn from `$P/references/plays.md`. They speak to a founder or
-  growth lead who wants to borrow a move; they never judge the company ("weak", "failing").
+- The report describes; it does not advise. The only prose written per company is the analyst's short read per
+  activity, in the voice of `$P/references/voice.md`. It never judges the company ("weak", "failing"); the reader
+  decides what to take from it.
 
-How the report is organised (channels, the 17 scored activities, and the sections) is in
+How the report is organised (channels, the 18 activities, and the sections) is in
 `$P/references/taxonomy.md`.
 
 Paths below: `$P` is this plugin's root (`${CLAUDE_PLUGIN_ROOT}`; if that is not filled in, it is the folder two
@@ -27,17 +28,57 @@ spaces: always quote them in commands (`"$P"`, `"$R"`).
 
 ## Tell the user what is happening
 A run takes several minutes and most of it is agents working. Send one short line in chat at each step, in plain
-words, so the user can see progress: "Step 1 of 6: free first-party checks (sitemap, robots, social links)",
-"Step 2 of 6: four collectors running in parallel (paid, owned, social, company)", then one line as each
-collector finishes ("Paid done: 63 Google ads, 10 credits"), "Step 3 of 6: merging and checking the evidence",
-"Step 4 of 6: scoring 17 activities", "Step 5 of 6: writing the headline and takeaways", "Step 6 of 6: building the
-report". Keep each to one line. Do not narrate tool calls.
+words, so the user can see progress: "Step 1 of 5: free first-party checks (sitemap, robots, social links)",
+"Step 2 of 5: four collectors running in parallel (paid, owned, social, company)", then one line as each
+collector finishes ("Paid done: 63 Google ads, 6 Meta ads, 15 credits"), "Step 3 of 5: merging and checking the
+evidence", "Step 4 of 5: writing the short reads", "Step 5 of 5: building the report". Keep each to one line. Do not narrate tool calls.
+
+## Setup: API keys (first run only)
+
+The plugin reads two API keys from the environment: `FIRECRAWL_API_KEY` and `EXA_API_KEY`. Before anything else:
+
+1. Run `node "$P/scripts/setup.mjs" check`. It says, for each key, whether it is set and where. It never prints a key.
+2. Look at which tools this session has (tool names ending in `firecrawl_scrape` and `web_search_exa`).
+   - **Both connected:** setup is done. Go to step 0.
+   - **A key is set but its tools are missing:** the connection was made before the key was saved. Tell the user to
+     restart Claude Code (or reload plugins), then run the same `/sneak` command again. Stop.
+   - **A key is not set:** run the onboarding below. Stop afterwards; the keys only take effect after a restart.
+
+**Onboarding.** Send one message, in plain words, with both links:
+
+> Growth Sneak needs two API keys. Both have free credits, so you can try it before paying.
+> 1. **Firecrawl** (reads pages, ads and screenshots): create a key at https://www.firecrawl.dev/app/api-keys. It
+>    starts with `fc-`.
+> 2. **Exa** (finds founders' posts, press and reviews): create a key at https://dashboard.exa.ai/api-keys.
+>
+> Paste them here and I'll save them for you. They go into the `env` block of `~/.claude/settings.json`, on this
+> computer only. Your keys will show in this chat. If you would rather not, export `FIRECRAWL_API_KEY` and
+> `EXA_API_KEY` in your shell profile instead and tell me when it's done. Exa is optional: say "skip Exa" and the
+> report will have less on founders, press and reviews.
+
+When the user replies with keys, save them without echoing them back:
+
+```bash
+node "$P/scripts/setup.mjs" save <<'JSON'
+{"FIRECRAWL_API_KEY":"<key>","EXA_API_KEY":"<key>"}
+JSON
+node "$P/scripts/setup.mjs" verify
+```
+
+Leave out the key the user did not give. `save` checks each key's shape and refuses a bad one without writing
+anything. `verify` makes one cheap call per key: `ok`, `rejected` (ask for a fresh key), `unverified` (a network
+problem; carry on) or `missing`. Then tell the user, in one short message: the keys are saved, they need to
+**restart Claude Code (or reload plugins)**, and then run `/sneak <company>` again. Do not start the run.
+
+Never write a key into the report folder, `run.json`, a fragment, a log or any file other than the settings file
+via `setup.mjs`. Never repeat a key back, not even partly. Never create an account for the user or open the
+sign-up pages and fill them in: give the links and let them do it.
 
 ## 0. Resolve and set up
 
 1. Normalise the input to a bare domain (`https://www.exa.ai/pricing` -> `exa.ai`) and note the brand name.
 2. If `$R` already exists from an earlier run, move it to `reports/.archive/<domain>-<date>/` first, so nothing
-   from the old run (fragments, analysis, scores) leaks into this one. Then create `$R/`, `$R/raw/`,
+   from the old run (fragments, analysis) leaks into this one. Then create `$R/`, `$R/raw/`,
    `$R/fragments/`, `$R/assets/`.
 3. **Site traffic costs 660 Firecrawl credits** (six months of Similarweb visits). Collect it only if the user
    asked for it ("with traffic") or said yes when asked. If they did not say, ask once now, before anything runs:
@@ -45,14 +86,12 @@ report". Keep each to one line. Do not narrate tool calls.
    `"traffic": true|false` in `run.json`.
 4. Work out which data tools this session actually has, by tool name (Alexandria is reached through Firecrawl: `firecrawl_find_tools`; see `$P/references/alexandria.md`):
    - **Firecrawl**: tools ending in `firecrawl_scrape`, `firecrawl_search`, `firecrawl_map`.
-   - **Exa**: tools ending in `web_search_exa` (works without a key on the free tier).
+   - **Exa**: tools ending in `web_search_exa`.
    - **Apify**: tools from an Apify MCP server, or `APIFY_TOKEN` in the environment.
    - **Alexandria**: reached through Firecrawl (`firecrawl_find_tools`); it is available when Firecrawl is.
-   - **TypeSafe (Jev) scoring**: available when the `TYPESAFE_API_KEY` environment variable is set. Check with
-     `[ -n "$TYPESAFE_API_KEY" ]`; never print or store the value.
    Write `$R/run.json`:
    ```json
-   { "domain": "exa.ai", "brand": "Exa", "captured_at": "<now, ISO>", "traffic": false, "sources": { "firecrawl": "connected|missing", "alexandria": "connected|missing", "exa": "...", "apify": "...", "typesafe": "key set|missing" }, "cost": { "note": "" } }
+   { "domain": "exa.ai", "brand": "Exa", "captured_at": "<now, ISO>", "traffic": false, "sources": { "firecrawl": "connected|missing", "alexandria": "connected|missing", "exa": "...", "apify": "..." }, "cost": { "note": "" } }
    ```
 
 ## 1. Free first-party collection (scripts, run in parallel)
@@ -106,32 +145,12 @@ the run's cost, and checks every item the way the renderer will: channel, status
 probe. If it reports an error, send it to the collector that owns that layer, have it fix its fragment, and merge
 again; fix the fragment, never the script.
 
-## 3b. Score the activities (optional key)
-
-```bash
-node "$P/scripts/score.mjs" "$R"
-```
-
-If `TYPESAFE_API_KEY` is set (the user's own TypeSafe key, read only from the environment, never stored), this
-scores every growth activity from the evidence with the Jev model and writes `$R/scores.json`. Without a key it
-prints a note and writes nothing; the analyst then gives each activity a level on the same rubric
-(`activity_levels`). Never ask the user to paste a key into a file; tell them to set the environment variable.
-
-If there is no key, nothing is written yet: the analyst gives each activity a level in step 4, then step 4b writes the scores.
-
 ## 4. Analyst
 
-Dispatch one `sneak-analyst` agent with `$R` and `$P`. It reads `$R/evidence.json` (and `$R/scores.json` when it exists) and writes
-`$R/analysis.json`: the headline, one read per scored activity, the plays to feature, 2 to 4 takeaways and the gaps (plus `activity_levels` when there is no key). These are the only words in the report written per company; everything else is built from the evidence. It does not collect anything new.
-
-## 4b. Finish the scores (only if there was no key)
-
-```bash
-node "$P/scripts/score.mjs" "$R"
-```
-
-With no key, this reads the analyst's `activity_levels` and writes `$R/scores.json` (levels on the same rubric,
-no confidence). With a key, step 3b already wrote it and there is nothing to do.
+Dispatch one `sneak-analyst` agent with `$R` and `$P`. It reads `$R/evidence.json` and writes `$R/analysis.json`:
+the company name, one read per activity we saw, and the gaps. These are the only
+words in the report written per company; everything else is built from the evidence. It does not collect anything
+new.
 
 ## 5. Render and open
 
@@ -139,7 +158,7 @@ no confidence). With a key, step 3b already wrote it and there is nothing to do.
 node "$P/scripts/render.mjs" "$R" --open
 ```
 
-If the renderer prints warnings (uncited claims dropped, a takeaway that copies a play card, an unknown activity), that is the system
+If the renderer prints warnings (uncited claims dropped, an unknown activity), that is the system
 working; pass the list to the user. If it exits with an error, the data is broken: fix the named field
 (usually via the analyst or the owning collector) and render again.
 
@@ -147,19 +166,17 @@ working; pass the list to the user. If it exits with an error, the data is broke
 
 Reply in chat with:
 - the report path (`$R/report.html`)
-- the headline from `analysis.json`
-- the plays featured at the top with their scores, and the takeaways
+- two or three things that stand out from the reads (the activities with the most evidence)
 - what wasn't covered and which missing source would cover it
-- the run cost: Firecrawl credits (Alexandria calls included, with the providers used) and whether Jev scoring ran
+- the run cost: Firecrawl credits (Alexandria calls included, with the providers used)
 
 Do not paste the whole report into chat.
 
 ## Cost and limits
 
-- A run without traffic costs about 70 to 100 Firecrawl credits in practice. Traffic adds 660 (110 per month),
-  so a run with traffic is about 750. The Upspring Meta lookup adds 150 when the brand is in its data and
-  nothing when it is not.
-
+- A run without traffic costs about 75 to 110 Firecrawl credits in practice, which includes 5 for the Meta Ad
+  Library lookup. Traffic adds 660 (110 per month), so a run with traffic is about 750. The optional Upspring
+  lookup (estimates of Meta spend, mostly consumer brands) adds 150 and is only run if the user asks.
 - Default collection caps: Google ads up to 200 (5 pages), X posts 10 per account (Firecrawl's provider
   limit), LinkedIn posts up to 40 per account. There is no total cost cap; report what was spent.
 - Alexandria calls are billed at each capability's published price. Discovery is free. Report what was spent and which providers were used. Providers that need terms accepted are skipped; never accept terms for the user.

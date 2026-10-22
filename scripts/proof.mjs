@@ -5,7 +5,7 @@
 //     strip: a horizontally scrolling row of examples (posts, ads, screenshots), or ''
 //     note: one plain sentence, facts: a small labelled list, inline: a checklist
 //
-// scoreboard.mjs puts these inside each activity's block, so the evidence sits next to the score it
+// scoreboard.mjs puts these inside each activity's block, so the evidence sits next to the claim it
 // supports and nothing is drawn twice.
 
 import { adLibraryLinks, brandFromDomain } from './adlinks.mjs';
@@ -38,6 +38,44 @@ export function strip(label, items, { itemClass = '' } = {}) {
     <div class="strip-track" tabindex="0" role="group" aria-label="${esc(label)}">${items.map((h) => `<div class="strip-item${itemClass ? ` ${itemClass}` : ''}">${h}</div>`).join('')}</div></div>`;
 }
 
+const KIND_NAME = {
+  press: 'Press release', article: 'Article', podcast: 'Podcast', award: 'Award', webinar: 'Webinar', conference: 'Conference',
+  event: 'Event', blog: 'Blog post', guide: 'Guide', ebook: 'E-book', report: 'Report', tool: 'Free tool', video: 'Video',
+  template: 'Template', docs: 'Docs', other: 'Other',
+};
+const EVENT_KINDS = new Set(['webinar', 'conference', 'event']);
+const MAX_ROWS = 12;
+
+// A table of pieces (title, kind, who, date), newest first. A column no row fills is left out.
+// cols: [['kind','Type'], ['title','Title'], ['who','Outlet'], ['date','Date']]
+export function pieceTable(items, { who = 'Outlet', whoKey = 'outlet', asOf } = {}) {
+  const rows = items.filter((x) => x && x.title && safeUrl(x.url));
+  if (!rows.length) return '';
+  const when = (x) => { const t = Date.parse(x.date); return Number.isFinite(t) ? t : null; };
+  const sorted = [...rows].sort((a, b) => (when(b) ?? -Infinity) - (when(a) ?? -Infinity));
+  const shown = sorted.slice(0, MAX_ROWS);
+  const hasWho = shown.some((x) => x[whoKey]);
+  const hasDate = shown.some((x) => when(x) != null);
+  const now = asOf ? Date.parse(asOf) : null;
+  const head = `<tr><th scope="col">Type</th><th scope="col">Title</th>${hasWho ? `<th scope="col">${esc(who)}</th>` : ''}${hasDate ? '<th scope="col">Date</th>' : ''}</tr>`;
+  const body = shown.map((x) => {
+    const t = when(x);
+    const up = x.upcoming || (t != null && now != null && t > now);
+    return `<tr><td class="ek"><span class="kind">${esc(KIND_NAME[x.kind] ?? KIND_NAME.other)}</span></td><td class="et"><a href="${esc(x.url)}" target="_blank" rel="noopener noreferrer">${esc(x.title)}</a></td>${hasWho ? `<td class="eo">${esc(x[whoKey] ?? '')}</td>` : ''}${hasDate ? `<td class="ed">${t != null ? esc(fmtDate(x.date, { year: true })) : ''}${up ? ' <span class="kind soon">Upcoming</span>' : ''}</td>` : ''}</tr>`;
+  }).join('');
+  const more = sorted.length > shown.length ? `<p class="note-s">And ${sorted.length - shown.length} more.</p>` : '';
+  return `<div class="tgrid"><table class="egrid"><thead>${head}</thead><tbody>${body}</tbody></table>${more}</div>`;
+}
+
+export function ratingPills(items) {
+  const rows = (items ?? []).filter((x) => x && Number.isFinite(x.rating) && x.source);
+  if (!rows.length) return '';
+  return `<ul class="rates" aria-label="Review site ratings">${rows.map((x) => {
+    const inner = `<b>${esc(Number(x.rating).toFixed(1).replace(/\.0$/, ''))}</b><span class="rsrc">${esc(x.source)}</span>${Number.isFinite(x.count) ? `<span class="rcount">${esc(fmtN(x.count))} reviews</span>` : ''}`;
+    return `<li>${safeUrl(x.url) ? `<a class="rate" href="${esc(x.url)}" target="_blank" rel="noopener noreferrer">${inner}</a>` : `<span class="rate">${inner}</span>`}</li>`;
+  }).join('')}</ul>`;
+}
+
 export function makeProof({ prep, an, ctx, shown, shotSrc, ev, asOf, domain = '' }) {
   const free = (type, x) => !shown.has(`${type}:${x.id}`);
   const claim = (type, x) => { shown.add(`${type}:${x.id}`); return x; };
@@ -57,8 +95,8 @@ export function makeProof({ prep, an, ctx, shown, shotSrc, ev, asOf, domain = ''
   };
 
   const libLinks = () => adLibraryLinks(ev.domain, ev.brand || brandFromDomain(ev.domain))
-    .map((x) => `<a href="${esc(x.url)}" target="_blank" rel="noopener noreferrer">${esc(x.label.split(' ')[0])}</a>`).join(' · ');
-  const libsRow = () => ({ label: 'Ad libraries', html: `${libLinks()} <span class="muted">Meta, LinkedIn and TikTok search by name, so check the advertiser.</span>` });
+    .map((x) => `<a class="lpill" href="${esc(x.url)}" target="_blank" rel="noopener noreferrer">${esc(x.label.split(' ')[0])}</a>`).join('');
+  const libsRow = () => ({ label: 'Ad libraries', html: `<span class="pills">${libLinks()}</span><span class="muted sm">Meta, LinkedIn and TikTok search by name, so check the advertiser.</span>` });
 
   const site = prep.site;
   const pt = site?.page_types ?? {};
@@ -72,7 +110,7 @@ export function makeProof({ prep, an, ctx, shown, shotSrc, ev, asOf, domain = ''
     const seen = new Set();
     const list = urls.filter((u) => { const k = strip0(u); if (shown.has(k) || seen.has(k)) return false; seen.add(k); return true; });
     if (!list.length) return null;
-    return { label, html: `${list.slice(0, 8).map((u) => ext(u, name(u))).join(' · ')}${list.length > 8 ? ` <span class="muted">and ${list.length - 8} more</span>` : ''}` };
+    return { label, html: `<span class="pills">${list.slice(0, 8).map((u) => `<a class="lpill" href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(name(u))}</a>`).join('')}${list.length > 8 ? `<span class="muted">and ${list.length - 8} more</span>` : ''}</span>` };
   };
 
   // Each builder gives: strip (visual examples), rows (a few labelled facts), inline (a checklist), note.
@@ -94,13 +132,13 @@ export function makeProof({ prep, an, ctx, shown, shotSrc, ev, asOf, domain = ''
       if (!m) return { rows: [libsRow()] };
       const pct = (list) => (list ?? []).slice(0, 3).map((x) => `${Math.round(x.share * 100)}% ${String(x.label).toLowerCase()}`).join(', ');
       const rows = [
-        Number.isFinite(m.active_ads) ? { label: 'Active Meta ads', html: `<b>${fmtN(m.active_ads)}</b>${m.as_of ? ` <span class="muted">as of ${esc(fmtDate(m.as_of, { year: true }))}</span>` : ''}` } : null,
+        Number.isFinite(m.active_ads) ? { label: m.active_ads_label ?? 'Active Meta ads', html: `<b>${fmtN(m.active_ads)}</b>${m.as_of ? ` <span class="muted">as of ${esc(fmtDate(m.as_of, { year: true }))}</span>` : ''}` } : null,
         pct(m.creative_mix?.media) ? { label: 'Format', html: esc(pct(m.creative_mix.media)) } : null,
         pct(m.creative_mix?.funnel) ? { label: 'Funnel stage', html: esc(pct(m.creative_mix.funnel)) } : null,
         m.spend?.grade ? { label: 'Spend', html: `Grade ${esc(m.spend.grade)} <span class="muted">${esc(m.spend.floor ?? '')}, ${esc(m.source ?? 'Upspring')} estimate</span>` } : null,
         libsRow(),
       ];
-      return { strip: strip('Their best-performing Meta ads', m.ads.slice(0, STRIP_MAX).map((a) => metaAdCard(a, { asOf }))), rows };
+      return { strip: strip(m.ads.some((x) => Number.isFinite(x.impressions)) ? 'Their best-performing Meta ads' : 'Meta ads running now', m.ads.slice(0, STRIP_MAX).map((a) => metaAdCard(a, { asOf })), { itemClass: m.ads.some((x) => x.primary_text || x.advertiser) ? 'nativead' : '' }), rows };
     },
     organic_social() { return { strip: strip('Their best posts', postsBy((p) => SOCIAL.includes(p.platform) && p.owner !== 'founder')) }; },
     founder_social() { return { strip: strip('Their best posts', postsBy((p) => SOCIAL.includes(p.platform) && p.owner === 'founder')) }; },
@@ -110,7 +148,7 @@ export function makeProof({ prep, an, ctx, shown, shotSrc, ev, asOf, domain = ''
       if (!c?.checks?.length) return {};
       const GL = { yes: '✓', no: '✕', unknown: '?' };
       const RESULT = { yes: 'Yes', no: 'No', unknown: "Couldn't check" };
-      return { inline: `<ul class="ck">${c.checks.map((x) => `<li><span class="gl gl-${x.result}" aria-hidden="true">${GL[x.result]}</span><span><b>${esc(x.check)}</b> <span class="muted">${RESULT[x.result]}${x.detail ? ` · ${esc(x.detail)}` : ''}</span></span></li>`).join('')}</ul>` };
+      return { inline: `<ul class="ck">${c.checks.map((x) => `<li><span class="gl gl-${x.result}" aria-hidden="true">${GL[x.result]}</span><span class="ckt"><b>${esc(x.check)}</b><span class="sr-only">: ${RESULT[x.result]}</span>${x.detail ? `<span class="ckd">${esc(x.detail)}</span>` : ''}</span></li>`).join('')}</ul>` };
     },
     comparison() {
       const all = (pt.comparison?.examples ?? []).filter(safeUrl);
@@ -120,10 +158,16 @@ export function makeProof({ prep, an, ctx, shown, shotSrc, ev, asOf, domain = ''
       const s = strip('Screenshots', shotsOf(['comparison']), { itemClass: 'shot' });
       return { strip: s, rows: [linkRow('Pages', urls, pageName)] };
     },
+    owned_content() {
+      const items = prep.content?.items ?? [];
+      return { grid: pieceTable(items, { who: 'By', whoKey: 'author', asOf }) };
+    },
+    press() { return { grid: pieceTable((prep.earned?.items ?? []).filter((x) => !EVENT_KINDS.has(x.kind)), { who: 'Outlet', whoKey: 'outlet', asOf }) }; },
+    events() { return { grid: pieceTable((prep.earned?.items ?? []).filter((x) => EVENT_KINDS.has(x.kind)), { who: 'Where', whoKey: 'outlet', asOf }) }; },
     customer_proof() {
       const urls = (pt.customers?.examples ?? []).filter((u) => safeUrl(u) && !/\/customers\/?$/i.test(u));
       const s = strip('Screenshots', shotsOf(['customers']), { itemClass: 'shot' });
-      return { strip: s, rows: [linkRow('Stories', urls, (u) => titleCase(lastSeg(u)))] };
+      return { strip: s, rows: [linkRow('Stories', urls, (u) => titleCase(lastSeg(u)))], inline: ratingPills(prep.ratings?.items) };
     },
     signup_entry() { return { strip: strip('Screenshots', shotsOf(SHOT_KINDS.signup_entry), { itemClass: 'shot' }) }; },
     pricing() {
@@ -156,8 +200,9 @@ export function makeProof({ prep, an, ctx, shown, shotSrc, ev, asOf, domain = ''
   return (id) => {
     const b = (builders[id] ?? (() => ({})))();
     const rows = (b.rows ?? []).filter(Boolean);
-    const facts = rows.length ? `<dl class="kf">${rows.map((r) => `<div><dt>${esc(r.label)}</dt><dd>${r.html}</dd></div>`).join('')}</dl>` : '';
-    return { strip: b.strip ?? '', note: b.note ?? '', facts, inline: b.inline ?? '' };
+    const facts = rows.length ? `<dl class="kf">${rows.map((r) => `<div${/<a |<span class="pills"/.test(r.html) ? ' class="w"' : ''}><dt>${esc(r.label)}</dt><dd>${r.html}</dd></div>`).join('')}</dl>` : '';
+    const grid = b.grid ?? '';
+    return { strip: b.strip ?? '', grid, note: b.note ?? '', facts, inline: b.inline ?? '', linked: Boolean(b.strip || grid || /<a /.test(facts) || /<a /.test(b.inline ?? '')) };
   };
 }
 
@@ -193,19 +238,19 @@ export function renderChannelCards(prep, asOf) {
     const last = s ? prep.posts.filter((p) => p.platform === a.platform && norm(p.account) === norm(a.handle)).map((p) => p.published).sort().at(-1) : null;
     const handle = a.platform === 'linkedin' ? personName(clean(a.handle)) : `@${clean(a.handle)}`;
     const followers = Number.isFinite(a.followers) && a.followers > 0;
-    const lines = [
-      s ? `${s.sampled} ${s.sampled === 1 ? 'post' : 'posts'} sampled` : '',
+    const owner = a.owner === 'founder' ? 'Founder' : a.owner === 'employee' ? 'Team' : 'Company';
+    const unit = a.platform === 'youtube' ? 'subscribers' : 'followers';
+    const detail = [
+      s ? `${s.sampled} ${s.sampled === 1 ? 'post' : 'posts'} sampled` : 'No posts collected',
       s?.baseline_ok ? `typical post ${fmtN(Math.round(s.median_engagement))} engagements` : s && s.measured ? `best post ${fmtN(s.top[0]?.engagement ?? 0)} engagements` : '',
       last ? `latest ${fmtDate(last, { year: false })}` : '',
-    ].filter(Boolean);
-    return `<a class="chan" href="${esc(a.url)}" target="_blank" rel="noopener noreferrer">
-      <span class="chead"><span class="cmark cm-${esc(a.platform)}" aria-hidden="true">${esc(PMARK[a.platform] ?? '·')}</span><b class="cname">${esc(PLATFORM_LABEL[a.platform] ?? a.platform)}</b><span class="cown">${esc(a.owner === 'founder' ? 'Founder' : a.owner === 'employee' ? 'Team' : 'Company')}</span></span>
-      <span class="chandle">${esc(handle)}</span>
-      <span class="cnum">${followers ? `<b>${compactN(a.followers)}</b> ${a.platform === 'youtube' ? 'subscribers' : 'followers'}` : '<span class="muted">Followers not visible</span>'}</span>
-      ${lines.length ? `<span class="cstats">${esc(lines.join(' · '))}</span>` : '<span class="cstats muted">No posts collected</span>'}
+    ].filter(Boolean).join(', ');
+    return `<a class="chan" href="${esc(a.url)}" target="_blank" rel="noopener noreferrer" title="${esc(`${PLATFORM_LABEL[a.platform] ?? a.platform}, ${owner.toLowerCase()}. ${detail}`)}">
+      <span class="cmark cm-${esc(a.platform)}" aria-hidden="true">${esc(PMARK[a.platform] ?? '·')}</span>
+      <span class="ctext"><b class="chandle">${esc(handle)}</b><span class="cmeta">${followers ? `<b>${compactN(a.followers)}</b> ${unit}` : `<span class="muted">${esc(PLATFORM_LABEL[a.platform] ?? a.platform)}</span>`}<span class="cown">${esc(owner)}</span></span></span>
     </a>`;
   }).join('');
-  return `<div class="chans" aria-label="Channels at a glance">${cards}</div>`;
+  return `<div class="chans" aria-label="Accounts">${cards}</div>`;
 }
 
 // ---------- site traffic: a line chart of monthly visits (Similarweb estimates) ----------
@@ -224,9 +269,9 @@ export function renderTraffic(prep, ctx) {
   // Under about 1,000 visits a month Similarweb's estimates are mostly noise: say so instead of drawing a trend.
   if (max < 1000) {
     const it = prep.byId.get(t.evidence_id);
-    return `<section id="traffic" class="block card" aria-labelledby="traffic-h"><h2 id="traffic-h">Site traffic</h2>
-    <p class="tsum">Too little traffic to show a trend: ${esc(t.source ?? 'Similarweb')} estimates under 1,000 visits a month (at most ${fmtN(Math.round(max))}).</p>
-    <p class="note-s">${it ? ctx.extLink(safeUrl(t.source_url) ? t.source_url : it.url, 'Source', 'Source: Similarweb traffic estimates') : ''}</p></section>`;
+    return `<section id="traffic" class="block" aria-labelledby="traffic-h"><h2 id="traffic-h">Site traffic</h2>
+    <div class="panel"><p class="tsum">Too little traffic to show a trend: ${esc(t.source ?? 'Similarweb')} estimates under 1,000 visits a month (at most ${fmtN(Math.round(max))}).</p>
+    <p class="note-s">${it ? ctx.extLink(safeUrl(t.source_url) ? t.source_url : it.url, 'Source', 'Source: Similarweb traffic estimates') : ''}</p></div></section>`;
   }
   const step = Math.pow(10, Math.floor(Math.log10(max)));
   const top = Math.ceil(max / step) * step;
@@ -244,12 +289,14 @@ export function renderTraffic(prep, ctx) {
   const dir = change === null ? 'up from none' : change === 0 ? 'flat' : change > 0 ? `up ${change}%` : `down ${Math.abs(change)}%`;
   const summary = `${compact(last.value)} visits in ${monthLabel(last.month)}, ${dir} since ${monthLabel(first.month)}`;
   const table = `<table class="sr-only"><caption>${esc(t.label ?? 'Monthly visits')}</caption><tbody>${pts.map((p) => `<tr><th>${esc(p.month)}</th><td>${fmtN(p.value)}</td></tr>`).join('')}</tbody></table>`;
-  return `<section id="traffic" class="block card" aria-labelledby="traffic-h">
+  return `<section id="traffic" class="block" aria-labelledby="traffic-h">
     <h2 id="traffic-h">Site traffic</h2>
+    <div class="panel">
     <p class="tsum"><b>${esc(summary)}.</b> <span class="muted">An estimate from ${esc(t.source ?? 'Similarweb')}${t.last_updated ? `, updated ${esc(fmtDate(t.last_updated, { year: true }))}` : ''}.</span></p>
     <svg class="tchart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(`${t.label ?? 'Monthly visits'}: ${summary}`)}">${grid}<path d="${area}" class="ta"/><path d="${line}" class="tline"/>${dots}${labels}</svg>
     ${table}
     <p class="note-s">${esc(t.label ?? 'Monthly visits')}. ${ctx.extLink(safeUrl(t.source_url) ? t.source_url : prep.byId.get(t.evidence_id).url, 'Source', 'Source: Similarweb traffic estimates')}</p>
+    </div>
   </section>`;
 }
 
@@ -260,9 +307,11 @@ export function renderTech(prep, ctx) {
   if (!tech) return '';
   const names = [...new Set(tech.tools.map((t) => t.tool))];
   const it = prep.byId.get(tech.evidence_id);
-  return `<section id="tech" class="block card" aria-labelledby="tech-h">
+  return `<section id="tech" class="block" aria-labelledby="tech-h">
     <h2 id="tech-h">Tech stack</h2>
+    <div class="panel">
     ${names.length ? `<ul class="chips">${names.map((n) => `<li>${esc(n)}</li>`).join('')}</ul>` : '<p class="muted">No third-party tools loaded during the visit.</p>'}
     <p class="note-s">What loaded on the homepage in a real browser visit. ${it ? ctx.extLink(it.url, 'Source', 'Source: tech stack visit') : ''}</p>
+    </div>
   </section>`;
 }

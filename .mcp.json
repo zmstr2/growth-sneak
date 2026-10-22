@@ -2,11 +2,17 @@
   "mcpServers": {
     "firecrawl": {
       "type": "http",
-      "url": "https://mcp.firecrawl.dev/v2/mcp-oauth"
+      "url": "https://mcp.firecrawl.dev/v2/mcp",
+      "headers": {
+        "Authorization": "Bearer ${FIRECRAWL_API_KEY}"
+      }
     },
     "exa": {
       "type": "http",
-      "url": "https://mcp.exa.ai/mcp"
+      "url": "https://mcp.exa.ai/mcp",
+      "headers": {
+        "x-api-key": "${EXA_API_KEY}"
+      }
     }
   }
 }

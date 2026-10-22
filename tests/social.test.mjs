@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { renderReport } from '../scripts/render.mjs';
-import { allScores, paneOf, stripOf, stripItems } from './helpers.mjs';
+import { paneOf, stripOf, stripItems } from './helpers.mjs';
 import { SECTIONS } from '../scripts/scoreboard.mjs';
 import { STRIP_MAX } from '../scripts/proof.mjs';
 import { discoverAccounts, engagementOf, accountStats, median, MIN_POSTS_FOR_BASELINE } from '../scripts/social.mjs';
@@ -14,7 +14,7 @@ const load = () => ({
   evidence: JSON.parse(readFileSync(join(FIX, 'evidence.json'), 'utf8')),
   analysis: JSON.parse(readFileSync(join(FIX, 'analysis.json'), 'utf8')),
 });
-const render = (ev, an) => renderReport(ev, an, { baseDir: FIX, scores: allScores(ev) });
+const render = (ev, an) => renderReport(ev, an, { baseDir: FIX });
 
 // ---------- collector helpers ----------
 

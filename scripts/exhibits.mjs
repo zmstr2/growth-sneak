@@ -80,8 +80,36 @@ export function postCard(p, { asOfYear } = {}) {
   </article>`;
 }
 
-// An ad from Meta's Ad Library, as Upspring describes it: its preview, hook line, how long it has run and a link to the library.
+// An ad from Meta, drawn the way Meta draws it: the advertiser, "Sponsored", the ad text, the creative, then the link
+// block with its domain, headline and button. The creative is the real image when we have one. A video ad has no
+// frame we can read, so it gets a plain panel that says so and links to the library.
+const initial = (name) => esc(String(name ?? '?').trim().charAt(0).toUpperCase() || '?');
+export function nativeMetaAd(a, { asOf } = {}) {
+  const days = asOf && a.started_at ? Math.max(0, Math.round((Date.parse(asOf) - Date.parse(a.started_at)) / 86_400_000)) : null;
+  const since = a.started_at ? fmtDate(a.started_at, { year: false }) : '';
+  const name = a.advertiser ?? 'Advertiser';
+  const avatar = a.avatar_src
+    ? `<img class="nad-av" alt="" src="${esc(a.avatar_src)}" referrerpolicy="no-referrer" loading="lazy" width="36" height="36">`
+    : `<span class="nad-av nad-ini" aria-hidden="true">${initial(name)}</span>`;
+  const text = String(a.primary_text ?? a.hook_text ?? '').replace(/\s+/g, ' ').trim();
+  const media = a.image_src
+    ? `<a class="nad-media" href="${esc(a.url)}" target="_blank" rel="noopener noreferrer"><img alt="${esc(`Ad creative: ${short(a.headline ?? text, 80)}`)}" src="${esc(a.image_src)}" referrerpolicy="no-referrer" loading="lazy"></a>`
+    : a.is_video
+      ? `<a class="nad-media nad-video" href="${esc(a.url)}" target="_blank" rel="noopener noreferrer"><span class="nad-play" aria-hidden="true">▶</span><span>Video ad</span><span class="nad-watch">Watch on Meta<span aria-hidden="true"> ↗</span></span></a>`
+      : '';
+  const cta = a.cta ? String(a.cta).trim() : '';
+  const desc = a.description && a.description.trim().toLowerCase() !== cta.toLowerCase() ? a.description.trim() : '';
+  const link = (a.headline || a.display_link || cta)
+    ? `<div class="nad-link"><span class="nad-meta">${a.display_link ? `<span class="nad-dom">${esc(short(String(a.display_link).replace(/^https?:\/\//i, ''), 40).toUpperCase())}</span>` : ''}${a.headline ? `<b>${esc(short(a.headline, 70))}</b>` : ''}${desc ? `<span class="nad-desc">${esc(short(desc, 70))}</span>` : ''}</span>${cta ? `<span class="nad-cta">${esc(cta)}</span>` : ''}</div>`
+    : '';
+  const cap = `<figcaption><b>${days != null ? `Running ${days} ${days === 1 ? 'day' : 'days'}` : 'Meta ad'}</b>${since ? ` · since ${esc(since)}` : ''} · <a class="ext" href="${esc(a.url)}" target="_blank" rel="noopener noreferrer">Ad Library<span aria-hidden="true"> ↗</span></a></figcaption>`;
+  return `<figure class="xad nad"><div class="nad-card"><div class="nad-top">${avatar}<span class="nad-who"><b>${esc(name)}</b><span>Sponsored</span></span></div>${text ? `<p class="nad-text">${esc(text)}</p>` : ''}${media}${link}</div>${cap}</figure>`;
+}
+
+// An ad from Meta's Ad Library as Upspring describes it (estimates and a thumbnail), or a native card when the ad
+// carries its own text and link block.
 export function metaAdCard(a, { asOf } = {}) {
+  if (a.primary_text || a.advertiser) return nativeMetaAd(a, { asOf });
   const days = asOf && a.started_at ? Math.max(0, Math.round((Date.parse(asOf) - Date.parse(a.started_at)) / 86_400_000)) : null;
   const since = a.started_at ? fmtDate(a.started_at, { year: false }) : '';
   const img = a.thumbnail_url && /^https:\/\//i.test(a.thumbnail_url);
@@ -109,7 +137,7 @@ export function shotFrame(s, src) {
     ${src
       ? `<button class="frame" type="button" data-zoom aria-label="Enlarge the ${esc(label.toLowerCase())} screenshot"><span class="fbar" aria-hidden="true"><em>${esc(short(host, 48))}</em></span>${img}</button>`
       : `<div class="frame"><span class="fbar" aria-hidden="true"><em>${esc(short(host, 48))}</em></span>${img}</div>`}
-    <figcaption><b>${esc(label)}.</b>${shortCaption(s) ? ` ${esc(shortCaption(s))}` : ''}<a class="ext" href="${esc(s.page_url)}" target="_blank" rel="noopener noreferrer" aria-label="Open the live ${esc(label.toLowerCase())}">Open page<span aria-hidden="true"> ↗</span></a></figcaption>
+    <figcaption><b>${esc(label)}.</b>${shortCaption(s) ? ` ${esc(shortCaption(s))}` : ''} <a class="ext" href="${esc(s.page_url)}" target="_blank" rel="noopener noreferrer" aria-label="Open the live ${esc(label.toLowerCase())}">Open page<span aria-hidden="true"> ↗</span></a></figcaption>
   </figure>`;
 }
 

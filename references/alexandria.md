@@ -26,7 +26,7 @@ website traffic, social posts. Everything here is optional. Without it, the repo
 | `ashbyhq-com` `jobs/jobs` (board slug from the careers page, e.g. `jobs.ashbyhq.com/<Slug>`) | 5 | every open role: title, team, location, publish date, salary and equity | not used in the report |
 | `greenhouse-io` (board token) | about 5 | the same for Greenhouse boards | not used in the report |
 | `adstransparency-google-com` `ad-transparency/search_advertisers`, `list_ads` | 5 per page | Google ads | Google ads |
-| `upspring` `advertisers/by-domain` | 100 (free if unsourced) | Meta ads: hooks, offers, top ads, follower counts | Paid social |
+| `upspring` `advertisers/by-domain` | 100 (free if unsourced) | Meta spend and creative-mix estimates, mostly consumer brands. Optional: only if the user asks. The default Meta read is the public Ad Library through `firecrawl_scrape` (5 credits, see `layers/paid.md`) | Paid social |
 | `firecrawl-trends` `trends/interest_over_time` | 5 | weekly search interest for up to 5 terms | not used in the report |
 | `similarweb` `web/traffic` with `metrics: "visits"`, one month per call | 110 per month | monthly visits | Site traffic (six months, only when the user opted in) |
 | `x-com`, `youtube-com`, `oriane` (TikTok and Instagram) | see contract | posts, channels, videos, follower counts | social, video |
@@ -48,7 +48,7 @@ Hunt and LinkedIn. Reviews and LinkedIn posts stay with Exa.
 ## Site traffic (used in the report)
 `similarweb` / `web/traffic`: one complete month per call, 110 credits per metric returned (max 5 metrics), `start_date` and `end_date` the same `YYYY-MM`, `metrics` a comma list from visits, average_visit_duration, pages_per_visit, bounce_rate, unique_visitors. In practice only `visits` came back for a small site; the other fields were null. Six months of visits = 660 credits. Data is lagged about a month (last_updated was 2026-09-30 on 2026-10-21). Tested on recall.ai: Apr–Sep 2026 returned.
 
-## Used in the report: Upspring (Meta ads) and Oriane (Instagram, TikTok)
+## Optional: Upspring (Meta estimates). Used in the report: Oriane (Instagram, TikTok)
 - `upspring` `advertisers/by-domain` 100 credits (free if unavailable) then `ads/browse` 50 credits per page, with
   `include: "media"` for preview thumbnails. Tested on mudwtr.com: a rich brief (226 active ads, creative mix, spend
   grade, hook themes) and 8 ads with Ad Library links and thumbnails, 150 credits in total. Recall.ai (B2B software)

@@ -5,7 +5,7 @@ import { createHash } from 'node:crypto';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { renderReport, hasPreview } from '../scripts/render.mjs';
-import { allScores, paneOf, stripOf, stripItems, sectionOf, kfRows } from './helpers.mjs';
+import { dropActivities, paneOf, stripOf, stripItems, sectionOf, kfRows } from './helpers.mjs';
 import { SECTIONS } from '../scripts/scoreboard.mjs';
 import { STRIP_MAX } from '../scripts/proof.mjs';
 
@@ -14,24 +14,24 @@ const load = () => ({
   evidence: JSON.parse(readFileSync(join(FIX, 'evidence.json'), 'utf8')),
   analysis: JSON.parse(readFileSync(join(FIX, 'analysis.json'), 'utf8')),
 });
-const render = (ev, an) => renderReport(ev, an, { baseDir: FIX, scores: allScores(ev) });
+const render = (ev, an) => renderReport(ev, an, { baseDir: FIX });
 const adCards = (html) => html.split('<figure class="xad"').slice(1).map((s) => s.split('</figure>')[0]);
 
 // ---------- structure ----------
 
-test('renders the shell: rail, hero, activity sections, tech stack, gaps and a footer; the old furniture is gone', () => {
+test('renders the shell: rail, hero, activity sections, tech stack and gaps, with no footer; the old furniture is gone', () => {
   const { evidence, analysis } = load();
   const { html, warnings } = render(evidence, analysis);
   assert.match(html, /<div class="shell">\s*<nav class="rail" aria-label="Sections">/);
   assert.match(html, /<main id="report">/);
   assert.match(html, /<header id="summary" class="hero"/);
   for (const id of ['tech', 'gaps']) assert.match(html, new RegExp(`<section id="${id}"`), `missing section ${id}`);
-  for (const sec of SECTIONS) assert.match(html, new RegExp(`<section id="s-${sec.id}" class="block card"`), `missing section s-${sec.id}`);
+  for (const sec of SECTIONS) assert.match(html, new RegExp(`<section id="s-${sec.id}" class="block"`), `missing section s-${sec.id}`);
   // Removed features must not come back: ribbon, hero card, strongest-signals card, tabbed panes, messaging, sources appendix.
   for (const gone of ['activities', 'scores', 'messaging', 'sources', 'srcSearch', 'map', 'glance', 'working', 'funnel']) assert.ok(!html.includes(`id="${gone}"`), `the ${gone} section is gone`);
   assert.ok(!/class="ribbon|class="hb-row|class="stagecard|class="srow|class="sc-detail|class="gcard|class="bcard|Strongest signals|How they say it|data-hay|<details class="sources"/.test(html.split('<main')[1].split('</main>')[0]), 'removed furniture is gone');
   assert.ok(!html.includes('"#E0'), 'no numeric jump links to evidence anchors');
-  assert.match(html, /<footer class="about/);
+  assert.ok(!html.includes('<footer class="about'), 'no footer');
   assert.match(html, /<a class="skip" href="#report">/);
   assert.deepEqual(warnings, [], 'the fixture should render without adjustments');
   assert.match(html, /<title>How Notion grows · Growth Sneak<\/title>/);
@@ -52,58 +52,36 @@ test('reading flow has no dashboard furniture: no stat tiles, chips, highlighter
   assert.ok(!/>E\d{3}</.test(main), 'evidence ids must not be shown as visible text in the reading flow');
 });
 
-test('the lede leads: the cited headline (or summary) is the first text after the brand, before any section, and is not repeated', () => {
+test('the hero is the brand only: name, domain and capture date, with no lede, cards or "Public data only"', () => {
   const { evidence, analysis } = load();
   const { html } = render(evidence, analysis);
   const hero = html.split('<header id="summary"')[1].split('</header>')[0];
   assert.match(hero, /<h1>Notion<\/h1>/);
-  const lede = hero.match(/<p class="lede">([\s\S]*?)<\/p>/)[1];
-  const lead = analysis.summary.text.slice(0, 40).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
-  assert.ok(lede.includes(lead), 'with no headline the summary leads');
-  assert.ok((lede.match(/class="fnlink"/g) ?? []).length <= 2, 'at most two arrow links');
-  assert.match(lede, /<sup class="fns"><a class="fnlink" href="https:\/\/[^"]+" target="_blank" rel="noopener noreferrer" aria-label="Source: [^"]+">↗<\/a><\/sup>/);
+  assert.ok(!/class="lede"|Public data only|class="plays"/.test(hero));
+  assert.match(hero, /Collected \d+ \w+ \d{4}<\/p>/);
   assert.equal(html.split('<h1').length - 1, 1, 'one h1');
   assert.ok(html.indexOf('<h1') < html.indexOf('<h2'), 'no section heading before the brand');
-  const visible = html.split('<main')[1]
-    .replace(/<div class="srcs"[\s\S]*?<\/div>/g, '');
-  assert.equal(visible.split(lead).length - 1, 1, 'the summary is not repeated below the lede');
+  const visible = html.split('<main')[1];
   assert.ok((visible.match(/600–700|600-700/g) ?? []).length <= 3, 'the ad total should be visible at most three times');
 });
 
 // ---------- citations ----------
 
-test('citations: the lede has arrow links to the evidence, claims open their sources inline, numbers ascend, and no numeric jump link to an evidence anchor remains', () => {
+test('citations: nothing shows evidence ids or numeric jump links; the only inline source links are real external links', () => {
   const { evidence, analysis } = load();
   const { html } = render(evidence, analysis);
-  assert.ok(!/class="fnlink" href="#E/.test(html), 'arrow links are external, not #E anchors');
+  assert.ok(!/class="fnlink"|class="fn"|class="srcs"|aria-controls="fp/.test(html), 'the footnote machinery is gone');
   assert.ok(!/id="E\d+"/.test(html), 'there are no evidence anchors to jump to');
-  // A takeaway's observation is a claim: its numbers are buttons that open the sources right underneath, numbered in reading order.
-  const ev2 = load();
-  const scores = { activities: { google_ads: { score: 80, confidence: 0.9, basis: 'jev', evidence_ids: ['E001'] } } };
-  ev2.analysis.takeaways = [
-    { activity: 'google_ads', move: 'Test more angles.', observed: 'Many ads run for months.', evidence_ids: ev2.evidence.items.slice(-4).map((i) => i.id) },
-    { activity: 'google_ads', move: 'Second move.', observed: 'Second observation.', evidence_ids: [ev2.evidence.items[0].id] },
-  ];
-  const r = renderReport(ev2.evidence, ev2.analysis, { baseDir: FIX, scores });
-  assert.deepEqual(r.warnings, []);
-  assert.match(r.html, /aria-label="Show sources? \d+(?: to \d+)?"/);
-  assert.match(r.html, /aria-label="Show sources \d+ to \d+">\d+–\d+</, 'three or more consecutive footnotes collapse to a range');
-  const nums = [...r.html.matchAll(/aria-label="Show sources? (\d+)/g)].map((m) => Number(m[1]));
-  const firsts = [...new Set(nums)];
-  assert.ok(firsts.length > 1);
-  assert.deepEqual(firsts, [...firsts].sort((a, b) => a - b), 'first appearance of each number ascends');
-  const buttons = [...r.html.matchAll(/aria-controls="(fp\d+)"/g)];
-  assert.ok(buttons.length > 0);
-  for (const m of buttons) assert.match(r.html, new RegExp(`<div class="srcs" id="${m[1]}" hidden>`));
-  // Every source row inside a claim is a real external link.
-  for (const m of r.html.matchAll(/<div class="srcs"[^>]*>([\s\S]*?)<\/div>/g)) assert.match(m[1], /<a class="ext" href="https?:\/\//);
+  const main = html.split('<main')[1];
+  assert.ok(!/>E\d{3}</.test(main), 'evidence ids are never visible text');
+  for (const m of main.matchAll(/<a class="ext" href="([^"]+)"/g)) assert.match(m[1], /^https?:\/\//);
 });
 
 test('source links have descriptive accessible names: block source lines and the traffic/tech Source links', () => {
   const { evidence, analysis } = load();
   const { html } = render(evidence, analysis);
   const lines = [...html.matchAll(/<p class="srcline">([\s\S]*?)<\/p>/g)].map((m) => m[1]);
-  assert.ok(lines.length > 5, 'most blocks end with a source line');
+  assert.ok(lines.length >= 1, 'blocks whose examples do not link to the originals end with a source line');
   for (const l of lines) {
     assert.match(l, /^<span class="slab">Sources<\/span>/, 'the line is labelled Sources');
     const links = [...l.matchAll(/<a class="schip"[^>]*>/g)].map((m) => m[0]);
@@ -122,14 +100,14 @@ test('source links have descriptive accessible names: block source lines and the
 
 const GAP_RE = /<p class="gapline"><b>Not covered:<\/b> ([^<]+)\./;
 const gapOf = (html) => (html.match(GAP_RE)?.[1] ?? '').replace(/&amp;/g, '&');
-// A tiny evidence file: one item per [channel, status, extra] row. No scores, so only the closing section depends on it.
+// A tiny evidence file: one item per [channel, status, extra] row.
 const tiny = (rows, extra = {}) => ({
   domain: 'x.test', captured_at: '2026-10-20T00:00:00Z',
   items: rows.map(([channel, status, more = {}], i) => ({ id: `E${String(i + 1).padStart(3, '0')}`, collector: 'owned', channel, status, finding: `${channel} ${status}.`, url: 'https://x.test/', captured_at: '2026-10-20T00:00:00Z', ...more })),
   ...extra,
 });
 
-test('channels we could not cover are named once, in the closing section, and get no score row', () => {
+test('channels we could not cover are named once, in the closing section, and get no activity row', () => {
   const { evidence, analysis } = load();
   const { html } = render(evidence, analysis);
   const gap = gapOf(html);
@@ -151,47 +129,45 @@ test('"Not covered" lists a channel with only couldn\'t-check items, but not one
     ['open_source', 'couldnt_check'],
     ['open_source', 'observed'],                  // one observed item among failed ones is enough
   ]);
-  const { html } = renderReport(ev, {}, { baseDir: '.', scores: null });
+  const { html } = renderReport(ev, {}, { baseDir: '.' });
   const gap = gapOf(html);
   for (const label of ['Social (company)', 'Community']) assert.ok(gap.includes(label), `${label} should be listed`);
   assert.equal((gap.match(/Community/g) ?? []).length, 1, 'listed once although two items were unchecked');
   for (const label of ['YouTube & video', 'Pricing & signup', 'Comparison pages', 'Open source & dev community']) assert.ok(!gap.includes(label), `${label} was covered`);
   // The same channel is not covered in one run and covered in the next, depending only on the evidence.
   const covered = tiny([['social', 'couldnt_check'], ['social', 'observed']]);
-  assert.ok(!gapOf(renderReport(covered, {}, { baseDir: '.', scores: null }).html).includes('Social (company)'));
+  assert.ok(!gapOf(renderReport(covered, {}, { baseDir: '.' }).html).includes('Social (company)'));
 });
 
 test('"Not covered" never lists traffic, hiring or martech, even when they have only couldn\'t-check items or nothing at all', () => {
   const ev = tiny([['traffic', 'couldnt_check'], ['hiring', 'couldnt_check'], ['martech', 'couldnt_check'], ['social', 'couldnt_check']]);
-  const gap = gapOf(renderReport(ev, {}, { baseDir: '.', scores: null }).html);
+  const gap = gapOf(renderReport(ev, {}, { baseDir: '.' }).html);
   assert.ok(gap.includes('Social (company)'));
   for (const label of ['Site traffic', 'Hiring', 'Martech']) assert.ok(!gap.includes(label), label);
-  const none = gapOf(renderReport(tiny([]), {}, { baseDir: '.', scores: null }).html);
+  const none = gapOf(renderReport(tiny([]), {}, { baseDir: '.' }).html);
   for (const label of ['Site traffic', 'Hiring', 'Martech']) assert.ok(!none.includes(label), `${label} (no items at all)`);
   assert.ok(none.includes('Social (company)'), 'a channel with no items at all is not covered');
 });
 
 test('collected Google ads count as covering google_ads even with no google_ads evidence item', () => {
   const ads = [{ id: 'AD1', platform: 'google', format: 'text', days_shown: 30, first_shown: '2026-09-01', url: 'https://x.test/ad' }];
-  const withAds = gapOf(renderReport(tiny([['social', 'couldnt_check']], { ads }), {}, { baseDir: '.', scores: null }).html);
+  const withAds = gapOf(renderReport(tiny([['social', 'couldnt_check']], { ads }), {}, { baseDir: '.' }).html);
   assert.ok(!withAds.includes('Google ads'));
-  const without = gapOf(renderReport(tiny([['social', 'couldnt_check']]), {}, { baseDir: '.', scores: null }).html);
+  const without = gapOf(renderReport(tiny([['social', 'couldnt_check']]), {}, { baseDir: '.' }).html);
   assert.ok(without.includes('Google ads'));
 });
 
-test('activities we could not look at are never shown as absent: "Not covered", no number, no "none found", named in the closing card', () => {
+test('activities we could not look at are never shown as absent: "Not covered", no "none found", named in the closing card', () => {
   const { evidence, analysis } = load();
-  const scores = allScores(evidence, { google_ads: null, pricing: null });
-  const { html } = renderReport(evidence, analysis, { baseDir: FIX, scores });
+  const { html } = renderReport(dropActivities(evidence, ['google_ads', 'pricing']), analysis, { baseDir: FIX });
   assert.ok(!/class="sbr ab/.test(html), 'no checked-absence rows without a recorded check');
   for (const id of ['google_ads', 'pricing']) {
     const pane = paneOf(html, id);
-    assert.match(pane, /<span class="ascore word">Not covered<\/span>/);
-    assert.ok(!/class="ascore s-/.test(pane) && !/none found/i.test(pane));
+    assert.match(pane, /<span class="state state-none">Not covered<\/span>/);
+    assert.ok(!/none found/i.test(pane));
   }
   const gaps = html.split('id="gaps"')[1].split('</section>')[0];
-  assert.match(gaps, /<b>Not scored:<\/b>[^<]*Google ads[^<]*Pricing page[^<]*which is not the same as a score of 0/);
-  assert.match(gaps, /<b>Not covered:<\/b>/);
+  assert.match(gaps, /<b>Activities not covered:<\/b>[^<]*Google ads[^<]*Pricing page[^<]*not the same as the company not doing it/);
 });
 test('empty sections are not printed', () => {
   const { evidence, analysis } = load();
@@ -207,32 +183,29 @@ test('a claim with no evidence ids is dropped and never shown', () => {
   const { html, warnings } = render(evidence, analysis);
   assert.ok(!html.includes('unsupported hot take'));
   assert.ok(warnings.some((w) => /no evidence ids/.test(w)));
-  assert.match(html, /1 item was left out or flagged when the page was built/);
 });
 
 test('citing an unknown evidence id is a hard error', () => {
   const { evidence, analysis } = load();
-  analysis.summary.evidence_ids.push('E999');
+  analysis.couldnt_see.push({ text: 'x', evidence_ids: ['E999'] });
   assert.throws(() => render(evidence, analysis), /unknown evidence id E999/);
 });
 
-test('a checked absence is a written 0 in its block with what was checked', () => {
-  const { evidence, analysis } = load();
+test('a checked absence says "Checked, none found" in its block with what was checked', () => {
+  const { evidence: full, analysis } = load();
+  const evidence = dropActivities(full, ['comparison']); // the other comparison facts would make it "Seen"
   evidence.items.push({
     id: 'E100', collector: 'owned', channel: 'comparison', status: 'observed', absent: true,
     probe: 'Fetched notion.com/sitemap.xml (4,812 URLs) and searched for /vs/ and /compare/ paths',
     finding: 'No Notion-authored comparison pages in the sitemap.', url: 'https://www.notion.com/sitemap.xml',
     captured_at: '2026-10-20T03:00:00Z',
   });
-  const scores = allScores(evidence);
-  scores.activities.comparison = { score: 0, confidence: 0.8, basis: 'checked_absence', evidence_ids: ['E100'] };
-  const { html } = renderReport(evidence, analysis, { baseDir: FIX, scores });
+  const { html } = renderReport(evidence, analysis, { baseDir: FIX });
   assert.ok(!html.includes('Checked and not found'), 'no separate absences list');
   const pane = paneOf(html, 'comparison');
-  assert.match(pane, /<span class="ascore s-n">0<small>\/100<\/small><\/span>/);
-  assert.match(pane, /<p class="asub">Checked, none found<\/p>/);
+  assert.match(pane, /<span class="state state-absent">Checked, none found<\/span>/);
   assert.match(pane, /<p class="facts muted">Checked: Fetched notion\.com\/sitemap\.xml/);
-  // A merely scored block never claims a check it did not make.
+  // A block that only shows what we saw never claims a check it did not make.
   assert.ok(!/Checked: /.test(paneOf(html, 'pricing')));
 });
 
@@ -338,7 +311,7 @@ test('the CSP script hash matches the inline script exactly', () => {
 
 test('hostile text is escaped and cannot add elements', () => {
   const { evidence, analysis } = load();
-  evidence.items[0].finding = '<img src=x onerror=alert(1)> <script>alert(2)</script> "quoted"';
+  analysis.reads = [{ activity: 'google_ads', read: '<img src=x onerror=alert(1)> <script>alert(2)</script> "quoted"', evidence_ids: [evidence.items[0].id] }];
   analysis.company.name = 'Evil $& Corp';
   const { html } = render(evidence, analysis);
   assert.ok(!html.includes('<img src=x'));
@@ -353,18 +326,11 @@ test('non-http links are rejected', () => {
   assert.throws(() => render(evidence, analysis), /http\(s\) link/);
 });
 
-test('the footer credits the scorer ("Scores by"), lists connected data sources, and no longer lists unconnected ones', () => {
+test('the page names no scorer and advertises no unconnected sources', () => {
   const { evidence, analysis } = load();
   const { html } = render(evidence, analysis);
-  const footer = html.split('<footer class="about')[1].split('</footer>')[0];
-  assert.match(footer, /Scores by Jev \(TypeSafe\), 0 to 100/);
-  assert.match(footer, /Data: Firecrawl\./);
-  assert.ok(!/Not connected|would add/.test(html), 'unconnected sources are not advertised');
-  // Without Jev scores the footer says an analyst agent scored the page.
-  const fb = load();
-  fb.analysis.activity_levels = [{ activity: 'google_ads', level: 3, evidence_ids: ['E001'] }];
-  const f2 = renderReport(fb.evidence, fb.analysis, { baseDir: FIX }).html.split('<footer class="about')[1];
-  assert.match(f2, /Scores by an analyst agent, 0 to 100/);
+  assert.ok(!/Scores by|Jev|TypeSafe/.test(html.replace(/data:[^"')]+/g, '')));
+  assert.ok(!/Not connected|would add|Made with Growth Sneak|Cost: \d/.test(html));
 });
 
 // ---------- structured tables ----------
@@ -386,7 +352,7 @@ test('readiness checks (in the AI search pane) are words, never colour alone, an
   evidence.site_checks.checks.push({ check: 'Sitemap reachable', result: 'unknown', detail: 'Timed out' });
   const html = paneOf(render(evidence, analysis).html, 'aeo');
   assert.match(html, /<span class="gl gl-yes" aria-hidden="true">✓<\/span>/);
-  assert.match(html, /<b>Sitemap reachable<\/b> <span class="muted">Couldn't check · Timed out<\/span>/);
+  assert.match(html, /<b>Sitemap reachable<\/b><span class="sr-only">: Couldn't check<\/span><span class="ckd">Timed out<\/span>/);
 });
 
 test('tech stack lists only tool names as chips; no categories, notes, table or claim of "no pixels"', () => {
@@ -445,10 +411,10 @@ test('comparison and customer-story pages are plain link lines of facts, labelle
   };
   const { html } = render(evidence, analysis);
   const cmp = paneOf(html, 'comparison');
-  assert.match(kfRows(cmp).get('Pages'), /^<a href="https:\/\/www\.notion\.com\/vs\/evernote" target="_blank" rel="noopener noreferrer">Evernote<\/a> · <a href="https:\/\/www\.notion\.com\/compare-against\/trello"[^>]*>Trello<\/a>$/);
+  assert.match(kfRows(cmp).get('Pages'), /^<span class="pills"><a class="lpill" href="https:\/\/www\.notion\.com\/vs\/evernote" target="_blank" rel="noopener noreferrer">Evernote<\/a><a class="lpill" href="https:\/\/www\.notion\.com\/compare-against\/trello"[^>]*>Trello<\/a><\/span>$/);
   assert.ok(!cmp.includes('javascript:'));
   const cust = paneOf(html, 'customer_proof');
-  assert.match(kfRows(cust).get('Stories'), /^<a href="https:\/\/www\.notion\.com\/customers\/figma-case-study"[^>]*>Figma Case Study<\/a>$/);
+  assert.match(kfRows(cust).get('Stories'), /^<span class="pills"><a class="lpill" href="https:\/\/www\.notion\.com\/customers\/figma-case-study"[^>]*>Figma Case Study<\/a><\/span>$/);
   assert.ok(!/customers"[^>]*>Customers</.test(cust), 'the index page is not a story');
 });
 
@@ -468,7 +434,7 @@ test('linkRow: a page already drawn as a screenshot is not repeated as a link; w
   const pages = kfRows(cmp).get('Pages');
   assert.ok(!/evernote/i.test(pages), 'so it is not also a link (trailing slash, query and case ignored when comparing)');
   assert.equal((pages.match(/<a /g) ?? []).length, 1, 'Trello is listed once although three spellings were collected');
-  assert.match(pages, />Trello<\/a>$/);
+  assert.match(pages, />Trello<\/a><\/span>$/);
   // When every page is already a screenshot, the row is dropped rather than left empty.
   const cust = paneOf(html, 'customer_proof');
   assert.ok(stripOf(cust).includes('<figure class="xshot'));
@@ -552,7 +518,7 @@ const loadFix = (name) => {
 test('every strip stays within STRIP_MAX, and no post, ad or screenshot is drawn twice anywhere on the page', () => {
   for (const name of FIXTURES) {
     const { dir, evidence, analysis } = loadFix(name);
-    const { html } = renderReport(evidence, analysis, { baseDir: dir, scores: allScores(evidence) });
+    const { html } = renderReport(evidence, analysis, { baseDir: dir });
     const strips = html.split('<div class="strip">').slice(1);
     assert.ok(strips.length > 0, `${name} has strips`);
     for (const st of strips) {
@@ -574,15 +540,13 @@ test('blocks of activities we could not cover contain no strip and no number', (
   for (const name of FIXTURES) {
     const { dir, evidence, analysis } = loadFix(name);
     const gone = ['google_ads', 'organic_social', 'pricing', 'founder_social', 'seo_content'];
-    const scores = allScores(evidence, Object.fromEntries(gone.map((id) => [id, null])));
-    const { html } = renderReport(evidence, analysis, { baseDir: dir, scores });
+    const { html } = renderReport(dropActivities(evidence, gone), analysis, { baseDir: dir });
     for (const id of gone) {
       const pane = paneOf(html, id);
       assert.equal(stripOf(pane), '', `${name}/${id}: no strip`);
       assert.ok(!pane.includes('class="strip'), `${name}/${id}: no strip markup`);
       assert.ok(!pane.includes('<details'), `${name}/${id}: no folds, charts or tables`);
-      assert.match(pane, /<span class="ascore word">Not covered<\/span>/);
-      assert.ok(!/class="ascore s-/.test(pane), 'no score chip');
+      assert.match(pane, /<span class="state state-none">Not covered<\/span>/);
       const text = pane.slice(pane.indexOf('>') + 1).replace(/<[^>]+>/g, ' ').replace(/&#?\w+;/g, '');
       assert.ok(!/\d/.test(text), `${name}/${id}: no number in the pane text: ${text.replace(/\s+/g, ' ').slice(0, 160)}`);
     }
@@ -596,7 +560,7 @@ const UNUSED_FIELDS = ['channels', 'connections', 'notable_plays', 'messaging', 
 test('analysis fields the report no longer shows are ignored, even when broken: a bad activities entry or an unknown channel does not break the render or add a warning', () => {
   for (const name of FIXTURES) {
     const { dir, evidence, analysis } = loadFix(name);
-    const opts = { baseDir: dir, scores: allScores(evidence) };
+    const opts = { baseDir: dir };
     const clean = structuredClone(analysis);
     for (const k of UNUSED_FIELDS) delete clean[k];
     const base = renderReport(evidence, clean, opts);
@@ -619,15 +583,14 @@ test('analysis fields the report no longer shows are ignored, even when broken: 
   }
 });
 
-test('the fields the report does read are still checked: an uncited summary, reads or takeaways entry is dropped and a bad evidence id stops the build', () => {
+test('the fields the report does read are still checked: an uncited read is dropped and a bad evidence id stops the build', () => {
   const { evidence, analysis } = loadFix('exa.ai');
-  const opts = { baseDir: FIX_DIR('exa.ai'), scores: allScores(evidence) };
+  const opts = { baseDir: FIX_DIR('exa.ai') };
   const a = structuredClone(analysis);
   a.reads = [{ activity: 'google_ads', read: 'Uncited read.', evidence_ids: [] }];
-  a.takeaways = [{ activity: 'google_ads', move: 'Uncited move.', observed: 'Uncited observation.', evidence_ids: [] }];
   const r = renderReport(evidence, a, opts);
-  assert.ok(!r.html.includes('Uncited read.') && !r.html.includes('Uncited move.'));
-  assert.equal(r.warnings.filter((w) => /no evidence ids/.test(w)).length, 2);
-  a.takeaways = [{ activity: 'google_ads', move: 'A move.', observed: 'Something.', evidence_ids: ['E999'] }];
-  assert.throws(() => renderReport(evidence, a, opts), /takeaways: cites unknown evidence id E999/);
+  assert.ok(!r.html.includes('Uncited read.'));
+  assert.equal(r.warnings.filter((w) => /no evidence ids/.test(w)).length, 1);
+  a.reads = [{ activity: 'google_ads', read: 'A read.', evidence_ids: ['E999'] }];
+  assert.throws(() => renderReport(evidence, a, opts), /reads: cites unknown evidence id E999/);
 });

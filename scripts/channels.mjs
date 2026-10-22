@@ -1,10 +1,11 @@
 // What a collector files each piece of evidence under. One definition of "a channel", shared by the
-// merge step, the renderer and the scoring rubric (rubric.mjs lists which channels feed each activity).
+// merge step, the renderer and the activity list (activities.mjs lists which channels feed each activity).
 export const CHANNELS = [
   { id: 'google_ads', label: 'Google ads' },
   { id: 'meta_ads', label: 'Meta ads' },
   { id: 'linkedin_ads', label: 'LinkedIn ads' },
   { id: 'tiktok_ads', label: 'TikTok ads' },
+  { id: 'owned_content', label: 'Blog and guides' },
   { id: 'seo_content', label: 'SEO & content' },
   { id: 'comparison', label: 'Comparison pages' },
   { id: 'pricing_signup', label: 'Pricing & signup' },
@@ -27,9 +28,3 @@ export const CHANNELS = [
 
 export const CHANNEL_BY_ID = Object.fromEntries(CHANNELS.map((c) => [c.id, c]));
 
-export const SOURCE_LABELS = {
-  firecrawl: 'Firecrawl',
-  exa: 'Exa',
-  jev: 'Jev (TypeSafe)',
-  apify: 'Apify',
-};

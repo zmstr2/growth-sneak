@@ -4,19 +4,19 @@
 //
 //   node scripts/render.mjs reports/<domain> [--open]
 //
-// The page leads with the answer and the strongest growth plays, then what to take from it, then one
-// block per growth activity with its score and the proof behind it (a post, an ad or a page screenshot),
+// The page opens with the company, then one
+// block per growth activity with what we saw and the proof behind it (a post, an ad or a page screenshot),
 // then site traffic, tech stack and what we could not see.
 //
-// The analysis it reads is: company, headline (or summary), reads, plays, takeaways and couldnt_see.
+// The analysis it reads is: company, reads and couldnt_see.
 // Anything else in analysis.json is ignored.
 //
 // Honesty rules are enforced here, not left to prompts:
 //   * a claim with no evidence ids is dropped (warning)
 //   * an unknown evidence id is a hard error (the data is broken)
-//   * an activity id the rubric does not know (in scores.json or the analysis) is ignored with a warning
-//   * a score of 0 from a checked absence needs a recorded check (absent:true + probe); an activity with
-//     no evidence is "Not covered", never 0
+//   * an activity id we do not know (in the analysis) is ignored with a warning
+//   * "checked, none found" needs a recorded check (absent:true + probe); an activity with no usable
+//     evidence is "Not covered", never "none"
 
 import { readFileSync, writeFileSync, existsSync, statSync } from 'node:fs';
 import { createHash } from 'node:crypto';
@@ -25,19 +25,18 @@ import { fileURLToPath } from 'node:url';
 import { isMain } from './ismain.mjs';
 import { normalizeMetrics } from './social.mjs';
 import { execFile } from 'node:child_process';
-import { CHANNELS, CHANNEL_BY_ID, SOURCE_LABELS } from './channels.mjs';
-import { esc, safeUrl, fmtDate, short, listJoin, emphasize, hasPreview, MIN_THUMB_WIDTH } from './util.mjs';
+import { CHANNELS, CHANNEL_BY_ID } from './channels.mjs';
+import { esc, safeUrl, fmtDate, short, listJoin, hasPreview, MIN_THUMB_WIDTH } from './util.mjs';
 import { KIND_LABEL } from './exhibits.mjs';
-import { ACTIVITY_BY_ID } from './rubric.mjs';
-import { fallbackScores } from './score.mjs';
-import { renderPlays, renderTake, renderSections, uncoveredActivities, scoreRows, SECTIONS, STRONG_FROM } from './scoreboard.mjs';
+import { ACTIVITY_BY_ID } from './activities.mjs';
+import { coverage } from './coverage.mjs';
+import { renderSections, uncoveredActivities, activityRows, SECTIONS } from './scoreboard.mjs';
 import { makeProof, renderTraffic, renderTech, renderChannelCards } from './proof.mjs';
 
 export { esc, safeUrl, fmtDate, hasPreview, MIN_THUMB_WIDTH };
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const TEMPLATE_PATH = join(HERE, '..', 'templates', 'report.html');
-const VERSION = JSON.parse(readFileSync(join(HERE, '..', '.claude-plugin', 'plugin.json'), 'utf8')).version;
 
 const STATUSES = ['observed', 'stated', 'couldnt_check'];
 const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
@@ -45,18 +44,9 @@ const MIME = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
 
 // ---------- validation / honesty rules ----------
 
-const norm = (t) => String(t ?? '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
-// The Move sentence of every card in references/plays.md, to catch a takeaway that copies it unchanged.
-function playMoves() {
-  try {
-    const md = readFileSync(join(HERE, '..', 'references', 'plays.md'), 'utf8');
-    return new Set([...md.matchAll(/\*\*Move\.\*\*\s*(.+)/g)].map((m) => norm(m[1])));
-  } catch { return new Set(); }
-}
-
 class DataError extends Error {}
 
-export function prepare(evidence, analysis, scores = null) {
+export function prepare(evidence, analysis, cov = null) {
   const warnings = [];
   const warn = (m) => warnings.push(m);
 
@@ -108,6 +98,13 @@ export function prepare(evidence, analysis, scores = null) {
     if (!Array.isArray(m.ads)) throw new DataError('meta_ads: "ads" must be an array');
     for (const a of m.ads) if (!a.id || !safeUrl(a.url)) throw new DataError(`meta_ads: ad ${a.id} needs an id and an http(s) "url"`);
   });
+  const listOf = (name, obj, check) => linked(name, obj, (o) => {
+    if (!Array.isArray(o.items)) throw new DataError(`${name}: "items" must be an array`);
+    o.items.forEach((x, i) => { if (!x || !safeUrl(x.url)) throw new DataError(`${name}.items[${i}]: needs an http(s) "url"`); check(x, i); });
+  });
+  const content = listOf('content', evidence.content, (x, i) => { if (!x.title) throw new DataError(`content.items[${i}]: needs a "title"`); });
+  const earned = listOf('earned', evidence.earned, (x, i) => { if (!x.title) throw new DataError(`earned.items[${i}]: needs a "title"`); });
+  const ratings = listOf('ratings', evidence.ratings, (x, i) => { if (!x.source || !Number.isFinite(x.rating)) throw new DataError(`ratings.items[${i}]: needs a "source" and a numeric "rating"`); });
   const pricing = linked('pricing', evidence.pricing, (p) => {
     if (!Array.isArray(p.plans) || p.plans.some((x) => !x.name || !x.price)) throw new DataError('pricing: each plan needs "name" and "price"');
   });
@@ -131,38 +128,13 @@ export function prepare(evidence, analysis, scores = null) {
 
   const couldntSee = cleanList(analysis.couldnt_see, 'couldnt_see');
 
-  // Score-led content. Each sentence must cite real evidence or it is dropped; a bad activity id is dropped with a warning.
+  // Activity-led content. Each sentence must cite real evidence or it is dropped; a bad activity id is dropped with a warning.
   const known = (label, list) => list.filter((x) => {
     if (ACTIVITY_BY_ID[x.activity]) return true;
     warn(`${label}: dropped an entry for unknown activity "${x.activity}"`);
     return false;
   });
-  const headline = analysis.headline ? (cleanList([analysis.headline], 'headline')[0] ?? null) : null;
   const reads = new Map(known('reads', cleanList(analysis.reads, 'reads')).map((r) => [r.activity, r]));
-  // The analyst's picks for the hero cards: only activities that are shown and have a score can be a play.
-  const scoredIds = scores ? new Set(scoreRows(scores).filter((r) => r.state === 'scored').map((r) => r.id)) : null;
-  const plays = known('plays', (analysis.plays ?? []).filter((x) => x && x.activity)).filter((x) => {
-    if (scoredIds && !scoredIds.has(x.activity)) { warn(`plays: dropped "${x.activity}" (it has no score, so it cannot be a growth play)`); return false; }
-    return true;
-  });
-  const positive = scores ? new Set(scoreRows(scores).filter((r) => r.state === 'scored' && r.score > 0).map((r) => r.id)) : null;
-  const cardMoves = playMoves();
-  const takeaways = known('takeaways', cleanList(analysis.takeaways, 'takeaways')).filter((t) => {
-    if (!t.move || !t.observed) { warn(`takeaways: dropped "${t.activity}" (needs observed and move)`); return false; }
-    if (positive && !positive.has(t.activity)) { warn(`takeaways: dropped "${t.activity}" (no move is taken from an activity scored 0 or not covered)`); return false; }
-    if (cardMoves.has(norm(t.move))) warn(`takeaways: the move for "${t.activity}" copies references/plays.md word for word; write it for this company`);
-    return true;
-  });
-  if (scores) {
-    for (const [id, sc] of Object.entries(scores.activities ?? {})) {
-      // An activity the rubric no longer has (an older scores.json) is ignored, not shown.
-      if (!ACTIVITY_BY_ID[id]) { warn(`scores.json: ignored unknown activity "${id}"`); continue; }
-      for (const e of sc.evidence_ids ?? []) if (!byId.has(e)) throw new DataError(`scores.json: ${id} cites unknown evidence id ${e}`);
-    }
-  }
-
-  const summary = analysis.summary ? cleanList([analysis.summary], 'summary')[0] ?? null : null;
-
   // Social and community collections. Every post and account points at its evidence item.
   const needEv = (label, id) => { if (!id || !byId.has(id)) throw new DataError(`${label}: "evidence_id" must name an existing evidence item`); };
   const posts = (evidence.posts ?? []).map((p, i) => {
@@ -204,6 +176,9 @@ export function prepare(evidence, analysis, scores = null) {
     tech,
     traffic,
     metaAds,
+    content,
+    earned,
+    ratings,
     pricing,
     posts,
     accounts,
@@ -213,11 +188,7 @@ export function prepare(evidence, analysis, scores = null) {
     // Only what the report shows. Each part cites evidence or was dropped above.
     analysis: {
       company: analysis.company ?? null,
-      headline,
-      summary,
       reads,
-      plays,
-      takeaways,
       couldnt_see: couldntSee,
     },
   };
@@ -238,117 +209,59 @@ function imageSrc(ref, baseDir, warn) {
   return `data:${mime};base64,${readFileSync(file).toString('base64')}`;
 }
 
-// ---------- rendering context: footnote numbers ----------
+// ---------- rendering context ----------
 
 function makeCtx(prep) {
-  const fnum = new Map(); // evidence id -> footnote number, in reading order
-  let panels = 0;
-  const num = (id) => {
-    if (!fnum.has(id)) fnum.set(id, fnum.size + 1);
-    return fnum.get(id);
-  };
-
   const extLink = (url, text, label) =>
     `<a class="ext" href="${esc(url)}" target="_blank" rel="noopener noreferrer"${label ? ` aria-label="${esc(label)}"` : ''}>${esc(text)}<span aria-hidden="true"> ↗</span></a>`;
 
-  const statusWord = (it) => {
-    if (it.absent) return '<span class="st">Checked absence</span>';
-    if (it.status === 'stated') return '<span class="st">Stated by the company</span>';
-    if (it.status === 'couldnt_check') return '<span class="st">Unconfirmed</span>';
-    return '';
-  };
-
-  // A statement with quiet footnote numbers; the numbers open its sources right underneath.
-  const claim = (text, ids, { tag = 'div', cls = '', emph = false } = {}) => {
-    const k = ++panels;
-    // Runs of three or more consecutive numbers read as a range ("1–6"), not six separate marks.
-    const nums = [...new Set(ids.map(num))].sort((a, b) => a - b);
-    const runs = [];
-    for (const n of nums) {
-      const last = runs.at(-1);
-      if (last && n === last[1] + 1) last[1] = n; else runs.push([n, n]);
-    }
-    const parts = runs.flatMap(([a, b]) => (b - a >= 2 ? [[a, b]] : Array.from({ length: b - a + 1 }, (_, i) => [a + i, a + i])));
-    const sups = parts.map(([a, b]) => {
-      const label = a === b ? `Show source ${a}` : `Show sources ${a} to ${b}`;
-      return `<button class="fn" type="button" aria-expanded="false" aria-controls="fp${k}" aria-label="${label}">${a === b ? a : `${a}–${b}`}</button>`;
-    }).join('');
-    const rows = ids.map((id) => {
-      const it = prep.byId.get(id);
-      return `<li><span class="n">${num(id)}</span><span>${esc(it.finding)} ${statusWord(it)} ${extLink(it.url, 'Source', `Source for: ${short(it.finding)}`)}</span></li>`;
-    }).join('');
-    return `<${tag} class="claim ${cls}"><p>${emph ? emphasize(esc(text)) : esc(text)}<sup class="fns">${sups}</sup></p><div class="srcs" id="fp${k}" hidden><ol>${rows}</ol></div></${tag}>`;
-  };
-
-  // A footnote number that jumps to the item in the Sources appendix (for tables and captions).
-  const ref = (id) => { const it = prep.byId.get(id); return `<sup class="fns"><a class="fnlink" href="${esc(it.url)}" target="_blank" rel="noopener noreferrer" aria-label="Source: ${esc(short(it.finding))}">↗</a></sup>`; };
-
-  return { num, fnum, claim, extLink, statusWord, ref };
+  return { extLink };
 }
 
 
-// The closing section: activities we could not score, channels with no usable evidence at all, plus the analyst's gaps.
+// The closing section: activities we could not see, channels with no usable evidence at all, plus the analyst's gaps.
 // A channel is "not covered" when none of its items is observed or stated and no absence was recorded for it
 // (items we could not check do not count). Traffic, hiring and martech are context, not growth channels, so never listed.
-function renderGaps(ev, an, prep, ctx, scores) {
+function renderGaps(ev, an, prep, ctx, cov) {
   const seen = new Set(ev.items.filter((i) => i.status !== 'couldnt_check' || i.absent).map((i) => i.channel));
   if (prep.ads.length) seen.add('google_ads');
   const notCovered = CHANNELS.filter((c) => !seen.has(c.id) && !['traffic', 'hiring', 'martech'].includes(c.id));
   const cs = an.couldnt_see.map((c) => { const it = prep.byId.get(c.evidence_ids[0]); return `<li>${esc(c.text)}${it ? ` ${ctx.extLink(it.url, 'Source', `Source for: ${short(it.finding)}`)}` : ''}</li>`; });
-  const unscored = scores ? uncoveredActivities(scores) : [];
-  if (!cs.length && !notCovered.length && !unscored.length) return '';
-  return `<section id="gaps" class="block card" aria-labelledby="gaps-h">
+  const unseen = uncoveredActivities(cov);
+  if (!cs.length && !notCovered.length && !unseen.length) return '';
+  return `<section id="gaps" class="block" aria-labelledby="gaps-h">
   <h2 id="gaps-h">What we could not see</h2>
-  ${unscored.length ? `<p class="gapline"><b>Not scored:</b> ${esc(listJoin(unscored.map((r) => r.label)))}. We had no evidence to score ${unscored.length === 1 ? 'it' : 'these'}, which is not the same as a score of 0.</p>` : ''}
+  <div class="panel">
+  ${unseen.length ? `<p class="gapline"><b>Activities not covered:</b> ${esc(listJoin(unseen.map((r) => r.label)))}. We had no usable evidence, which is not the same as the company not doing it.</p>` : ''}
   ${notCovered.length ? `<p class="gapline"><b>Not covered:</b> ${esc(listJoin(notCovered.map((c) => c.label)))}.</p>` : ''}
   ${cs.length ? `<ul class="plain gapl">${cs.join('')}</ul>` : ''}
+  </div>
 </section>`;
 }
 
-function renderHero(ev, an, ctx, scores) {
+function renderHero(ev, an) {
   const name = an.company?.name || ev.domain;
-  const lede = an.headline ?? an.summary;
-  const refs = lede ? lede.evidence_ids.slice(0, 2).map((id) => ctx.ref(id)).join('') : '';
-  const plays = scores ? renderPlays(scores, an) : '';
   return `<header id="summary" class="hero" aria-label="Overview">
   <div class="brand">
     <img class="logo" src="https://www.google.com/s2/favicons?domain=${esc(encodeURIComponent(ev.domain))}&amp;sz=128" alt="" width="56" height="56" referrerpolicy="no-referrer">
     <div><h1>${esc(name)}</h1>
-    <p class="meta"><a class="ext" href="https://${esc(ev.domain)}" target="_blank" rel="noopener noreferrer">${esc(ev.domain)}<span aria-hidden="true"> ↗</span></a> · Collected ${esc(fmtDate(ev.captured_at, { year: true }))} · Public data only</p></div>
+    <p class="meta"><a class="ext" href="https://${esc(ev.domain)}" target="_blank" rel="noopener noreferrer">${esc(ev.domain)}<span aria-hidden="true"> ↗</span></a> · Collected ${esc(fmtDate(ev.captured_at, { year: true }))}</p></div>
   </div>
-  ${lede ? `<p class="lede">${esc(lede.text)}${refs}</p>` : ''}
   ${ev.note ? `<p class="note">${esc(ev.note)}</p>` : ''}
-  ${plays ? `<h2 class="hsub">Their strongest growth plays</h2>${plays}` : ''}
 </header>`;
 }
 
 // A slim bar that stays at the top while you read; the script marks the section you are in.
 function renderRail(sections) {
-  // [id, label, score?]: a section's score is its highest scored activity; sections with nothing scored show none.
-  return `<nav class="rail" aria-label="Sections"><ol>${sections.map(([id, label, score]) => `<li><a href="#${id}"><span>${esc(label)}</span>${Number.isFinite(score) ? `<b class="rs ${score >= STRONG_FROM ? 's-g' : 's-n'}"><span class="sr-only">top score </span>${score}</b>` : ''}</a></li>`).join('')}</ol></nav>`;
-}
-
-function renderAbout(ev, prep, scoreBasis = null) {
-  const sources = ev.sources ?? {};
-  const used = Object.keys(SOURCE_LABELS).filter((s) => sources[s] === 'connected').map((s) => SOURCE_LABELS[s]);
-  const scored = scoreBasis ? `Scores by ${scoreBasis === 'jev' ? 'Jev (TypeSafe)' : 'an analyst agent'}, 0 to 100 on a four-level rubric.` : '';
-  const cost = ev.cost?.firecrawl_credits != null ? `Cost: ${esc(ev.cost.firecrawl_credits)} Firecrawl credits.` : '';
-  const adjusted = prep.warnings.length
-    ? ` ${prep.warnings.length} ${prep.warnings.length === 1 ? 'item was' : 'items were'} left out or flagged when the page was built (uncited, unknown or not shown).`
-    : '';
-  return `<footer class="about">
-  <p>Made with Growth Sneak ${esc(VERSION)} on ${esc(fmtDate(ev.captured_at))}. ${used.length ? `Data: ${esc(listJoin(used))}.` : 'No data sources were connected.'} ${esc(scored)} ${cost}${adjusted}</p>
-  <p>This page describes what a company does in public and suggests moves to consider. The moves are suggestions, not facts. Missing evidence is not proof that something is absent.</p>
-</footer>`;
+  return `<nav class="rail" aria-label="Sections"><ol>${sections.map(([id, label]) => `<li><a href="#${id}"><span>${esc(label)}</span></a></li>`).join('')}</ol></nav>`;
 }
 
 // ---------- assemble ----------
 
-export function renderReport(evidence, analysis, { baseDir = '.', scores: given = null } = {}) {
-  // Scores: scores.json if given, else the analyst's levels on the same rubric, else none (the board is left out).
-  const scores = given ?? (analysis.activity_levels?.length ? fallbackScores(analysis, evidence) : null);
-  const scoreBasis = scores && Object.values(scores.activities ?? {}).some((a) => a.basis === 'jev') ? 'jev' : 'analyst';
-  const prep = prepare(evidence, analysis, scores);
+export function renderReport(evidence, analysis, { baseDir = '.' } = {}) {
+  // What we saw per activity is worked out from the evidence, never scored.
+  const cov = coverage(evidence);
+  const prep = prepare(evidence, analysis, cov);
   const warn = (m) => prep.warnings.push(m);
   const an = prep.analysis;
   const ev = { ...evidence, ads: prep.ads };
@@ -360,25 +273,26 @@ export function renderReport(evidence, analysis, { baseDir = '.', scores: given 
   const shotCache = new Map();
   const shotSrc = (x) => { if (!shotCache.has(x.id)) shotCache.set(x.id, imageSrc(x.image, baseDir, warn)); return shotCache.get(x.id); };
   const shown = new Set(); // posts, ads and screenshots already drawn, so nothing appears twice
-  const hero = renderHero(ev, an, ctx, scores);
-  const take = scores ? renderTake({ an, scores, ctx }) : '';
+  const hero = renderHero(ev, an);
+  if (prep.metaAds) {
+    const cache = new Map();
+    const src = (ref) => { if (!ref) return null; if (!cache.has(ref)) cache.set(ref, imageSrc(ref, baseDir, warn)); return cache.get(ref); };
+    prep.metaAds = { ...prep.metaAds, ads: prep.metaAds.ads.map((a) => ({ ...a, image_src: src(a.image ?? a.image_url), avatar_src: src(a.avatar ?? a.avatar_url) })) };
+  }
   const proof = makeProof({ prep, an, ctx, shown, shotSrc, ev, asOf, domain: evidence.domain });
-  const sectionsHtml = scores ? renderSections({ scores, an, prep, ctx, proof, intro: { organic: renderChannelCards(prep, asOf) } }) : '';
+  const sectionsHtml = renderSections({ cov, an, prep, ctx, proof, intro: { organic: renderChannelCards(prep, asOf) } });
   const traffic = renderTraffic(prep, ctx);
   const tech = renderTech(prep, ctx);
-  const gaps = renderGaps(ev, an, prep, ctx, scores);
-  const about = renderAbout(ev, prep, scores ? scoreBasis : null);
+  const gaps = renderGaps(ev, an, prep, ctx, cov);
 
   const present = (id) => sectionsHtml.includes(`id="s-${id}"`);
-  const scored = scores ? scoreRows(scores).filter((r) => r.state === 'scored') : [];
-  const topScore = (sec) => { const s = scored.filter((r) => sec.activities.includes(r.id)).map((r) => r.score); return s.length ? Math.max(...s) : null; };
-  const nav = [['summary', 'Overview'], take ? ['take', 'What to take'] : null, traffic ? ['traffic', 'Site traffic'] : null,
-    ...SECTIONS.filter((x) => present(x.id)).map((x) => [`s-${x.id}`, x.label, topScore(x)]),
+  const nav = [['summary', 'Overview'], traffic ? ['traffic', 'Site traffic'] : null,
+    ...SECTIONS.filter((x) => present(x.id)).map((x) => [`s-${x.id}`, x.label]),
     tech ? ['tech', 'Tech stack'] : null, gaps ? ['gaps', 'Not seen'] : null].filter(Boolean);
   const body = [
     '<a class="skip" href="#report">Skip to the report</a>',
     '<div class="shell">', renderRail(nav), '<main id="report">',
-    hero, take, traffic, sectionsHtml, tech, gaps, about, '</main>', '</div>',
+    hero, traffic, sectionsHtml, tech, gaps, '</main>', '</div>',
   ].filter(Boolean).join('\n');
 
   const template = readFileSync(TEMPLATE_PATH, 'utf8');
@@ -404,8 +318,7 @@ export function renderDir(dir, { open = false } = {}) {
   };
   const evidence = read('evidence.json');
   const analysis = read('analysis.json');
-  const scores = existsSync(join(dir, 'scores.json')) ? read('scores.json') : null;
-  const { html, warnings } = renderReport(evidence, analysis, { baseDir: dir, scores });
+  const { html, warnings } = renderReport(evidence, analysis, { baseDir: dir });
   const out = join(dir, 'report.html');
   writeFileSync(out, html);
   if (open) execFile(process.platform === 'darwin' ? 'open' : process.platform === 'win32' ? 'explorer' : 'xdg-open', [out], () => {});

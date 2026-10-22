@@ -58,8 +58,19 @@ report stays small. Add one entry per page to the fragment's `screens` array:
 to point at (for example the comparison-pages item). Never invent a caption; read the page first.
 The funnel items (`funnel_step`) are still fine: any item with an `image` is shown as a screenshot too.
 
+## Blog and guides (the `content` block)
+Owned content that is not a comparison page or a customer story: blog posts, guides, e-books, reports, free tools,
+templates, docs. Pick the 6 to 12 pieces most worth seeing: the newest posts from the biggest section of
+`$R/raw/sitemap.json` plus any flagship resource (an e-book, a research report, a free tool). Open a few to read
+the real title, author and date; take the rest from the sitemap and listing pages. Write one `owned_content` item
+(what kinds of content exist and how much, with the section sizes) and the block:
+`"content": { "items": [{ "title": "<the page's own title>", "url": "<deep link>", "kind": "blog|guide|ebook|report|tool|template|docs|video|other", "date": "YYYY-MM-DD", "author": "<name>" }], "evidence_ref": "<that item's ref>" }`.
+`date` and `author` are optional; leave them out unless the page shows them (a sitemap `lastmod` is an edit date, not
+a publication date, so do not use it). The report shows them as a table, newest first. Never put a comparison page or
+a customer story here.
+
 Also copy `page_types` from `$R/raw/sitemap.json` into the `site` block unchanged. The report lists the
-comparison and customer-story pages from it, and the scorer counts them.
+comparison and customer-story pages from it.
 
 ## Integrations and AI search
 - Integration directories and marketplace listings found in the sitemap; count them.
@@ -76,7 +87,7 @@ comparison and customer-story pages from it, and the scorer counts them.
 
 ## Cadence and plans
 - **Cadence.** Copy `by_month` from `$R/raw/sitemap.json` into the `site` block unchanged. It is the number of
-  pages last updated per month for the last 12 months; the scorer uses it to judge freshness.
+  pages last updated per month for the last 12 months; the report uses it to show how fresh the content is.
 - **Plans.** The `pricing` block's `plans` (name, price, cta) are shown one row per plan. Keep `price` exactly
   as shown on the page.
 

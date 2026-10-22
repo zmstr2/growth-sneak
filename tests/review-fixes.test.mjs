@@ -6,21 +6,16 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { renderReport } from '../scripts/render.mjs';
 import { normalizeMetrics } from '../scripts/social.mjs';
-import { digestFor, analysisIsStale } from '../scripts/score.mjs';
 import { run as sitecheck } from '../scripts/sitecheck.mjs';
 import { merge, mergeDir } from '../scripts/merge.mjs';
-import { pickPlays, scoreRows } from '../scripts/scoreboard.mjs';
-import { ACTIVITIES } from '../scripts/rubric.mjs';
-import { allScores, paneOf, stripOf, stripItems, sectionOf } from './helpers.mjs';
+import { dropActivities, paneOf, stripOf, stripItems, sectionOf } from './helpers.mjs';
 
 const FIX = join(dirname(fileURLToPath(import.meta.url)), 'fixtures', 'exa.ai');
 const load = () => ({
   evidence: JSON.parse(readFileSync(join(FIX, 'evidence.json'), 'utf8')),
   analysis: JSON.parse(readFileSync(join(FIX, 'analysis.json'), 'utf8')),
 });
-const render = (ev, an, scores = allScores(ev)) => renderReport(ev, an, { baseDir: FIX, scores });
-const act = (id) => ACTIVITIES.find((a) => a.id === id);
-const sc = (score, confidence = 0.9, basis = 'jev', ev = ['E001']) => ({ score, confidence, basis, evidence_ids: ev });
+const render = (ev, an) => renderReport(ev, an, { baseDir: FIX });
 
 // ---------- normalizeMetrics ----------
 
@@ -43,58 +38,6 @@ test('merge normalises post metrics', () => {
   const item = { ref: 's1', channel: 'organic_social', status: 'observed', finding: 'f', url: 'https://x.test/' };
   const { evidence } = merge(run, [{ layer: 'social', items: [item], posts: [{ platform: 'linkedin', owner: 'company', account: 'a', published: '2026-10-01', url: 'https://www.linkedin.com/x', text: 't', metrics: { likes: 5, replies: 1, views: 99 }, evidence_ref: 's1' }] }]);
   assert.deepEqual(evidence.posts[0].metrics, { reactions: 5, comments: 1 });
-});
-
-// ---------- digest citations and zero counts ----------
-
-test('digest: lines from structured blocks cite the block\'s evidence id and add it to ids', () => {
-  const ev = { items: [{ id: 'E007', channel: 'seo_content', status: 'observed', finding: 'Sitemap read.', url: 'https://x.test/' }], site: { evidence_id: 'E007', total_urls: 50, sections: [{ path: '/blog', urls: 40 }] } };
-  const d = digestFor(act('seo_content'), ev);
-  assert.ok(d.lines.some((l) => /^E007: Site: 50 English pages/.test(l)));
-  assert.ok(d.lines.every((l) => /^E\d+: /.test(l)));
-  assert.deepEqual(d.ids, ['E007']);
-  const ev2 = { items: [], site: { evidence_id: 'E009', total_urls: 5, sections: [] } };
-  assert.deepEqual(digestFor(act('seo_content'), ev2).ids, ['E009'], 'cited via the block even with no fact item');
-});
-test('digest: a block with no evidence id contributes no line', () => {
-  const d = digestFor(act('seo_content'), { items: [], site: { total_urls: 50, sections: [] } });
-  assert.deepEqual(d.lines, []);
-});
-test('digest: counts of zero are never sent as evidence', () => {
-  const zero = { evidence_id: 'E001', page_types: { comparison: { urls: 0 }, customers: { urls: 0 }, integrations: { urls: 0 } } };
-  const ev = { items: [], site: zero, community: { discord: { evidence_id: 'E002', members: 0 }, hacker_news: { evidence_id: 'E003', stories: 0 } }, oss: { evidence_id: 'E004', repos: 0 } };
-  for (const id of ['comparison', 'customer_proof', 'partnerships', 'community', 'open_source']) assert.deepEqual(digestFor(act(id), ev).lines, [], id);
-  const some = { items: [], site: { evidence_id: 'E001', page_types: { comparison: { urls: 3 } } } };
-  assert.match(digestFor(act('comparison'), some).lines[0], /^E001: 3 comparison-type URLs/);
-});
-test('digest: engagement uses the platform formula, unmeasured posts say not visible, replies are excluded', () => {
-  const post = (o) => ({ platform: 'linkedin', owner: 'company', published: '2026-10-01', evidence_id: 'E001', ...o });
-  const ev = { items: [], posts: [post({ metrics: { reactions: 10, comments: 5 } }), post({ metrics: { reactions: 3 } }), post({ reply: true, metrics: { reactions: 999 } })] };
-  const l = digestFor(act('organic_social'), ev).lines[0];
-  assert.match(l, /^E001: 2 company posts/);
-  assert.match(l, /15, 3\./);
-  assert.ok(!/999/.test(l));
-  const none = digestFor(act('organic_social'), { items: [], posts: [post({})] }).lines[0];
-  assert.match(none, /engagement not visible/);
-});
-test('digest: the google_ads line counts only the company\'s own ads', () => {
-  const ev = { items: [{ id: 'E001', channel: 'google_ads', status: 'observed', finding: 'ads', url: 'https://x.test/' }], ads: [{ days_shown: 10 }, { days_shown: 5, own: false }, { days_shown: 7, own: true }] };
-  const line = digestFor(act('google_ads'), ev).lines.find((l) => /own ads/.test(l));
-  assert.match(line, /^E001: 2 of the company's own ads collected; days shown: 10, 7\./);
-  const onlyOthers = digestFor(act('google_ads'), { ...ev, ads: [{ days_shown: 5, own: false }] }).lines;
-  assert.ok(!onlyOthers.some((l) => /own ads/.test(l)));
-});
-
-// ---------- stale analysis guard ----------
-
-test('analysisIsStale: an analysis.json older than evidence.json is stale', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'gs-stale-'));
-  const a = join(dir, 'analysis.json'), e = join(dir, 'evidence.json');
-  writeFileSync(a, '{}'); writeFileSync(e, '{}');
-  utimesSync(a, 1000, 1000); utimesSync(e, 2000, 2000);
-  assert.equal(analysisIsStale(a, e), true);
-  utimesSync(a, 3000, 3000);
-  assert.equal(analysisIsStale(a, e), false);
 });
 
 // ---------- sitecheck: 404 vs 403 vs 200 ----------
@@ -190,56 +133,8 @@ test('mergeDir validates the merged evidence before writing it', () => {
   assert.deepEqual(JSON.parse(readFileSync(join(dir, 'evidence-ids.json'), 'utf8')), { z: 'E002', a: 'E001' });
 });
 
-// ---------- plays and uncovered ----------
+// ---------- couldnt_see ----------
 
-const PS = (o) => ({ activities: Object.fromEntries(Object.entries(o).map(([id, v]) => [id, sc(v)])) });
-test('pickPlays: the analyst\'s plays are not padded to fill the hero', () => {
-  const picked = pickPlays(PS({ google_ads: 95, organic_social: 90, comparison: 85 }), { plays: [{ activity: 'comparison' }] });
-  assert.deepEqual(picked.map((r) => r.id), ['comparison']);
-});
-test('pickPlays: without plays or takeaways, only scores of 40 or more are plays', () => {
-  const picked = pickPlays(PS({ pricing: 39, aeo: 30, seo_content: 40 }), {});
-  assert.deepEqual(picked.map((r) => r.id), ['seo_content']);
-  assert.deepEqual(pickPlays(PS({ pricing: 39 }), {}), []);
-});
-test('scoreRows: a score of 0 without a checked absence or evidence is uncovered; with either it is not', () => {
-  const rows = (s) => Object.fromEntries(scoreRows({ activities: s }).map((r) => [r.id, r.state]));
-  const r = rows({
-    google_ads: { score: 0, confidence: 0.9, basis: 'jev', evidence_ids: [] },
-    pricing: { score: 0, confidence: 0.9, basis: 'jev', evidence_ids: ['E001'] },
-    aeo: { score: 0, confidence: 0.9, basis: 'checked_absence', evidence_ids: [] },
-    video: { score: 0, confidence: null, basis: 'analyst', evidence_ids: [] },
-  });
-  assert.equal(r.google_ads, 'uncovered');
-  assert.equal(r.video, 'uncovered');
-  assert.equal(r.pricing, 'scored');
-  assert.equal(r.aeo, 'absent');
-});
-
-// ---------- takeaways ----------
-
-const take = (o = {}) => ({ activity: 'google_ads', move: 'Test more angles on the ads that already run.', observed: 'Many ads run for months.', evidence_ids: ['E001'], ...o });
-
-test('render: a takeaway on an activity scored 0 or not covered is dropped with a warning', () => {
-  const { evidence, analysis } = load();
-  const scores = allScores(evidence, { video: null });
-  scores.activities.pricing = sc(0, 0.9, 'jev', ['E001']);
-  scores.activities.events = sc(0, 0.9, 'jev', []);
-  analysis.takeaways = [take({ activity: 'video' }), take({ activity: 'pricing' }), take({ activity: 'events' }), take()];
-  const { html, warnings } = render(evidence, analysis, scores);
-  for (const a of ['video', 'pricing', 'events']) assert.ok(warnings.some((w) => w.includes(`takeaways: dropped "${a}"`)), `${a}: ${warnings.join(' | ')}`);
-  const links = [...sectionOf(html, 'take').matchAll(/href="#(a-\w+)">See details/g)].map((m) => m[1]);
-  assert.deepEqual(links, ['a-google_ads']);
-});
-test('render: a takeaway whose move copies a plays.md Move sentence warns', () => {
-  const { evidence, analysis } = load();
-  const copied = 'Post one useful thing a week in the style your buyers already read, and reuse the best into a thread or short video.';
-  analysis.takeaways = [take({ activity: 'organic_social', move: copied })];
-  const r = render(evidence, analysis);
-  assert.ok(r.warnings.some((w) => /copies references\/plays\.md word for word/.test(w)), r.warnings.join(' | '));
-  analysis.takeaways = [take({ activity: 'organic_social', move: 'Post weekly about how your customers use the API.' })];
-  assert.ok(!render(evidence, analysis).warnings.some((w) => /plays\.md/.test(w)));
-});
 test('render: couldnt_see lines carry a Source link', () => {
   const { evidence, analysis } = load();
   analysis.couldnt_see = [{ text: 'We could not see their email program.', evidence_ids: [evidence.items[0].id] }];
@@ -248,14 +143,10 @@ test('render: couldnt_see lines carry a Source link', () => {
   assert.match(li, /Source/);
   assert.match(li, /href="https?:\/\//);
 });
-test('each scored block says how many findings are behind its score', () => {
+test('blocks carry no finding counts', () => {
   const { evidence, analysis } = load();
-  const scores = allScores(evidence);
-  scores.activities.google_ads.evidence_ids = ['E001'];
-  scores.activities.pricing.evidence_ids = ['E001', 'E002', 'E003'];
-  const { html } = render(evidence, analysis, scores);
-  assert.match(paneOf(html, 'google_ads'), /<p class="asub">1 finding behind this score<\/p>/);
-  assert.match(paneOf(html, 'pricing'), /<p class="asub">3 findings behind this score<\/p>/);
+  const { html } = render(evidence, analysis);
+  for (const id of ['google_ads', 'pricing']) assert.ok(!/class="asub"|findings? behind/.test(paneOf(html, id)), 'no finding counts');
 });
 
 // ---------- traffic floor ----------

@@ -20,6 +20,9 @@
 //   "community": { "discord": { ..., "evidence_ref" }, "hacker_news": { ..., "evidence_ref" } },
 //   "traffic": { "metric": "visits", "label", "points": [{ "month": "YYYY-MM", "value" }], "source", "source_url", "last_updated"?, "evidence_ref" }   (monthly site visits, Similarweb)
 //   "meta_ads": { "source", "advertiser": {id,name}, "active_ads"?, "as_of"?, "spend"?, "creative_mix"?, "ads": [{ id, media_type, is_active, started_at, one_line, hook_text, impressions?, url, thumbnail_url? }], "evidence_ref" }   (Meta ads via Upspring)
+//   "content": { "items": [{ "title", "url", "kind"?, "date"?, "author"? }], "evidence_ref" }   (blog posts, guides and other owned content that is not a comparison or customer story)
+//   "earned":  { "items": [{ "title", "url", "kind", "outlet"?, "date"?, "upcoming"? }], "evidence_ref" }   (press, podcasts, events, webinars)
+//   "ratings": { "items": [{ "source", "rating", "count"?, "scale"?, "url" }], "evidence_ref" }   (review-site ratings)
 //   "screens": [{ "kind", "page_url", "image", "caption", "evidence_ref" }]   (page screenshots)
 //   "site" | "site_checks" | "tech" | "pricing": { ..., "evidence_ref" }
 // }
@@ -32,12 +35,12 @@ import { normalizeMetrics } from './social.mjs';
 import { prepare } from './render.mjs';
 
 const LAYER_ORDER = ['paid', 'owned', 'social', 'company'];
-const SINGLE = ['site', 'site_checks', 'tech', 'pricing', 'oss', 'traffic', 'meta_ads'];
+const SINGLE = ['site', 'site_checks', 'tech', 'pricing', 'oss', 'traffic', 'meta_ads', 'content', 'earned', 'ratings'];
 
-const FRAGMENT_KEYS = new Set(['layer', 'credits', 'items', 'ads', 'ads_total', 'posts', 'accounts', 'oss', 'community', 'site', 'site_checks', 'tech', 'pricing', 'screens', 'traffic', 'meta_ads']);
+const FRAGMENT_KEYS = new Set(['layer', 'credits', 'items', 'ads', 'ads_total', 'posts', 'accounts', 'oss', 'community', 'site', 'site_checks', 'tech', 'pricing', 'screens', 'traffic', 'meta_ads', 'content', 'earned', 'ratings']);
 
 // previousIds: ref -> id from an earlier merge of the same run, so re-merging after a fix keeps every id that
-// analysis.json and scores.json already cite.
+// analysis.json already cites.
 export function merge(run, fragments, previousIds = {}) {
   for (const f of fragments) {
     for (const k of Object.keys(f)) {
@@ -118,7 +121,7 @@ export function mergeDir(dir) {
   const idsPath = join(dir, 'evidence-ids.json');
   const previous = existsSync(idsPath) ? JSON.parse(readFileSync(idsPath, 'utf8')) : {};
   const { evidence, ids } = merge(run, fragments, previous);
-  // Check the evidence now, not at render time: a bad url, channel or absence fails before scoring and analysis.
+  // Check the evidence now, not at render time: a bad url, channel or absence fails before analysis.
   prepare(evidence, {});
   writeFileSync(join(dir, 'evidence.json'), `${JSON.stringify(evidence, null, 2)}\n`);
   writeFileSync(join(dir, 'evidence-ids.json'), `${JSON.stringify(ids, null, 2)}\n`);
