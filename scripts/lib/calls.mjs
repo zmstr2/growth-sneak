@@ -59,6 +59,29 @@ export function field(rec, ...names) {
   return undefined;
 }
 
+// Like field(), but also looks inside the objects providers tuck numbers into (public_metrics, preview, ...).
+export function fieldIn(rec, boxes, ...names) {
+  const direct = field(rec, ...names);
+  if (direct !== undefined) return direct;
+  for (const b of boxes) { const v = field(field(rec, b), ...names); if (v !== undefined) return v; }
+  return undefined;
+}
+
+// Keys a provider sent that no mapping read, so a silent gap shows up in extract-report.json instead of in the report.
+// `consumed` lists the names a mapping used; `boxes` are objects whose own keys are checked one level down.
+export function unmappedKeys(records, consumed, boxes = []) {
+  const used = new Set(consumed.map(key));
+  const seen = new Set();
+  for (const r of records) {
+    for (const [k, v] of Object.entries(r ?? {})) {
+      if (v == null || used.has(key(k))) continue;
+      if (boxes.includes(k) && typeof v === 'object') { for (const [k2, v2] of Object.entries(v)) if (v2 != null && !used.has(key(k2))) seen.add(`${k}.${k2}`); continue; }
+      seen.add(k);
+    }
+  }
+  return [...seen].sort();
+}
+
 const PREFERRED = ['records', 'posts', 'tweets', 'ads', 'creatives', 'items', 'results', 'data'];
 // The list of records inside a result, with the JSON pointer to it (relative to `obj`).
 export function findRecords(obj, base = '', depth = 0) {

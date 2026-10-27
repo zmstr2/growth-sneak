@@ -1,5 +1,5 @@
 // X posts from Firecrawl Alexandria x-com / users/posts, mapped by code from the captured response.
-import { alexandria, findRecords, field, isoDay, num, norm } from '../lib/calls.mjs';
+import { alexandria, findRecords, field, fieldIn, unmappedKeys, isoDay, num, norm } from '../lib/calls.mjs';
 import { fmtDate, listJoin } from '../util.mjs';
 
 const ID = ['id', 'tweet_id', 'post_id', 'status_id', 'rest_id'];
@@ -8,11 +8,13 @@ const WHEN = ['created_at', 'created', 'date', 'published_at', 'published', 'tim
 const LIKES = ['likes', 'like_count', 'favorite_count', 'favorites'];
 const REPOSTS = ['reposts', 'retweets', 'retweet_count', 'repost_count'];
 const REPLIES = ['replies', 'reply_count', 'comments', 'comment_count'];
-const VIEWS = ['views', 'view_count', 'impressions'];
+const VIEWS = ['views', 'view_count', 'impression_count', 'impressions'];
+const BOXES = ['public_metrics', 'metrics', 'stats', 'statistics', 'engagement'];
 const FOLLOWERS = ['followers', 'followers_count', 'author_followers', 'author_followers_count'];
+const USED = [...ID, ...TEXT, ...WHEN, ...LIKES, ...REPOSTS, ...REPLIES, ...VIEWS, ...FOLLOWERS, 'url', 'permalink', 'link', 'username', 'name', 'description', 'is_reply', 'in_reply_to_status_id', 'in_reply_to_user_id', 'in_reply_to_screen_name', 'public_metrics'];
 
 export function extractXPosts(calls, ctx) {
-  const posts = []; const items = []; const accounts = []; const skipped = []; const seen = new Set();
+  const posts = []; const items = []; const accounts = []; const skipped = []; const outside = []; const seen = new Set(); const allRecords = [];
   const byHandle = new Map();
   for (const call of calls) {
     for (const a of alexandria(call)) {
@@ -20,6 +22,7 @@ export function extractXPosts(calls, ctx) {
       const handle = String(a.options.username ?? a.options.handle ?? '').replace(/^@/, '');
       const found = findRecords(a.result);
       if (!handle || !found) { skipped.push({ call: call.ref, why: handle ? 'no records in the response' : 'no username in the request' }); continue; }
+      allRecords.push(...found.records);
       found.records.forEach((rec, i) => {
         const id = field(rec, ...ID); const text = field(rec, ...TEXT); const published = isoDay(field(rec, ...WHEN));
         const ref = `${call.ref}#${a.ptr}${found.ptr}/${i}`;
@@ -28,8 +31,9 @@ export function extractXPosts(calls, ctx) {
         const u = /^https?:\/\//.test(url ?? '') ? url : `https://x.com/${handle}/status/${id}`;
         if (seen.has(u)) return;
         seen.add(u);
+        if (ctx.cutoff && published < ctx.cutoff) { outside.push({ url: u, published }); return; }
         const metrics = {};
-        for (const [k, names] of [['likes', LIKES], ['reposts', REPOSTS], ['replies', REPLIES], ['views', VIEWS]]) { const n = num(field(rec, ...names)); if (n !== undefined) metrics[k] = n; }
+        for (const [k, names] of [['likes', LIKES], ['reposts', REPOSTS], ['replies', REPLIES], ['views', VIEWS]]) { const n = num(fieldIn(rec, BOXES, ...names)); if (n !== undefined) metrics[k] = n; }
         const isReply = Boolean(field(rec, 'is_reply', 'in_reply_to_status_id', 'in_reply_to_user_id', 'in_reply_to_screen_name'));
         const kind = ctx.kindOf(u);
         const owner = ctx.ownerOf(handle, 'x');
@@ -40,7 +44,7 @@ export function extractXPosts(calls, ctx) {
         });
         const g = byHandle.get(handle.toLowerCase()) ?? { handle, owner, dates: [], call: call.ref, followers: undefined };
         g.dates.push(published);
-        const f = num(field(rec, ...FOLLOWERS));
+        const f = num(fieldIn(rec, BOXES, ...FOLLOWERS));
         if (g.followers === undefined && f !== undefined) g.followers = f;
         byHandle.set(handle.toLowerCase(), g);
       });
@@ -57,6 +61,6 @@ export function extractXPosts(calls, ctx) {
     });
     accounts.push({ platform: 'x', handle: g.handle, url: `https://x.com/${g.handle}`, owner: g.owner, ...(g.followers !== undefined ? { followers: g.followers } : {}), evidence_ref: `auto-x-${g.handle.toLowerCase()}`, raw_ref: g.call });
   }
-  return { layer: 'social', posts, items, accounts, skipped };
+  return { layer: 'social', posts, items, accounts, skipped, outside, unmapped: unmappedKeys(allRecords, USED, ['public_metrics']) };
 }
 void norm; void listJoin;

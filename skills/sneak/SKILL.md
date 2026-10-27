@@ -137,6 +137,11 @@ each with a `raw_ref` to its source. Read `$R/extract-report.json`:
 - `skipped` lists records the provider returned without a field we need (an id, a date, a count). They are left out,
   never guessed. If a whole provider is skipped, run `node "$P/scripts/extract.mjs" "$R" --inspect` to see the real
   shape and tell the user the mapping needs updating; do not hand-write the data instead.
+- `unmapped_fields` lists fields a provider sent that no mapping reads (for example a nested count). A non-empty list
+  means a number or date may be missing from the report: run `--inspect`, tell the user which field it is, and do not
+  hand-write the missing data.
+- `outside_window` lists posts older than `post_window_days` (default 120, set it in `run.json`). They are left out
+  of the recent posts, not lost; mention the count in step 6.
 - `owners_defaulted_to_team` lists accounts nobody classified. Re-dispatch that collector once to write its
   `judgments/<layer>.json`, then extract again.
 
