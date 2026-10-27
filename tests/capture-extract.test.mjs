@@ -111,12 +111,13 @@ test('extract: LinkedIn posts carry the counts the page showed, and none where i
   const dir = setup({ calls: [{ tool: 'mcp__plugin_growth-sneak_exa__web_search_exa', input: { query: 'exa linkedin' }, response: envelope(EXA_TEXT) }], social: { domain: 'exa.ai', accounts: [{ platform: 'linkedin', handle: 'company/exa-ai', url: 'https://www.linkedin.com/company/exa-ai/' }] } });
   const { fragments, report } = extractAll(dir);
   const social = fragments.find((f) => f.layer === 'social');
-  assert.equal(social.posts.length, 2);
+  assert.equal(social.posts.length, 1, 'the 2024 post is outside the 120-day window');
   assert.deepEqual(social.posts[0].metrics, { reactions: 339, comments: 24 });
-  assert.equal(social.posts[1].metrics, undefined, 'no count shown: no metrics, never a zero');
   assert.equal(social.posts[0].owner, 'company');
   assert.match(social.posts[0].raw_ref, /^calls\/.+\.json#exa:0$/);
-  assert.equal(report.extracted.linkedin_posts, 2);
+  assert.equal(report.extracted.linkedin_posts, 1);
+  assert.equal(report.outside_window.posts.length, 1, 'and it is listed, not silently lost');
+  assert.equal(report.outside_window.posts[0].published, '2024-07-17');
 });
 
 test('extract: X posts, Google ads and pricing are mapped from saved responses, never invented', () => {
@@ -216,4 +217,87 @@ test('merge: auto blocks from the free scripts never cause hand-written posts to
   assert.equal(JSON.parse(readFileSync(join(dir, 'evidence.json'), 'utf8')).posts.length, 1, 'the post is kept');
   assert.equal(r.provenance.capture_active, false);
   assert.equal(r.provenance.dropped.length, 0);
+});
+
+// ---- shapes captured from a live run on 2026-10-27 (the hook hands over the tool response as a JSON string) ----
+const live = (provider, capability, options, result) => ({
+  tool: 'mcp__plugin_growth-sneak_firecrawl__firecrawl_scrape',
+  input: { objective: 'x', alexandria: [{ provider, capability, options }] },
+  response: JSON.stringify({ success: true, data: { alexandria: [{ provider, capability, ...result }] } }),
+});
+const liveX = (id, text, like, repost, reply, at) => ({ id, username: 'WilliamBryk', url: `https://x.com/WilliamBryk/status/${id}`, text, name: 'Will Bryk', description: 'ceo @exaailabs', created_at: at, public_metrics: { like_count: like, repost_count: repost, reply_count: reply } });
+const liveAd = (cid, format, days, first, last, preview) => ({ advertiser_id: 'AR1', advertiser_name: 'Exa AI Labs', creative_id: cid, days_shown: days, domain: 'exa.ai', first_shown_at: first, first_shown_unix: 1, format, format_code: 1, impressions_high: null, impressions_low: null, last_shown_at: last, last_shown_unix: 2, preview, regions: null, spend_high: null, spend_low: null, url: `https://adstransparency.google.com/advertiser/AR1/creative/${cid}?region=anywhere` });
+
+test('live shape: X counts sit under public_metrics and are read from there', () => {
+  const dir = setup({ calls: [live('x-com', 'users/posts', { username: 'WilliamBryk', limit: 10 }, { data: { data: [liveX('2112286651787641135', 'Around 500,000 B200 GPU-hours were used for making this.', 218, 5, 24, '2026-10-19T20:55:56.000Z')], meta: { citations: [] } }, records: 1 })] });
+  const { fragments } = extractAll(dir);
+  const p = fragments.find((f) => f.layer === 'social').posts[0];
+  assert.deepEqual(p.metrics, { likes: 218, reposts: 5, replies: 24 }, 'likes, reposts and replies come from public_metrics');
+  assert.equal(p.published, '2026-10-19');
+  writeAuto(dir); assert.equal(mergeDir(dir).provenance.verified.posts, 1, 'and the counts verify against the saved response');
+});
+
+test('live shape: Google ads use the provider total, the preview image and size, and first/last_shown_at', () => {
+  const page = (ads, count) => ({ data: { ads, advertiser_id: null, continuation: null, count, domain: 'exa.ai', region: 'anywhere', total_low: 3, total_high: 3 }, records: count });
+  const dir = setup({ calls: [live('adstransparency-google-com', 'ad-transparency/list_ads', { domain: 'exa.ai', limit: 40 }, page([
+    liveAd('CR1', 'TEXT', 25, '2026-10-01T19:34:04Z', '2026-10-27T17:58:41Z', { height: 483, image_html: '<img>', image_url: 'https://tpc.googlesyndication.com/archive/simgad/1', kind: 'image', preview_url: null, width: 348 }),
+    liveAd('CR2', 'IMAGE', 31, '2025-10-20T09:50:20Z', '2025-11-25T06:52:26Z', { height: 511, image_url: 'https://tpc.googlesyndication.com/archive/simgad/2', kind: 'image', width: 724 }),
+    liveAd('CR3', 'VIDEO', 37, '2025-10-06T18:42:35Z', '2025-11-25T02:46:29Z', { height: null, image_url: null, kind: 'rendered', preview_url: 'https://displayads-formats.googleusercontent.com/ads/preview/content.js?x=1', width: null }),
+  ], 3))] });
+  const paid = extractAll(dir).fragments.find((f) => f.layer === 'paid');
+  assert.deepEqual(paid.ads_total, { low: 3, high: 3 }, 'total_low/high, not the page size');
+  const [a, b, c] = paid.ads;
+  assert.equal(a.image_url, 'https://tpc.googlesyndication.com/archive/simgad/1'); assert.equal(a.width, 348); assert.equal(a.height, 483);
+  assert.equal(a.first_shown, '2026-10-01'); assert.equal(a.last_shown, '2026-10-27'); assert.equal(a.days_shown, 25); assert.equal(a.days_shown_basis, undefined);
+  assert.equal(c.image_url, null, 'a video preview_url is a player page, not a picture');
+  assert.equal(b.format, 'image');
+  assert.match(paid.items.find((i) => i.ref === 'auto-google-total').finding, /lists 3 ads/);
+  const sample = paid.items.find((i) => i.ref === 'auto-google-sample').finding;
+  assert.match(sample, /^All 3 ads Google lists were retrieved; 1 last shown within 2 days of the capture date; 1 search \(text\), 1 image, 1 video\./);
+});
+
+test('live shape: an Exa result with "Author: N/A" and no account in its URL is not attributed to anyone', () => {
+  const text = `Title: Agent search is easy to demo and hard to evaluate.
+URL: https://www.linkedin.com/feed/update/urn:li:activity:7513267462105104384
+Published: 2026-10-06T00:00:00.000Z
+Author: N/A
+Highlights:
+Agent search is easy to demo and hard to evaluate.
+
+Peter Deng and I sat down with Exa co-founder Will Bryk.`;
+  const dir = setup({ calls: [{ tool: 'mcp__plugin_growth-sneak_exa__web_search_exa', input: { query: 'q' }, response: text }] });
+  const { fragments, report } = extractAll(dir);
+  assert.equal(fragments.find((f) => f.layer === 'social')?.posts?.length ?? 0, 0);
+  assert.match(report.skipped[0].why, /no account/);
+});
+
+test('extract report: provider fields no mapping reads are listed, so a gap cannot hide', () => {
+  const rec = { ...liveX('9', 'A post.', 1, 2, 3, '2026-10-19T00:00:00Z'), quote_count: 4, lang: 'en' };
+  const dir = setup({ calls: [live('x-com', 'users/posts', { username: 'WilliamBryk' }, { data: { data: [rec] }, records: 1 })] });
+  assert.deepEqual(extractAll(dir).report.unmapped_fields.x_posts, ['lang', 'quote_count']);
+  const clean = setup({ calls: [live('x-com', 'users/posts', { username: 'WilliamBryk' }, { data: { data: [liveX('9', 'A post.', 1, 2, 3, '2026-10-19T00:00:00Z')] }, records: 1 })] });
+  assert.equal(extractAll(clean).report.unmapped_fields.x_posts, undefined);
+});
+
+test('verify: numbers in a cited free-script file are found, and years and "90 days" are not treated as data', () => {
+  const dir = setup({ social: { domain: 'exa.ai', accounts: [], discord: { name: 'Exa', members: 5059, online: 310, invite: 'x' } } });
+  writeFileSync(join(dir, 'fragments', 'social.json'), JSON.stringify({ layer: 'social', items: [
+    { ref: 'ok', channel: 'community', status: 'observed', finding: 'The Discord has 5,059 members, checked on 27 Oct 2026, 90 days after launch.', url: 'https://discord.gg/x', cites: ['raw/social.json'] },
+    { ref: 'bad', channel: 'community', status: 'observed', finding: 'The Discord has 7,777 members.', url: 'https://discord.gg/x', cites: ['raw/social.json'] },
+  ] }));
+  writeAuto(dir);
+  const w = mergeDir(dir).provenance.warnings;
+  assert.equal(w.length, 1, 'only the number that is not in the file is flagged');
+  assert.match(w[0], /7777/);
+});
+
+test('verify: a saved call can be cited as raw/calls/<file> or calls/<file>', () => {
+  const dir = setup({ calls: [{ tool: 'mcp__plugin_growth-sneak_exa__web_search_exa', input: { query: 'q' }, response: EXA_TEXT }] });
+  const file = readdirSync(join(dir, 'raw', 'calls'))[0];
+  writeAuto(dir);
+  writeFileSync(join(dir, 'fragments', 'social.json'), JSON.stringify({ layer: 'social', items: [
+    { ref: 'a', channel: 'social', status: 'observed', finding: 'The post has 339 reactions.', url: 'https://x.com/a', cites: [`raw/calls/${file}`] },
+    { ref: 'b', channel: 'social', status: 'observed', finding: 'The post has 24 comments.', url: 'https://x.com/a', cites: [`calls/${file}`] },
+  ] }));
+  assert.deepEqual(mergeDir(dir).provenance.warnings, []);
 });

@@ -2,12 +2,14 @@
 // posts, match it (every line of text and every count appears in the source record). Hand-written items that cite a
 // file get a softer check: numbers in the finding should appear in what they cite.
 
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { loadCalls, pointer, corpusOf, norm } from './lib/calls.mjs';
 import { parseExaResults } from './extract/exa.mjs';
 
 const numsIn = (s) => new Set([...String(s).matchAll(/\d[\d,]*(?:\.\d+)?/g)].map((m) => Number(m[0].replace(/,/g, ''))));
+// Numbers in a finding that are not data: years, "last 90 days", dates like "27 Oct 2026".
+const dataNumsIn = (s) => numsIn(String(s).replace(/\b(?:19|20)\d{2}(?:-\d{2}){0,2}\b/g, ' ').replace(/\b\d+[- ](?:days?|months?|weeks?|years?)\b/gi, ' ').replace(/\b\d{1,2} (?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\b/g, ' '));
 const leaves = (v, out = []) => { if (v == null) return out; if (typeof v === 'string') out.push(v); else if (typeof v === 'number') out.push(String(v)); else if (typeof v === 'object') for (const x of Object.values(v)) leaves(x, out); return out; };
 
 export function verifyProvenance(dir, ev) {
@@ -17,8 +19,15 @@ export function verifyProvenance(dir, ev) {
 
   // The source text a raw_ref points at: the exact record, the exact Exa result, or the whole call.
   const source = (ref, label) => {
-    const [file, frag] = String(ref).split('#');
-    if (file.startsWith('raw/')) { if (!existsSync(join(dir, file))) { errors.push(`${label}: raw_ref ${ref} names a file that does not exist`); return null; } return { corpus: null }; }
+    const [rawFile, frag] = String(ref).split('#');
+    const file = rawFile.startsWith('raw/calls/') ? rawFile.slice(4) : rawFile; // collectors cite saved calls as raw/calls/<file> or calls/<file>
+    if (file.startsWith('raw/') && !file.startsWith('raw/calls/')) {
+      const path = join(dir, file);
+      if (!existsSync(path)) { errors.push(`${label}: raw_ref ${ref} names a file that does not exist`); return null; }
+      let text = readFileSync(path, 'utf8');
+      if (file.endsWith('.json')) { try { text = `${text} ${leaves(JSON.parse(text)).join(' ')}`; } catch { /* plain text */ } }
+      return { corpus: norm(text), file: true };
+    }
     const call = calls.get(file);
     if (!call) { errors.push(`${label}: raw_ref ${ref} names a captured call that does not exist`); return null; }
     if (!frag) return { corpus: corpusOf(call) };
@@ -61,7 +70,7 @@ export function verifyProvenance(dir, ev) {
     const corpus = [];
     for (const c of it.cites) { const s = source(c, `${it.id} cites`); if (s?.corpus) corpus.push(s.corpus); else if (s) corpus.push(''); }
     const have = numsIn(corpus.join(' '));
-    const missing = [...numsIn(it.finding)].filter((n) => n >= 10 && !have.has(n));
+    const missing = [...dataNumsIn(it.finding)].filter((n) => n >= 10 && !have.has(n));
     if (corpus.length && missing.length) warnings.push(`${it.id}: the finding mentions ${missing.join(', ')}, which does not appear in ${it.cites.join(', ')}`);
   }
   return { errors, warnings, counts };

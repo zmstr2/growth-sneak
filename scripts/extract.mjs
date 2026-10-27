@@ -39,7 +39,11 @@ export function makeContext(dir) {
   const j = loadJudgments(dir);
   const own = new Set((social.accounts ?? []).map((a) => `${a.platform}:${String(a.handle).replace(/^company\//, '').toLowerCase()}`));
   const defaulted = new Set();
+  // Posts older than this many days before the capture are not shown as recent posts (run.json "post_window_days").
+  const days = Number.isFinite(run.post_window_days) ? run.post_window_days : 120;
+  const at = Date.parse(run.captured_at ?? '') || Date.now();
   return {
+    cutoff: new Date(at - days * 864e5).toISOString().slice(0, 10), windowDays: days,
     domain: run.domain ?? social.domain, brand: run.brand,
     ownerOf(handle, platform) {
       const h = String(handle).toLowerCase();
@@ -59,7 +63,7 @@ function combine(parts) {
     if (!p) continue;
     const f = by.get(p.layer) ?? { layer: p.layer, auto: true, credits: 0, items: [] };
     for (const [k, v] of Object.entries(p)) {
-      if (k === 'layer' || k === 'skipped') continue;
+      if (['layer', 'skipped', 'outside', 'unmapped'].includes(k)) continue;
       if (Array.isArray(v)) f[k] = [...(f[k] ?? []), ...v];
       else if (k === 'community') f.community = { ...(f.community ?? {}), ...v };
       else f[k] = v;
@@ -87,6 +91,8 @@ export function extractAll(dir) {
       script_blocks: sc.flatMap((f) => Object.keys(f).filter((k) => ['site', 'site_checks', 'oss', 'community', 'accounts'].includes(k))),
     },
     skipped,
+    outside_window: { days: ctx.windowDays, since: ctx.cutoff, posts: [...x.outside, ...li.outside] },
+    unmapped_fields: Object.fromEntries(Object.entries({ x_posts: x.unmapped, google_ads: ga.unmapped }).filter(([, v]) => v?.length)),
     owners_defaulted_to_team: [...ctx.defaulted],
   };
   return { fragments, report };
@@ -118,6 +124,8 @@ if (isMain(import.meta.url)) {
     else {
       const r = writeAuto(dir);
       console.log(`extracted from ${r.calls} captured call${r.calls === 1 ? '' : 's'}: ${r.extracted.x_posts} X posts, ${r.extracted.linkedin_posts} LinkedIn posts, ${r.extracted.google_ads} Google ads, ${r.extracted.pricing_plans} pricing plans; ${r.skipped.length} record${r.skipped.length === 1 ? '' : 's'} skipped (see ${join(dir, 'extract-report.json')})`);
+      if (r.outside_window.posts.length) console.log(`note: ${r.outside_window.posts.length} post${r.outside_window.posts.length === 1 ? '' : 's'} older than ${r.outside_window.days} days were left out of the recent posts (listed in extract-report.json).`);
+      for (const [k, v] of Object.entries(r.unmapped_fields)) console.log(`warning: ${k}: the provider sent fields no mapping reads: ${v.join(', ')}. Run --inspect; a count or date may be missing from the report.`);
       if (r.calls === 0) console.log('warning: no calls were captured. The capture hook may not be active; posts and ads will not be verbatim.');
       if (r.owners_defaulted_to_team.length) console.log(`note: no owner given for ${r.owners_defaulted_to_team.join(', ')}; shown as team accounts until judgments/<layer>.json says otherwise.`);
     }

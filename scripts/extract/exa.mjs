@@ -28,17 +28,20 @@ const LI = /^https?:\/\/(?:[a-z]+\.)?linkedin\.com\/(?:posts\/([^_/?#]+)_|feed\/
 const METRIC = { reactions: 'reactions', likes: 'reactions', comments: 'comments', reposts: 'reposts', shares: 'reposts' };
 
 export function extractLinkedInPosts(calls, ctx) {
-  const posts = []; const items = []; const skipped = []; const seen = new Set(); const by = new Map();
+  const posts = []; const items = []; const skipped = []; const outside = []; const seen = new Set(); const by = new Map();
   for (const call of calls) {
     if (!/(web_search_exa|web_fetch_exa|web_search_advanced_exa)$/.test(call.tool)) continue;
     parseExaResults(call.text).forEach((b, i) => {
       const m = b.url && LI.exec(b.url);
       if (!m) return;
-      const slug = (m[1] || String(b.author ?? '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')) || null;
+      // The account comes from the post's own URL or its author. A result with neither ("Author: N/A") is not attributed to anyone.
+      const author = /^(n\/a|na|none|unknown|-)$/i.test(String(b.author ?? '').trim()) ? '' : String(b.author ?? '');
+      const slug = (m[1] || author.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')) || null;
       const published = isoDay(b.published); const text = postText(b.raw);
-      if (!slug || !published || !text) { skipped.push({ call: `${call.ref}#exa:${i}`, why: 'result is missing its account, date or text' }); return; }
+      if (!slug || !published || !text) { skipped.push({ call: `${call.ref}#exa:${i}`, why: `result has no ${!slug ? 'account (no author and none in the URL)' : !published ? 'date' : 'text'}: ${b.url}` }); return; }
       if (seen.has(b.url)) return;
       seen.add(b.url);
+      if (ctx.cutoff && published < ctx.cutoff) { outside.push({ url: b.url, published }); return; }
       const metrics = {};
       for (const [k, v] of Object.entries(b.engagement)) if (METRIC[k]) metrics[METRIC[k]] = v;
       const owner = ctx.ownerOf(slug, 'linkedin'); const kind = ctx.kindOf(b.url);
@@ -60,6 +63,6 @@ export function extractLinkedInPosts(calls, ctx) {
       url: `https://www.linkedin.com/${g.owner === 'company' ? 'company' : 'in'}/${g.slug}/`, raw_ref: g.call,
     });
   }
-  return { layer: 'social', posts, items, skipped };
+  return { layer: 'social', posts, items, skipped, outside };
 }
 void norm;

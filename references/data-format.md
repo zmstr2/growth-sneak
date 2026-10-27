@@ -75,6 +75,10 @@ source, community and accounts are built there by code. Each carries a `raw_ref`
 `judgments/<layer>.json` is the only model input to extraction: `{ "owners": { "<handle>": "company|founder|employee" },
 "kinds": { "<post url>": "launch" } }`. A handle with no owner is shown as a team account.
 
+Posts older than `run.json` `post_window_days` (default 120 days before `captured_at`) are left out of `posts` and listed
+in `extract-report.json` under `outside_window`. `extract-report.json` also lists `unmapped_fields`: provider fields no
+mapping reads, so a missing count or date is visible instead of silent.
+
 `ads[].days_shown_basis` appears when the provider gave no day count and it was worked out from the first and last
 dates shown. Fields the provider did not return are left out: a post with no counts says "engagement not visible".
 
