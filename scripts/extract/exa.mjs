@@ -45,9 +45,10 @@ export function extractLinkedInPosts(calls, ctx) {
       const metrics = {};
       for (const [k, v] of Object.entries(b.engagement)) if (METRIC[k]) metrics[METRIC[k]] = v;
       const owner = ctx.ownerOf(slug, 'linkedin'); const kind = ctx.kindOf(b.url);
+      if (!owner) return; // not attributed to the company, a founder or staff: listed in extract-report.json
       posts.push({
         platform: 'linkedin', account: slug, owner, url: b.url, published, text,
-        ...(Object.keys(metrics).length ? { metrics } : {}), ...(kind ? { kind } : {}),
+        ...(Object.keys(metrics).length ? { metrics } : {}), ...(kind ? { kind } : {}), ...(ctx.paidOf?.(b.url) ? { paid: true } : {}),
         evidence_ref: `auto-li-${slug}`, raw_ref: `${call.ref}#exa:${i}`,
       });
       const g = by.get(slug) ?? { slug, owner, dates: [], call: call.ref };

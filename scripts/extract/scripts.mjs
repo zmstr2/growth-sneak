@@ -13,6 +13,13 @@ export function extractScripts(dir, ctx) {
   if (site && Number.isFinite(site.total_urls) && Array.isArray(site.sections)) {
     const top = [...site.sections].sort((a, b) => b.urls - a.urls).slice(0, 3).map((s) => `${s.path} (${fmtN(s.urls)})`);
     owned.items.push({ ref: 'auto-site', channel: 'seo_content', status: 'observed', finding: `The sitemaps list ${fmtN(site.total_urls)} pages${top.length ? `; the largest sections are ${top.join(', ')}` : ''}.`, url: `https://${ctx.domain}/sitemap.xml`, raw_ref: 'raw/sitemap.json' });
+    const fresh = site.sections.filter((s) => Number.isFinite(s.updated_90d)).sort((a, b) => b.urls - a.urls).slice(0, 6);
+    if (fresh.length) owned.items.push({ ref: 'auto-site-freshness', channel: 'seo_content', status: 'observed', finding: `Pages with a sitemap lastmod in the last 90 days, by section: ${fresh.map((s) => `${s.path} ${fmtN(s.updated_90d)} of ${fmtN(s.urls)}`).join('; ')}. A lastmod is an edit date, not a publication date.`, url: `https://${ctx.domain}/sitemap.xml`, raw_ref: 'raw/sitemap.json' });
+    const months = Array.isArray(site.by_month) ? site.by_month.filter((m) => /^\d{4}-\d{2}$/.test(m.month) && Number.isFinite(m.pages)) : [];
+    if (months.length) {
+      const last12 = months.slice(-12); const total = last12.reduce((n, m) => n + m.pages, 0); const tail = last12.slice(-2);
+      owned.items.push({ ref: 'auto-site-months', channel: 'seo_content', status: 'observed', finding: `${fmtN(total)} URLs carry a sitemap lastmod in ${last12[0].month} to ${last12.at(-1).month}; ${tail.map((m) => `${fmtN(m.pages)} in ${m.month}`).join(' and ')}. These are edit dates, not publication dates.`, url: `https://${ctx.domain}/sitemap.xml`, raw_ref: 'raw/sitemap.json' });
+    }
     owned.site = {
       total_urls: site.total_urls, locales: Array.isArray(site.locales) ? site.locales.length : (site.locales ?? 0), sitemaps_read: site.sitemaps_read, as_of: site.as_of, sections: site.sections,
       ...(site.page_types ? { page_types: site.page_types } : {}), ...(site.by_month ? { by_month: site.by_month } : {}), evidence_ref: 'auto-site', raw_ref: 'raw/sitemap.json',

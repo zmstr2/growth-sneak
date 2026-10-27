@@ -39,7 +39,7 @@ export function extractXPosts(calls, ctx) {
         const owner = ctx.ownerOf(handle, 'x');
         posts.push({
           platform: 'x', account: handle, owner, url: u, published, text,
-          ...(Object.keys(metrics).length ? { metrics } : {}), ...(isReply ? { reply: true } : {}), ...(kind ? { kind } : {}),
+          ...(Object.keys(metrics).length ? { metrics } : {}), ...(isReply ? { reply: true } : {}), ...(kind ? { kind } : {}), ...(ctx.paidOf?.(u) ? { paid: true } : {}),
           evidence_ref: `auto-x-${handle.toLowerCase()}`, raw_ref: ref,
         });
         const g = byHandle.get(handle.toLowerCase()) ?? { handle, owner, dates: [], call: call.ref, followers: undefined };

@@ -23,12 +23,13 @@ const readJson = (p, d) => { try { return JSON.parse(readFileSync(p, 'utf8')); }
 // judgments/<layer>.json: { "owners": { "<handle>": "company|founder|employee" }, "kinds": { "<post url>": "launch" } }
 export function loadJudgments(dir) {
   const jdir = join(dir, 'judgments');
-  const out = { owners: {}, kinds: {} };
+  const out = { owners: {}, kinds: {}, paid: new Set() };
   if (!existsSync(jdir)) return out;
   for (const f of readdirSync(jdir).filter((x) => x.endsWith('.json')).sort()) {
     const j = readJson(join(jdir, f), {});
     for (const [h, o] of Object.entries(j.owners ?? {})) if (['company', 'founder', 'employee'].includes(o)) out.owners[h.toLowerCase()] = o;
     for (const [u, k] of Object.entries(j.kinds ?? {})) if (typeof k === 'string') out.kinds[u] = k;
+    for (const u of Array.isArray(j.paid) ? j.paid : Object.keys(j.paid ?? {})) out.paid.add(u);
   }
   return out;
 }
@@ -38,7 +39,7 @@ export function makeContext(dir) {
   const social = readJson(join(dir, 'raw', 'social.json'), {});
   const j = loadJudgments(dir);
   const own = new Set((social.accounts ?? []).map((a) => `${a.platform}:${String(a.handle).replace(/^company\//, '').toLowerCase()}`));
-  const defaulted = new Set();
+  const defaulted = new Set(); const unattributed = new Map();
   // Posts older than this many days before the capture are not shown as recent posts (run.json "post_window_days").
   const days = Number.isFinite(run.post_window_days) ? run.post_window_days : 120;
   const at = Date.parse(run.captured_at ?? '') || Date.now();
@@ -49,9 +50,14 @@ export function makeContext(dir) {
       const h = String(handle).toLowerCase();
       if (j.owners[h]) return j.owners[h];
       if (own.has(`${platform}:${h}`)) return 'company';
+      // An X account is one a collector asked for by name. A LinkedIn account is whoever a search returned, which may be a
+      // customer or an investor, so it is left out until judgments/<layer>.json says it is the company, a founder or staff.
+      if (platform === 'linkedin') { unattributed.set(handle, (unattributed.get(handle) ?? 0) + 1); return null; }
       defaulted.add(`${platform}:${handle}`);
       return 'employee';
     },
+    paidOf: (url) => j.paid.has(url),
+    unattributed,
     kindOf: (url) => j.kinds[url],
     defaulted,
   };
@@ -63,7 +69,7 @@ function combine(parts) {
     if (!p) continue;
     const f = by.get(p.layer) ?? { layer: p.layer, auto: true, credits: 0, items: [] };
     for (const [k, v] of Object.entries(p)) {
-      if (['layer', 'skipped', 'outside', 'unmapped'].includes(k)) continue;
+      if (['layer', 'skipped', 'outside', 'unmapped', 'unattributed'].includes(k)) continue;
       if (Array.isArray(v)) f[k] = [...(f[k] ?? []), ...v];
       else if (k === 'community') f.community = { ...(f.community ?? {}), ...v };
       else f[k] = v;
@@ -93,6 +99,7 @@ export function extractAll(dir) {
     skipped,
     outside_window: { days: ctx.windowDays, since: ctx.cutoff, posts: [...x.outside, ...li.outside] },
     unmapped_fields: Object.fromEntries(Object.entries({ x_posts: x.unmapped, google_ads: ga.unmapped }).filter(([, v]) => v?.length)),
+    unattributed_linkedin_accounts: [...ctx.unattributed].map(([account, posts]) => ({ account, posts })),
     owners_defaulted_to_team: [...ctx.defaulted],
   };
   return { fragments, report };
@@ -127,6 +134,7 @@ if (isMain(import.meta.url)) {
       if (r.outside_window.posts.length) console.log(`note: ${r.outside_window.posts.length} post${r.outside_window.posts.length === 1 ? '' : 's'} older than ${r.outside_window.days} days were left out of the recent posts (listed in extract-report.json).`);
       for (const [k, v] of Object.entries(r.unmapped_fields)) console.log(`warning: ${k}: the provider sent fields no mapping reads: ${v.join(', ')}. Run --inspect; a count or date may be missing from the report.`);
       if (r.calls === 0) console.log('warning: no calls were captured. The capture hook may not be active; posts and ads will not be verbatim.');
+      if (r.unattributed_linkedin_accounts.length) console.log(`note: LinkedIn posts by ${r.unattributed_linkedin_accounts.map((a) => a.account).join(', ')} were left out because nobody said who they are. Add any that are the company, a founder or staff to judgments/<layer>.json.`);
       if (r.owners_defaulted_to_team.length) console.log(`note: no owner given for ${r.owners_defaulted_to_team.join(', ')}; shown as team accounts until judgments/<layer>.json says otherwise.`);
     }
   } catch (e) { console.error(`error: ${e.message}`); process.exit(1); }
