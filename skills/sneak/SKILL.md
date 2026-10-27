@@ -77,6 +77,11 @@ sign-up pages and fill them in.
    { "domain": "exa.ai", "brand": "Exa", "captured_at": "<now, ISO>", "traffic": false, "sources": { "firecrawl": "connected|missing", "alexandria": "connected|missing", "exa": "...", "apify": "..." }, "cost": { "note": "" } }
    ```
 
+5. **Start verbatim capture:** `node "$P/scripts/capture.mjs" --start "$R"`. From here until step 3 a plugin hook saves
+   every Firecrawl and Exa response to `$R/raw/calls/` exactly as the tool returned it, with no model in between.
+   Code (step 2b), not a collector, turns those files into the posts, ads, pricing and site blocks, so the report
+   shows what the tools returned and not a model's retelling of it.
+
 ## 1. Free first-party collection (scripts, run in parallel)
 
 These need no keys. Run them together and save their output:
@@ -108,10 +113,32 @@ Tell each collector to follow `$P/references/alexandria.md` for any Alexandria c
 total), so they should batch calls, wait and retry once on a rate-limit error, and use `curl` for plain
 pages. A rate-limited check that was not repeated is `couldnt_check`, never an absence.
 
+Tell each collector: **do not write `posts`, `ads`, `ads_total`, `pricing`, `site`, `site_checks`, `oss`, `community`
+or X and LinkedIn `accounts`**. Run the queries (the tool calls are saved for you) and code builds those blocks. They
+write only what code cannot: items for judgment calls, checked absences with a probe, `couldnt_check`, and
+`$R/judgments/<layer>.json` (who owns each account, what kind each post is). Every number in an item's `finding` must
+come from a saved response, and the item lists those files in `cites`.
+
 Each collector writes `$R/fragments/<layer>.json` in the fragment format in
 `$P/references/data-format.md`, and saves any screenshots into `$R/assets/`. If one fails or times out,
 re-dispatch that one layer once; if it fails again, continue without it (the report will show those
 channels as "couldn't see").
+
+## 2b. Extract (code, no model)
+
+```bash
+node "$P/scripts/extract.mjs" "$R"
+```
+
+This reads every saved response in `$R/raw/calls/` and the free scripts' files in `$R/raw/`, and writes
+`$R/fragments/<layer>.auto.json`: posts, ads, pricing, the site, site checks, open source, community and accounts,
+each with a `raw_ref` to its source. Read `$R/extract-report.json`:
+- `calls: 0` means capture was not active. Say so in step 6: posts and ads are then not verified.
+- `skipped` lists records the provider returned without a field we need (an id, a date, a count). They are left out,
+  never guessed. If a whole provider is skipped, run `node "$P/scripts/extract.mjs" "$R" --inspect` to see the real
+  shape and tell the user the mapping needs updating; do not hand-write the data instead.
+- `owners_defaulted_to_team` lists accounts nobody classified. Re-dispatch that collector once to write its
+  `judgments/<layer>.json`, then extract again.
 
 ## 3. Merge
 
@@ -122,6 +149,10 @@ shared rate limit can cause it.
 ```bash
 node "$P/scripts/merge.mjs" "$R"
 ```
+
+Merge also checks every machine-made entry against the saved response it points at (every line of a post's text and
+every count must appear in it) and fails if one does not. Hand-written `posts` and `ads` with no `raw_ref` are set aside
+and listed. Then run `node "$P/scripts/capture.mjs" --stop`.
 
 This assigns evidence ids (kept stable if you merge again after a fix), adds up every fragment's `credits` into
 the run's cost, and checks every item the way the renderer will: channel, status, url, and that an absence has a
@@ -151,6 +182,8 @@ Reply in chat with:
 - the report path (`$R/report.html`)
 - two or three things that stand out from the reads (the activities with the most evidence)
 - what wasn't covered and which missing source would cover it
+- provenance, from `evidence.json` `provenance` and `extract-report.json`: how many posts and ads came verbatim from saved
+  tool responses, how many hand-written entries were set aside, and which records were skipped for missing fields
 - the run cost: Firecrawl credits (Alexandria calls included, with the providers used)
 - if the Exa key was not set: one line saying so, with the link to get one
 

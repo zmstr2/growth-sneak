@@ -21,8 +21,17 @@ recommend or speculate.
 2. Collect. Prefer the cheapest source that gives an exact answer: free first-party files first
    (`$R/raw/*.json` from the scripts), then provider data (Firecrawl Alexandria, Exa), then page
    scraping. Do not re-collect what `$R/raw/` already has; build on it.
-3. Write `$R/fragments/<layer>.json` with one `item` per fact and the structured collections your brief
-   asks for. Every structured block and post gets an `evidence_ref` pointing at one of your items.
+3. Write `$R/fragments/<layer>.json` with one `item` per fact that needs a judgment, an absence or a
+   `couldnt_check`. **Do not write `posts`, `ads`, `ads_total`, `pricing`, `site`, `site_checks`, `oss`,
+   `community` or X and LinkedIn `accounts`.** A plugin hook saves every Firecrawl and Exa response exactly as
+   returned, and code builds those blocks from the saved files after you finish. Your job is to make the calls
+   that fetch the data (through the MCP tools, so they are saved; a `curl` is not) and to decide what to fetch.
+   Other blocks your brief names (`earned`, `ratings`, `content`, `screens`, `tech`, `traffic`, `meta_ads`) you
+   still write; copy numbers and titles exactly as shown.
+   Give each item you write a `cites` list: the saved files (`calls/<file>.json` or `raw/<file>.json`) its numbers
+   come from. Do not put a number in a `finding` that is not in a file you cite.
+   Write `$R/judgments/<layer>.json` for the one thing only you can decide: `{ "owners": { "<handle>":
+   "company|founder|employee" }, "kinds": { "<post url>": "launch|partnership|event|research|hiring|stunt|milestone|other" } }`.
 4. Save any screenshots to `$R/assets/` as JPEG (`sips -s format jpeg` on macOS) and reference them by
    relative path. Screenshot URLs from Firecrawl are signed and expire in days; never store them.
 5. Reply with: the fragment path, how many items, credits spent, and anything you could not check and why.

@@ -4,7 +4,8 @@ Channels: `social` (company accounts), `founder_social`, `community`, `open_sour
 `press_podcasts`, `events`, `partnerships`, `reviews`.
 
 Start from `$R/raw/social.json`: the company's own accounts (from its homepage), GitHub stats, Discord
-counts and Hacker News stories. Turn those into `accounts`, `oss` and `community` blocks with items.
+counts and Hacker News stories. Code turns those into the `accounts`, `oss` and `community` blocks and their items;
+do not copy them by hand.
 
 ## Find the founders and execs
 Use Exa (`web_search_exa`) for "<company> co-founder CEO LinkedIn and X profile". Record the founders'
@@ -22,10 +23,12 @@ For each company account and each founder (X and LinkedIn):
   the company profile with recent posts and reaction counts. Use those numbers as shown.
 - **Apify (only if connected):** `harvestapi/linkedin-company-posts`, `harvestapi/linkedin-profile-posts`,
   or an X scraper, capped at 40 posts per account.
-- Normalise each post to the post shape in data-format.md. Set `kind` from the content (launch,
-  partnership, event, research, hiring, stunt, milestone, other). Set `paid: true` only when the post
-  itself carries evidence (e.g. `utm_medium=paid` in its link), and write an item saying what you saw.
-- One item per account sample ("A 10-post sample of @ExaAILabs on X, 8-19 Oct") that the posts reference.
+- Do not write `posts` yourself. Run the queries; `scripts/extract.mjs` builds each post (text, date, counts, link)
+  from the saved response. You decide only the judgments, in `$R/judgments/social.json`: `owners` (who is the
+  company, a founder, an employee) and `kinds` (launch, partnership, event, research, hiring, stunt, milestone,
+  other, by post url). Set `paid` only when the post itself carries evidence (e.g. `utm_medium=paid` in its link),
+  and write an item saying what you saw.
+- The per-account sample item ("A 10-post sample of @ExaAILabs on X, 8-19 Oct") is written by code too.
 - Founders' own numbers ("we passed $100m ARR") are `stated` items on `founder_social`, quoted.
 
 ## Engagement numbers (the report shows them on each post)
