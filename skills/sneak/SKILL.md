@@ -142,7 +142,11 @@ each with a `raw_ref` to its source. Read `$R/extract-report.json`:
   hand-write the missing data.
 - `outside_window` lists posts older than `post_window_days` (default 120, set it in `run.json`). They are left out
   of the recent posts, not lost; mention the count in step 6.
-- `owners_defaulted_to_team` lists accounts nobody classified. Re-dispatch that collector once to write its
+- `unattributed_linkedin_accounts` lists people whose LinkedIn posts a search returned but nobody classified (often
+  customers or investors). Their posts are left out. If any is clearly the company, a founder or staff, add them to
+  `judgments/<layer>.json` and extract again. A post that carries `utm_medium=paid` in its own link goes under `paid`
+  in the judgments file.
+- `owners_defaulted_to_team` lists X accounts nobody classified. Re-dispatch that collector once to write its
   `judgments/<layer>.json`, then extract again.
 
 ## 3. Merge
@@ -196,8 +200,8 @@ Do not paste the whole report into chat.
 
 ## Cost and limits
 
-- A run without traffic costs about 75 to 110 Firecrawl credits in practice, which includes 5 for the Meta Ad
-  Library lookup. Traffic adds 660 (110 per month), so a run with traffic is about 750. The optional Upspring
+- A run without traffic costs about 75 to 110 Firecrawl credits in practice, which includes 10 for the two Meta Ad
+  Library reads. Traffic adds 660 (110 per month), so a run with traffic is about 750. The optional Upspring
   lookup (estimates of Meta spend, mostly consumer brands) adds 150 and is only run if the user asks.
 - Default collection caps: Google ads up to 200 (5 pages), X posts 10 per account (Firecrawl's provider
   limit), LinkedIn posts up to 40 per account. There is no total cost cap; report what was spent.

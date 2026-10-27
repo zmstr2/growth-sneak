@@ -28,6 +28,11 @@ recommend or speculate.
    that fetch the data (through the MCP tools, so they are saved; a `curl` is not) and to decide what to fetch.
    Other blocks your brief names (`earned`, `ratings`, `content`, `screens`, `tech`, `traffic`, `meta_ads`) you
    still write; copy numbers and titles exactly as shown.
+   Code also writes these items, so do not write them yourself: the Google ads total and sample counts; the pricing
+   plan list; the sitemap page total, largest sections, per-section freshness and lastmod months; the site-check
+   summary; the accounts the homepage links to; the GitHub, Discord and Hacker News facts; and each X or LinkedIn
+   account's post sample. Write items only for what needs reading or judging: ad headlines, what a page says,
+   comparison and customer pages, press, events, partnerships, referral, and absences or `couldnt_check`.
    Give each item you write a `cites` list: the saved files (`calls/<file>.json` or `raw/<file>.json`) its numbers
    come from. Do not put a number in a `finding` that is not in a file you cite.
    Write `$R/judgments/<layer>.json` for the one thing only you can decide: `{ "owners": { "<handle>":

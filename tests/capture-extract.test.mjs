@@ -182,7 +182,7 @@ test('merge: a count that is not in the saved response fails the build', () => {
 });
 
 test('merge: a hand-written item that cites a file gets a warning when its numbers are not in that file', () => {
-  const dir = setup({ calls: [{ tool: 'mcp__plugin_growth-sneak_exa__web_search_exa', input: { query: 'q' }, response: envelope(EXA_TEXT) }] });
+  const dir = setup({ calls: [{ tool: 'mcp__plugin_growth-sneak_exa__web_search_exa', input: { query: 'q' }, response: envelope(EXA_TEXT) }], social: { domain: 'exa.ai', accounts: [{ platform: 'linkedin', handle: 'company/exa-ai', url: 'https://www.linkedin.com/company/exa-ai/' }] } });
   const file = readdirSync(join(dir, 'raw', 'calls'))[0];
   writeAuto(dir);
   writeFileSync(join(dir, 'fragments', 'social.json'), JSON.stringify({ layer: 'social', items: [{ ref: 'm1', channel: 'social', status: 'observed', finding: 'The Exa 3.0 post has 363 reactions.', url: 'https://x.com/ExaAILabs', cites: [`calls/${file}`] }] }));
@@ -292,7 +292,7 @@ test('verify: numbers in a cited free-script file are found, and years and "90 d
 });
 
 test('verify: a saved call can be cited as raw/calls/<file> or calls/<file>', () => {
-  const dir = setup({ calls: [{ tool: 'mcp__plugin_growth-sneak_exa__web_search_exa', input: { query: 'q' }, response: EXA_TEXT }] });
+  const dir = setup({ calls: [{ tool: 'mcp__plugin_growth-sneak_exa__web_search_exa', input: { query: 'q' }, response: EXA_TEXT }], social: { domain: 'exa.ai', accounts: [{ platform: 'linkedin', handle: 'company/exa-ai', url: 'https://www.linkedin.com/company/exa-ai/' }] } });
   const file = readdirSync(join(dir, 'raw', 'calls'))[0];
   writeAuto(dir);
   writeFileSync(join(dir, 'fragments', 'social.json'), JSON.stringify({ layer: 'social', items: [
@@ -300,4 +300,49 @@ test('verify: a saved call can be cited as raw/calls/<file> or calls/<file>', ()
     { ref: 'b', channel: 'social', status: 'observed', finding: 'The post has 24 comments.', url: 'https://x.com/a', cites: [`calls/${file}`] },
   ] }));
   assert.deepEqual(mergeDir(dir).provenance.warnings, []);
+});
+
+test('extract: sitemap freshness and lastmod months are written by code from raw/sitemap.json', () => {
+  const dir = setup();
+  writeFileSync(join(dir, 'raw', 'sitemap.json'), JSON.stringify({ domain: 'exa.ai', as_of: '2026-10-27', sitemaps_read: 2, locales: [], total_urls: 384,
+    sections: [{ path: '/docs', urls: 164, updated_90d: 162 }, { path: '/blog', urls: 70, updated_90d: 41 }, { path: '/customers', urls: 16, updated_90d: 0 }],
+    by_month: [{ month: '2026-07', pages: 2 }, { month: '2026-08', pages: 4 }, { month: '2026-09', pages: 65 }, { month: '2026-10', pages: 165 }] }));
+  const items = extractAll(dir).fragments.find((f) => f.layer === 'owned').items;
+  assert.match(items.find((i) => i.ref === 'auto-site-freshness').finding, /^Pages with a sitemap lastmod in the last 90 days, by section: \/docs 162 of 164; \/blog 41 of 70; \/customers 0 of 16\./);
+  assert.match(items.find((i) => i.ref === 'auto-site-months').finding, /^236 URLs carry a sitemap lastmod in 2026-07 to 2026-10; 65 in 2026-09 and 165 in 2026-10\./);
+});
+
+test('instructions: Meta absence needs two reads, and the collector knows which items code writes', () => {
+  const paid = readFileSync(join(ROOT, 'references', 'layers', 'paid.md'), 'utf8');
+  for (const must of ['absence only after two reads', 'q=<brand name>', 'Never write an absence from\n  one keyword query']) assert.ok(paid.includes(must), must);
+  const agent = readFileSync(join(ROOT, 'agents', 'sneak-collector.md'), 'utf8');
+  for (const must of ['Code also writes these items', 'sitemap page total', 'post sample']) assert.ok(agent.includes(must), must);
+});
+
+test('extract: a LinkedIn post by someone nobody classified is left out and listed, never shown as a team account', () => {
+  const text = `Title: Great news for our customers
+URL: https://www.linkedin.com/posts/some-customer_great-news-activity-7496577947248525312-abcd
+Published: 2026-10-10T00:00:00.000Z
+Author: Some Customer
+Highlights:
+Excited about the Exa integration.`;
+  const dir = setup({ calls: [{ tool: 'mcp__plugin_growth-sneak_exa__web_search_exa', input: { query: 'q' }, response: text }] });
+  const { fragments, report } = extractAll(dir);
+  assert.equal(fragments.find((f) => f.layer === 'social')?.posts?.length ?? 0, 0);
+  assert.deepEqual(report.unattributed_linkedin_accounts, [{ account: 'some-customer', posts: 1 }]);
+  mkdirSync(join(dir, 'judgments')); writeFileSync(join(dir, 'judgments', 'social.json'), JSON.stringify({ owners: { 'some-customer': 'employee' } }));
+  assert.equal(extractAll(dir).fragments.find((f) => f.layer === 'social').posts.length, 1, 'once classified it is shown');
+});
+
+test('extract: judgments can mark a post as paid when its own link carries utm_medium=paid', () => {
+  const text = `Title: We built a time machine for the web.
+URL: https://www.linkedin.com/posts/exa-ai_introducing-exa-snapshot-activity-7506401688518311937-uUtC
+Published: 2026-09-17T00:00:00.000Z
+Author: Exa
+Highlights:
+We built a time machine for the web. https://lnkd.in/x/?utm_medium=paid`;
+  const dir = setup({ calls: [{ tool: 'mcp__plugin_growth-sneak_exa__web_search_exa', input: { query: 'q' }, response: text }], social: { domain: 'exa.ai', accounts: [{ platform: 'linkedin', handle: 'company/exa-ai', url: 'https://www.linkedin.com/company/exa-ai/' }] } });
+  mkdirSync(join(dir, 'judgments')); writeFileSync(join(dir, 'judgments', 'social.json'), JSON.stringify({ paid: ['https://www.linkedin.com/posts/exa-ai_introducing-exa-snapshot-activity-7506401688518311937-uUtC'] }));
+  const p = extractAll(dir).fragments.find((f) => f.layer === 'social').posts[0];
+  assert.equal(p.paid, true); assert.equal(p.owner, 'company');
 });

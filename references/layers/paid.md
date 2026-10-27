@@ -67,11 +67,15 @@ What to do with the answer:
   for a video ad: the library gives no readable frame for videos, and the report shows a "Video ad" panel that
   links to the library. Leave out `impressions`, `spend` and `creative_mix`; do not set `active_ads` to the keyword
   total.
-- **Zero own ads on the first screen** is an observed result on Meta's own library for that domain query, so record
-  one `meta_ads` item with `absent: true` and a `probe` naming the exact query, the country (`ALL`), the status
-  filter (active only) and that ads by other names or older ads were not searched. If the scrape returns an error,
-  a login wall or nothing readable, it is `couldnt_check`, never an absence.
-- Costs 5 credits; add it to `credits`.
+- **Zero own ads is an absence only after two reads.** A keyword search for a domain can return fuzzy matches, so a
+  first screen of unrelated advertisers (a cosmetics brand for `exa.ai`) proves nothing on its own. Read the library
+  twice: once with `q=<domain>` and once with `q=<brand name>` (and the legal name if you know it). Record
+  `absent: true` only if neither screen has a card whose advertiser is the brand or whose link goes to the domain,
+  and the `probe` names both queries, the country (`ALL`), the status filter (active only), and that older or inactive
+  ads were not searched. If you read only one query, or either scrape errors, hits a login wall or returns nothing
+  readable, write a `couldnt_check` item saying what was read and why it is inconclusive. Never write an absence from
+  one keyword query.
+- Costs 5 credits per read (10 for both); add it to `credits`.
 
 ## LinkedIn and TikTok
 - **LinkedIn:** the public Ad Library blocks Firecrawl even with the stealth proxy (tested), and there is no API.
