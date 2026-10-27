@@ -6,7 +6,7 @@
     },
     "exa": {
       "type": "http",
-      "url": "https://mcp.exa.ai/mcp"
+      "url": "https://mcp.exa.ai/mcp?login"
     }
   }
 }

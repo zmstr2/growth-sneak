@@ -61,7 +61,7 @@ test('first-run setup: MCP servers use OAuth URLs with no keys, and the skill po
   assert.ok(!plugin.userConfig, 'no API key settings');
   const mcp = JSON.parse(read('.mcp.json')).mcpServers;
   assert.equal(mcp.firecrawl.url, 'https://mcp.firecrawl.dev/v2/mcp-oauth');
-  assert.equal(mcp.exa.url, 'https://mcp.exa.ai/mcp');
+  assert.equal(mcp.exa.url, 'https://mcp.exa.ai/mcp?login', 'the ?login URL starts Exa OAuth; the plain URL is keyless and rate-limited');
   for (const k of ['firecrawl', 'exa']) assert.ok(!mcp[k].headers, k + ' sends no key header');
   assert.ok(!/user_config|API_KEY/.test(read('.mcp.json')), 'no key placeholders in .mcp.json');
   const md = read('skills', 'sneak', 'SKILL.md');
