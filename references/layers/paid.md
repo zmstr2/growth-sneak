@@ -1,3 +1,7 @@
+> **Machine-made blocks.** Run the Google ads queries below through the MCP tools; `scripts/extract.mjs` builds `ads`
+> and `ads_total` from the saved response. Do not type ad rows or totals into your fragment. Reading a headline off a
+> creative image is yours to do: say so in the item and keep the image.
+
 # Layer: paid
 
 Channels: `google_ads`, `meta_ads`, `linkedin_ads`, `tiktok_ads`.

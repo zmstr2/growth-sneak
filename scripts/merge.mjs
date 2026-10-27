@@ -33,21 +33,28 @@ import { fileURLToPath } from 'node:url';
 import { isMain } from './ismain.mjs';
 import { normalizeMetrics } from './social.mjs';
 import { prepare } from './render.mjs';
+import { verifyProvenance } from './verify.mjs';
+import { loadCalls } from './lib/calls.mjs';
 
 const LAYER_ORDER = ['paid', 'owned', 'social', 'company'];
 const SINGLE = ['site', 'site_checks', 'tech', 'pricing', 'oss', 'traffic', 'meta_ads', 'content', 'earned', 'ratings'];
 
-const FRAGMENT_KEYS = new Set(['layer', 'credits', 'items', 'ads', 'ads_total', 'posts', 'accounts', 'oss', 'community', 'site', 'site_checks', 'tech', 'pricing', 'screens', 'traffic', 'meta_ads', 'content', 'earned', 'ratings']);
+const FRAGMENT_KEYS = new Set(['layer', 'auto', 'credits', 'items', 'ads', 'ads_total', 'posts', 'accounts', 'oss', 'community', 'site', 'site_checks', 'tech', 'pricing', 'screens', 'traffic', 'meta_ads', 'content', 'earned', 'ratings']);
 
 // previousIds: ref -> id from an earlier merge of the same run, so re-merging after a fix keeps every id that
 // analysis.json already cites.
-export function merge(run, fragments, previousIds = {}) {
+// opts.strict: hand-written posts and ads without a raw_ref are set aside. mergeDir turns it on only when tool calls were
+// actually captured, so a hook that did not fire never wipes a report.
+export function merge(run, fragments, previousIds = {}, opts = {}) {
   for (const f of fragments) {
     for (const k of Object.keys(f)) {
       if (!FRAGMENT_KEYS.has(k)) throw new Error(`fragment ${f.layer ?? '?'}: unknown key "${k}" (allowed: ${[...FRAGMENT_KEYS].join(', ')}). Put extra detail in an item's finding.`);
     }
   }
-  const sorted = [...fragments].sort((a, b) => LAYER_ORDER.indexOf(a.layer) - LAYER_ORDER.indexOf(b.layer));
+  // Machine-made fragments (auto: true, from scripts/extract.mjs) come first within a layer and win over hand-written ones.
+  const sorted = [...fragments].sort((a, b) => LAYER_ORDER.indexOf(a.layer) - LAYER_ORDER.indexOf(b.layer) || (b.auto ? 1 : 0) - (a.auto ? 1 : 0));
+  const anyAuto = fragments.some((f) => f.auto === true);
+  const dropped = [];
   const idOf = new Map();
   const items = [];
   const taken = new Set(Object.values(previousIds));
@@ -88,23 +95,53 @@ export function merge(run, fragments, previousIds = {}) {
     screens: [],
   };
   const owner = {};
+  const autoPostUrls = new Set(); const autoAccounts = new Set();
   for (const f of sorted) {
-    for (const a of f.ads ?? []) out.ads.push({ ...a, id: a.id ?? `AD${String(out.ads.length + 1).padStart(3, '0')}` });
-    if (f.ads_total) out.ads_total = f.ads_total;
-    (f.posts ?? []).forEach((p, i) => out.posts.push({ id: p.id ?? `P${String(out.posts.length + 1).padStart(3, '0')}`, ...resolveRef({ ...p, metrics: normalizeMetrics(p.platform, p.metrics) }, `${f.layer}.posts[${i}]`) }));
+    const manual = anyAuto && !f.auto;
+    const strictManual = Boolean(opts.strict) && !f.auto;
+    // With capture active, a hand-written post or ad must point at a saved response (raw_ref) or it is left out:
+    // the report shows what the tools returned, not what a model remembers of it.
+    const keep = (kind, list) => (list ?? []).filter((x) => {
+      if (!strictManual) return true;
+      if (!x.raw_ref) { dropped.push({ layer: f.layer, kind, ref: x.url ?? x.id ?? '?', why: 'hand-written, with no raw_ref to a saved tool response' }); return false; }
+      if (kind === 'post' && autoPostUrls.has(x.url)) { dropped.push({ layer: f.layer, kind, ref: x.url, why: 'already extracted from the saved response' }); return false; }
+      return true;
+    });
+    for (const a of keep('ad', f.ads)) out.ads.push({ ...a, id: a.id ?? `AD${String(out.ads.length + 1).padStart(3, '0')}` });
+    if (f.ads_total && !(manual && out.ads_total)) out.ads_total = f.ads_total;
+    keep('post', f.posts).forEach((p, i) => {
+      if (f.auto) autoPostUrls.add(p.url);
+      out.posts.push({ id: p.id ?? `P${String(out.posts.length + 1).padStart(3, '0')}`, ...resolveRef({ ...p, metrics: normalizeMetrics(p.platform, p.metrics) }, `${f.layer}.posts[${i}]`) });
+    });
     (f.screens ?? []).forEach((x, i) => out.screens.push({ id: x.id ?? `S${String(out.screens.length + 1).padStart(2, '0')}`, ...resolveRef(x, `${f.layer}.screens[${i}]`) }));
-    (f.accounts ?? []).forEach((a, i) => out.accounts.push(resolveRef(a, `${f.layer}.accounts[${i}]`)));
+    (f.accounts ?? []).forEach((a, i) => {
+      const k = `${a.platform}:${String(a.handle).toLowerCase()}`;
+      if (f.auto) autoAccounts.add(k);
+      else if (anyAuto && autoAccounts.has(k)) { dropped.push({ layer: f.layer, kind: 'account', ref: a.handle, why: 'already built from the saved data' }); return; }
+      out.accounts.push(resolveRef(a, `${f.layer}.accounts[${i}]`));
+    });
     for (const k of SINGLE) {
       if (!f[k]) continue;
-      if (owner[k]) throw new Error(`"${k}" is written by both the ${owner[k]} and ${f.layer} layers; only one layer may write it`);
+      if (owner[k]) {
+        const prev = out[k]?.raw_ref ? 'auto' : null;
+        if (f.auto || manual) {
+          // one side is machine-made: it wins, the other is set aside
+          if (f.auto) { out[k] = resolveRef(f[k], `${f.layer}.${k}`); owner[k] = f.layer; }
+          dropped.push({ layer: f.auto ? owner[k] : f.layer, kind: k, ref: k, why: 'replaced by the block built from saved data' });
+          void prev;
+          continue;
+        }
+        throw new Error(`"${k}" is written by both the ${owner[k]} and ${f.layer} layers; only one layer may write it`);
+      }
       owner[k] = f.layer;
       out[k] = resolveRef(f[k], `${f.layer}.${k}`);
     }
     if (f.community) {
       out.community = { ...(out.community ?? {}) };
-      for (const [k, v] of Object.entries(f.community)) out.community[k] = resolveRef(v, `${f.layer}.community.${k}`);
+      for (const [k, v] of Object.entries(f.community)) { if (manual && out.community[k]?.raw_ref) { dropped.push({ layer: f.layer, kind: `community.${k}`, ref: k, why: 'replaced by the block built from saved data' }); continue; } out.community[k] = resolveRef(v, `${f.layer}.community.${k}`); }
     }
   }
+  if (anyAuto) out.provenance = { capture_active: Boolean(opts.strict), auto_layers: sorted.filter((f) => f.auto).map((f) => f.layer), dropped };
   return { evidence: out, ids: Object.fromEntries(idOf) };
 }
 
@@ -120,12 +157,17 @@ export function mergeDir(dir) {
   });
   const idsPath = join(dir, 'evidence-ids.json');
   const previous = existsSync(idsPath) ? JSON.parse(readFileSync(idsPath, 'utf8')) : {};
-  const { evidence, ids } = merge(run, fragments, previous);
+  const captured = loadCalls(dir).length;
+  const { evidence, ids } = merge(run, fragments, previous, { strict: captured > 0 });
+  // Every machine-made entry must match the saved tool response it points at.
+  const prov = verifyProvenance(dir, evidence);
+  if (prov.errors.length) throw new Error(`provenance check failed:\n  - ${prov.errors.join('\n  - ')}`);
+  if (evidence.provenance) evidence.provenance = { ...evidence.provenance, verified: prov.counts.verified, warnings: prov.warnings };
   // Check the evidence now, not at render time: a bad url, channel or absence fails before analysis.
   prepare(evidence, {});
   writeFileSync(join(dir, 'evidence.json'), `${JSON.stringify(evidence, null, 2)}\n`);
   writeFileSync(join(dir, 'evidence-ids.json'), `${JSON.stringify(ids, null, 2)}\n`);
-  return { items: evidence.items.length, fragments: files.length };
+  return { items: evidence.items.length, fragments: files.length, ...(evidence.provenance ? { provenance: evidence.provenance } : {}) };
 }
 
 if (isMain(import.meta.url)) {
@@ -134,5 +176,11 @@ if (isMain(import.meta.url)) {
   try {
     const r = mergeDir(dir);
     console.log(`merged ${r.fragments} fragments into ${join(dir, 'evidence.json')} (${r.items} evidence items)`);
+    const p = r.provenance;
+    if (p) {
+      console.log(`provenance: ${p.verified.posts} posts, ${p.verified.ads} ads and ${p.verified.blocks} blocks verified against saved tool responses; ${p.dropped.length} hand-written entr${p.dropped.length === 1 ? 'y' : 'ies'} set aside`);
+      for (const d of p.dropped) console.log(`  set aside (${d.layer} ${d.kind}): ${d.ref} - ${d.why}`);
+      for (const w of p.warnings) console.log(`  warning: ${w}`);
+    }
   } catch (e) { console.error(`error: ${e.message}`); process.exit(1); }
 }

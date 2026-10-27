@@ -55,6 +55,29 @@ Rules the renderer enforces (a broken rule is a hard error, not a warning):
 - an item with `absent: true` must be `observed` and have a `probe`
 - posts need `platform`, `account`, `url` and a real `published` date
 
+## Machine-made fragments and provenance
+
+`scripts/capture.mjs` (a PostToolUse hook) saves every Firecrawl and Exa response to `raw/calls/<time>-<id>-<tool>.json`
+as `{ tool, at, tool_input, response }`, untouched. `scripts/extract.mjs` reads those files and the free scripts'
+`raw/*.json` and writes `fragments/<layer>.auto.json` (`"auto": true`). Posts, ads, pricing, site, site checks, open
+source, community and accounts are built there by code. Each carries a `raw_ref`:
+
+- `calls/<file>.json#/data/alexandria/0/records/3` (the record inside a JSON response)
+- `calls/<file>.json#exa:2` (the third result in an Exa text response)
+- `raw/sitemap.json` (a free script's file)
+
+`merge.mjs` rules when auto fragments exist:
+- a hand-written `post` or `ad` with no `raw_ref` is set aside and listed under `provenance.dropped`
+- an auto block replaces a hand-written one of the same name
+- every `raw_ref` must resolve; a post's text lines and counts must appear in the record it points at, or the merge fails
+- an item with `cites: ["calls/<file>.json"]` gets a warning when a number in its `finding` is not in the cited file
+
+`judgments/<layer>.json` is the only model input to extraction: `{ "owners": { "<handle>": "company|founder|employee" },
+"kinds": { "<post url>": "launch" } }`. A handle with no owner is shown as a team account.
+
+`ads[].days_shown_basis` appears when the provider gave no day count and it was worked out from the first and last
+dates shown. Fields the provider did not return are left out: a post with no counts says "engagement not visible".
+
 ## `analysis.json` (written by the analyst)
 
 ```jsonc

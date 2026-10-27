@@ -1,3 +1,7 @@
+> **Machine-made blocks.** `site` and `site_checks` come straight from `raw/sitemap.json` and `raw/sitecheck.json`, and
+> `pricing` from the saved Firecrawl JSON extraction of the pricing page, all built by `scripts/extract.mjs`. Run the
+> extraction (so the response is saved); do not copy those numbers into your fragment.
+
 # Layer: owned
 
 Channels: `seo_content`, `comparison`, `pricing_signup`, `integrations`, `ai_search`, `traffic`, and `reviews`
