@@ -346,3 +346,9 @@ We built a time machine for the web. https://lnkd.in/x/?utm_medium=paid`;
   const p = extractAll(dir).fragments.find((f) => f.layer === 'social').posts[0];
   assert.equal(p.paid, true); assert.equal(p.owner, 'company');
 });
+
+test('report template: wide tables scroll sideways inside their card instead of being clipped on a phone', () => {
+  const css = readFileSync(join(ROOT, 'templates', 'report.html'), 'utf8');
+  assert.match(css, /\.tgrid\{[^}]*overflow-x:auto/);
+  assert.doesNotMatch(css, /\.egrid\{[^}]*min-width:max-content/, 'max-content would stop all text wrapping');
+});

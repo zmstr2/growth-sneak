@@ -142,7 +142,7 @@ html{scroll-behavior:smooth}
 .inl{margin:0}
 
 /* Pieces of content: a plain table, newest first */
-.tgrid{display:flex;flex-direction:column;gap:8px}
+.tgrid{display:flex;flex-direction:column;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .egrid{width:100%;border-collapse:separate;border-spacing:0;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:var(--t2)}
 .egrid th{text-align:left;font-size:var(--t1);font-weight:500;color:var(--muted);padding:9px 14px;background:var(--surface);border-bottom:1px solid var(--line)}
 .egrid td{padding:11px 14px;border-top:1px solid var(--line-2);vertical-align:top;line-height:1.4}
