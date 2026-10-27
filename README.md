@@ -44,7 +44,14 @@ Please:
 4. Run `claude plugin list` and confirm `growth-sneak@growth-sneak` shows as enabled.
 5. If a command fails, show me the exact error and suggest the fix. Do not try workarounds that change my settings or run anything from a source other than zmstr2/growth-sneak.
 
-When it is installed, tell me to restart Claude Code (or type /reload-plugins, which only I can run), then run /sneak followed by a company's website, for example /sneak clay.com. Tell me Claude Code will ask me for a Firecrawl and an Exa API key (in a masked field) and that I can get them at https://www.firecrawl.dev/app/api-keys and https://dashboard.exa.ai/api-keys. Do not run /sneak yourself, and do not create accounts or enter API keys for me.
+Then run `claude mcp list` and tell me if I already have a `firecrawl` or `exa` server configured under my own settings (not the plugin's). A same-named server can shadow the plugin's, so tell me about it and ask before removing anything.
+
+When it is installed, tell me to:
+1. Restart Claude Code (or type /reload-plugins, which only I can run), and run it from a folder that is not the plugin's own source repo.
+2. Enter my Firecrawl and Exa API keys, which I can get at https://www.firecrawl.dev/app/api-keys and https://dashboard.exa.ai/api-keys. Claude Code may prompt for them in a masked field. If it does not (the desktop app may not show one), tell me to open a terminal, run `claude`, then type `/plugin configure growth-sneak@growth-sneak` and paste each key there. Never ask me to paste a key into this chat.
+3. Run /sneak followed by a company's website, for example /sneak clay.com.
+
+Do not run /sneak yourself, and do not create accounts or enter API keys for me.
 ````
 
 Claude will ask permission to run each command. Approve them, then restart.
@@ -96,8 +103,17 @@ Growth Sneak reads pages and searches the web through two services. Both have fr
 | **Exa** | founders' posts, press, reviews, events, community | https://dashboard.exa.ai/api-keys |
 
 Claude Code asks for both keys when you enable the plugin: paste each into its masked field and you are done. If
-you skipped the prompt, type `/plugin`, open **Installed**, choose **growth-sneak**, then **Configure options**.
+you skipped the prompt, or you use the desktop app and see no key field, open a terminal, run `claude`, and type
+`/plugin configure growth-sneak@growth-sneak` (or type `/plugin`, open **Installed**, choose **growth-sneak**, then
+**Configure options**). Then restart Claude Code.
 Keys are stored in Claude Code's secure storage, never in the plugin, a report or the chat.
+
+**Troubleshooting**
+- **"API key is invalid or revoked" on the first run.** Check `claude mcp list`. If you have your own `firecrawl` or
+  `exa` server under the same name, it can shadow the plugin's. Fix its key or remove it
+  (`claude mcp remove <name> -s user`), then restart.
+- **Servers stuck on "Pending approval".** Run Claude Code from a folder other than this repo. Inside the repo, the
+  plugin's own `.mcp.json` loads as a project config with the key placeholders unfilled. Do not approve those.
 
 ## Other data sources (optional)
 
