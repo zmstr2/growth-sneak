@@ -26,15 +26,65 @@ reports can be compared side by side.
 
 ## Install
 
-In Claude Code:
+Growth Sneak is a **Claude Code** plugin. It works in the Claude Code terminal and in the **Code tab** of the Claude
+desktop app. It needs [Claude Code](https://code.claude.com/docs/en/overview) and Node.js 20 or newer
+(`node --version`) installed, because the plugin runs small Node scripts on your computer.
+
+### Easiest: paste this to Claude
+
+Open Claude Code (terminal or the desktop Code tab) and paste:
+
+````text
+Install the Growth Sneak plugin for me. It is a Claude Code plugin published on GitHub at zmstr2/growth-sneak.
+
+Please:
+1. Run `node --version` and check it is 20 or newer. If Node is missing or older, stop and tell me how to install it for my system. Do not install it without asking me.
+2. Run `claude plugin marketplace add zmstr2/growth-sneak` and show me the output.
+3. Run `claude plugin install growth-sneak@growth-sneak` and show me the output.
+4. Run `claude plugin list` and confirm `growth-sneak@growth-sneak` shows as enabled.
+5. If a command fails, show me the exact error and suggest the fix. Do not try workarounds that change my settings or run anything from a source other than zmstr2/growth-sneak.
+
+When it is installed, tell me to restart Claude Code (or type /reload-plugins, which only I can run), then run /sneak followed by a company's website, for example /sneak clay.com. Tell me the first run will ask me for a Firecrawl and an Exa API key and that I can get them at https://www.firecrawl.dev/app/api-keys and https://dashboard.exa.ai/api-keys. Do not run /sneak yourself, and do not create accounts or enter API keys for me.
+````
+
+Claude will ask permission to run each command. Approve them, then restart.
+
+### Claude Code in the terminal
 
 ```
 /plugin marketplace add zmstr2/growth-sneak
 /plugin install growth-sneak@growth-sneak
 ```
 
-Then restart Claude Code and run `/sneak <company url>`. The first run asks for two API keys (below). To work on the
-plugin itself, clone the repo and start Claude Code with `claude --plugin-dir /path/to/growth-sneak`.
+`/plugin install` opens the plugin's details so you can pick where to install it (for you, for a project, or for this
+folder only). Choose "Install for you" to use it in every project. Or run the same thing from your shell without a
+session: `claude plugin marketplace add zmstr2/growth-sneak`, then `claude plugin install growth-sneak@growth-sneak`.
+On Claude Code 2.1.292 or newer, one command does both: `claude plugin install growth-sneak --marketplace zmstr2/growth-sneak`.
+
+### Claude desktop app (Code tab)
+
+The desktop app's Code tab and the terminal read the same plugin settings, so a plugin you add in one is available in
+the other.
+
+1. Add the marketplace once: run `claude plugin marketplace add zmstr2/growth-sneak` in any terminal, or in the app
+   open **Customize > Plugins > Add > Add marketplace** and enter `zmstr2/growth-sneak`.
+2. In a local Code-tab session, click **+** next to the prompt box and choose **Add plugins** (or **Plugins**, then
+   **Browse plugins**). Select **Growth Sneak** and choose a scope.
+
+Plugins don't load in cloud sessions or at claude.ai/code in the browser, so use a local session. Growth Sneak is
+built for Claude Code; it isn't set up for claude.ai chat or Cowork, which don't run its scripts or save the report
+on your computer.
+
+### After installing
+
+Restart Claude Code (or type `/reload-plugins`), type `/` and look for `/growth-sneak:sneak`, then run:
+
+```
+/sneak clay.com
+```
+
+The first run asks for two API keys (below). Update later with `claude plugin update growth-sneak@growth-sneak`.
+To work on the plugin itself, clone the repo and start Claude Code with `claude --plugin-dir /path/to/growth-sneak`.
 
 ## First run: two API keys
 
