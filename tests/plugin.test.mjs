@@ -56,21 +56,19 @@ test('the skill names every step the pipeline needs, in order, with setup first 
   assert.ok(!/of 6:/.test(md), 'the step count matches the steps');
 });
 
-test('first-run setup: keys are sensitive plugin settings wired into the MCP config, and the skill points users to /plugin, never the chat', () => {
-  const cfg = JSON.parse(read('.claude-plugin', 'plugin.json')).userConfig;
-  for (const k of ['firecrawl_api_key', 'exa_api_key']) {
-    assert.equal(cfg[k].sensitive, true, k + ' is sensitive');
-    assert.equal(cfg[k].type, 'string');
-    assert.ok(cfg[k].title && cfg[k].description, k + ' has a title and description');
-  }
-  const mcp = read('.mcp.json');
-  assert.ok(mcp.includes('${user_config.firecrawl_api_key}') && mcp.includes('${user_config.exa_api_key}'));
-  assert.ok(!/\$\{(FIRECRAWL|EXA)_API_KEY\}/.test(mcp), 'no raw env-var keys in .mcp.json');
+test('first-run setup: MCP servers use OAuth URLs with no keys, and the skill points users to /mcp Authenticate, never the chat', () => {
+  const plugin = JSON.parse(read('.claude-plugin', 'plugin.json'));
+  assert.ok(!plugin.userConfig, 'no API key settings');
+  const mcp = JSON.parse(read('.mcp.json')).mcpServers;
+  assert.equal(mcp.firecrawl.url, 'https://mcp.firecrawl.dev/v2/mcp-oauth');
+  assert.equal(mcp.exa.url, 'https://mcp.exa.ai/mcp');
+  for (const k of ['firecrawl', 'exa']) assert.ok(!mcp[k].headers, k + ' sends no key header');
+  assert.ok(!/user_config|API_KEY/.test(read('.mcp.json')), 'no key placeholders in .mcp.json');
   const md = read('skills', 'sneak', 'SKILL.md');
   const setup = md.slice(md.indexOf('## Setup'), md.indexOf('## 0.'));
-  for (const must of ['https://www.firecrawl.dev/app/api-keys', 'https://dashboard.exa.ai/api-keys', '/plugin', 'Configure options', 'Do not start']) assert.ok(setup.includes(must), must);
-  assert.match(setup, /not (?:save it or )?repeat/i);
-  for (const url of ['https://www.firecrawl.dev/app/api-keys', 'https://dashboard.exa.ai/api-keys']) assert.ok(read('README.md').includes(url), 'the README gives ' + url);
+  for (const must of ['/mcp', 'Authenticate', 'Do not start']) assert.ok(setup.includes(must), must);
+  assert.match(setup, /not save it or repeat/i);
+  assert.ok(read('README.md').includes('Authenticate'), 'the README explains sign-in');
 });
 
 test('paid social: the collector brief reads the public Meta Ad Library through Firecrawl and is honest about LinkedIn and TikTok', () => {

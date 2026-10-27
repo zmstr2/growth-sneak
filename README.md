@@ -48,7 +48,7 @@ Then run `claude mcp list` and tell me if I already have a `firecrawl` or `exa` 
 
 When it is installed, tell me to:
 1. Restart Claude Code (or type /reload-plugins, which only I can run), and run it from a folder that is not the plugin's own source repo.
-2. Enter my Firecrawl and Exa API keys, which I can get at https://www.firecrawl.dev/app/api-keys and https://dashboard.exa.ai/api-keys. Claude Code may prompt for them in a masked field. If it does not (the desktop app may not show one), tell me to open a terminal, run `claude`, then type `/plugin configure growth-sneak@growth-sneak` and paste each key there. Never ask me to paste a key into this chat.
+2. Sign in to the plugin's two connections, with no API keys: type `/mcp`, select **firecrawl** then **exa**, and choose **Authenticate** for each (in the desktop app, use **Connect** under Customize > Connectors). I sign in through my browser. Never ask me to paste a key or token into this chat.
 3. Run /sneak followed by a company's website, for example /sneak clay.com.
 
 Do not run /sneak yourself, and do not create accounts or enter API keys for me.
@@ -90,30 +90,30 @@ Restart Claude Code (or type `/reload-plugins`), type `/` and look for `/growth-
 /sneak clay.com
 ```
 
-The first run asks for two API keys (below). Update later with `claude plugin update growth-sneak@growth-sneak`.
+The first run needs you to sign in to two connections (below). Update later with `claude plugin update growth-sneak@growth-sneak`.
 To work on the plugin itself, clone the repo and start Claude Code with `claude --plugin-dir /path/to/growth-sneak`.
 
-## First run: two API keys
+## First run: sign in to two connections
 
-Growth Sneak reads pages and searches the web through two services. Both have free credits to start:
+Growth Sneak reads pages and searches the web through two services, bundled as remote MCP servers. You sign in to
+each once in your browser; there are no API keys to copy. Both have free credits to start:
 
-| Service | What it does here | Get a key |
-|---|---|---|
-| **Firecrawl** | Google and Meta ads, page screenshots, pricing, the rendered tech stack, X posts, data providers | https://www.firecrawl.dev/app/api-keys (starts with `fc-`) |
-| **Exa** | founders' posts, press, reviews, events, community | https://dashboard.exa.ai/api-keys |
+| Service | What it does here |
+|---|---|
+| **Firecrawl** (`firecrawl`) | Google and Meta ads, page screenshots, pricing, the rendered tech stack, X posts, data providers |
+| **Exa** (`exa`) | founders' posts, press, reviews, events, community |
 
-Claude Code asks for both keys when you enable the plugin: paste each into its masked field and you are done. If
-you skipped the prompt, or you use the desktop app and see no key field, open a terminal, run `claude`, and type
-`/plugin configure growth-sneak@growth-sneak` (or type `/plugin`, open **Installed**, choose **growth-sneak**, then
-**Configure options**). Then restart Claude Code.
-Keys are stored in Claude Code's secure storage, never in the plugin, a report or the chat.
+In Claude Code, type `/mcp`, select **firecrawl**, choose **Authenticate**, and sign in; then do the same for
+**exa**. In the desktop app, use **Connect** on each under Customize > Connectors. Restart Claude Code (or type
+`/reload-plugins`) and run `/sneak <company>`. Logins are stored by Claude Code, never in the plugin, a report or
+the chat.
 
 **Troubleshooting**
-- **"API key is invalid or revoked" on the first run.** Check `claude mcp list`. If you have your own `firecrawl` or
-  `exa` server under the same name, it can shadow the plugin's. Fix its key or remove it
-  (`claude mcp remove <name> -s user`), then restart.
-- **Servers stuck on "Pending approval".** Run Claude Code from a folder other than this repo. Inside the repo, the
-  plugin's own `.mcp.json` loads as a project config with the key placeholders unfilled. Do not approve those.
+- **Auth error on the first run.** Check `claude mcp list`. If you have your own `firecrawl` or `exa` server under
+  the same name, it can shadow the plugin's. Fix it or remove it (`claude mcp remove <name> -s user`), then
+  restart.
+- **Servers stuck on "Pending approval".** Run Claude Code from a folder other than this repo; inside it, the
+  plugin's own `.mcp.json` also loads as a project config. Approve or ignore those, they are the same servers.
 
 ## Other data sources (optional)
 
