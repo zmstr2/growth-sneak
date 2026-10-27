@@ -4,14 +4,14 @@
       "type": "http",
       "url": "https://mcp.firecrawl.dev/v2/mcp",
       "headers": {
-        "Authorization": "Bearer ${FIRECRAWL_API_KEY}"
+        "Authorization": "Bearer ${user_config.firecrawl_api_key}"
       }
     },
     "exa": {
       "type": "http",
       "url": "https://mcp.exa.ai/mcp",
       "headers": {
-        "x-api-key": "${EXA_API_KEY}"
+        "x-api-key": "${user_config.exa_api_key}"
       }
     }
   }

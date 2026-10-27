@@ -56,13 +56,21 @@ test('the skill names every step the pipeline needs, in order, with setup first 
   assert.ok(!/of 6:/.test(md), 'the step count matches the steps');
 });
 
-test('first-run setup: the skill checks keys, gives both sign-up links, saves through setup.mjs, never echoes a key, and tells the user to restart', () => {
+test('first-run setup: keys are sensitive plugin settings wired into the MCP config, and the skill points users to /plugin, never the chat', () => {
+  const cfg = JSON.parse(read('.claude-plugin', 'plugin.json')).userConfig;
+  for (const k of ['firecrawl_api_key', 'exa_api_key']) {
+    assert.equal(cfg[k].sensitive, true, k + ' is sensitive');
+    assert.equal(cfg[k].type, 'string');
+    assert.ok(cfg[k].title && cfg[k].description, k + ' has a title and description');
+  }
+  const mcp = read('.mcp.json');
+  assert.ok(mcp.includes('${user_config.firecrawl_api_key}') && mcp.includes('${user_config.exa_api_key}'));
+  assert.ok(!/\$\{(FIRECRAWL|EXA)_API_KEY\}/.test(mcp), 'no raw env-var keys in .mcp.json');
   const md = read('skills', 'sneak', 'SKILL.md');
   const setup = md.slice(md.indexOf('## Setup'), md.indexOf('## 0.'));
-  for (const must of ['setup.mjs" check', 'https://www.firecrawl.dev/app/api-keys', 'https://dashboard.exa.ai/api-keys', 'setup.mjs" save', 'setup.mjs" verify', 'FIRECRAWL_API_KEY', 'EXA_API_KEY', 'restart Claude Code', 'skip Exa']) assert.ok(setup.includes(must), must);
-  assert.match(setup, /Never repeat a key back/);
-  assert.match(setup, /Do not start the run/);
-  for (const url of ['https://www.firecrawl.dev/app/api-keys', 'https://dashboard.exa.ai/api-keys']) assert.ok(read('README.md').includes(url), `the README gives ${url}`);
+  for (const must of ['https://www.firecrawl.dev/app/api-keys', 'https://dashboard.exa.ai/api-keys', '/plugin', 'Configure options', 'Do not start']) assert.ok(setup.includes(must), must);
+  assert.match(setup, /not (?:save it or )?repeat/i);
+  for (const url of ['https://www.firecrawl.dev/app/api-keys', 'https://dashboard.exa.ai/api-keys']) assert.ok(read('README.md').includes(url), 'the README gives ' + url);
 });
 
 test('paid social: the collector brief reads the public Meta Ad Library through Firecrawl and is honest about LinkedIn and TikTok', () => {

@@ -1,6 +1,6 @@
 {
   "name": "growth-sneak",
-  "version": "0.13.1",
+  "version": "0.14.0",
   "description": "Give it a company's URL and get a local HTML report on how that company grows: 18 growth activities, the real posts, ads and pages behind each one, site traffic, tech stack, and moves a founder or growth lead can borrow. Every claim links to its source.",
   "author": {
     "name": "Zac Masters"
@@ -15,5 +15,21 @@
     "report"
   ],
   "repository": "https://github.com/zmstr2/growth-sneak",
-  "homepage": "https://github.com/zmstr2/growth-sneak"
+  "homepage": "https://github.com/zmstr2/growth-sneak",
+  "userConfig": {
+    "firecrawl_api_key": {
+      "type": "string",
+      "title": "Firecrawl API key",
+      "description": "Reads pages, ads and screenshots. Free credits to start. Get one at https://www.firecrawl.dev/app/api-keys (starts with fc-).",
+      "sensitive": true,
+      "required": true
+    },
+    "exa_api_key": {
+      "type": "string",
+      "title": "Exa API key",
+      "description": "Finds founders' posts, press and reviews. Get one at https://dashboard.exa.ai/api-keys.",
+      "sensitive": true,
+      "required": true
+    }
+  }
 }

@@ -35,47 +35,26 @@ evidence", "Step 4 of 5: writing the short reads", "Step 5 of 5: building the re
 
 ## Setup: API keys (first run only)
 
-The plugin reads two API keys from the environment: `FIRECRAWL_API_KEY` and `EXA_API_KEY`. Before anything else:
+The two API keys (Firecrawl and Exa) are plugin settings: Claude Code asks for them in a masked field when the
+plugin is enabled and keeps them in secure storage. They reach the Firecrawl and Exa connections directly; you
+never see them and must never ask for them. Do not look for them in the environment.
 
-1. Run `node "$P/scripts/setup.mjs" check`. It says, for each key, whether it is set and where. It never prints a key.
-2. Decide from that, not from which tools the session lists: the plugin's connections show as connected even with
-   no key, and every call then fails.
-   - **Firecrawl key set** (environment or settings file): setup is done. If this session has no tool ending in
-     `firecrawl_scrape`, the connection was made before the key was saved: tell the user to restart Claude Code (or
-     reload plugins) and run the same `/sneak` command again, then stop. Otherwise go to step 0. If the Exa key
-     is not set, carry on without it and say so in the closing message (step 6): founders' posts, press and reviews
-     are thinner without Exa, and the keys page is https://dashboard.exa.ai/api-keys.
-   - **Firecrawl key not set:** run the onboarding below and stop afterwards; keys only take effect after a restart.
+Before step 0, check that the connections work, by tool name and one cheap call:
+- No tool ending in `firecrawl_scrape` in this session, or a Firecrawl call that fails with an auth error (401,
+  "unauthorized", "invalid API key"): the key is missing or wrong. Send the message below and stop. Do not start
+  the run.
+- Exa tools missing or failing with an auth error: carry on without Exa and say so in the closing message (step 6):
+  founders' posts, press and reviews are thinner without it.
 
-**Onboarding.** Send one message, in plain words, with both links:
+> Growth Sneak needs two API keys, and you paste them into Claude Code's own settings, not into this chat.
+> 1. Get a **Firecrawl** key (reads pages, ads and screenshots; free credits to start): https://www.firecrawl.dev/app/api-keys. It starts with `fc-`.
+> 2. Get an **Exa** key (finds founders' posts, press and reviews): https://dashboard.exa.ai/api-keys
+> 3. Type `/plugin`, open the **Installed** tab, choose **growth-sneak**, then **Configure options**, and paste each key into its field.
+> 4. Restart Claude Code (or type `/reload-plugins`), then run `/sneak <company>` again.
 
-> Growth Sneak needs two API keys. Both have free credits, so you can try it before paying.
-> 1. **Firecrawl** (reads pages, ads and screenshots): create a key at https://www.firecrawl.dev/app/api-keys. It
->    starts with `fc-`.
-> 2. **Exa** (finds founders' posts, press and reviews): create a key at https://dashboard.exa.ai/api-keys.
->
-> Paste them here and I'll save them for you. They go into the `env` block of `~/.claude/settings.json`, on this
-> computer only. Your keys will show in this chat. If you would rather not, export `FIRECRAWL_API_KEY` and
-> `EXA_API_KEY` in your shell profile instead and tell me when it's done. Exa is optional: say "skip Exa" and the
-> report will have less on founders, press and reviews.
-
-When the user replies with keys, save them without echoing them back:
-
-```bash
-node "$P/scripts/setup.mjs" save <<'JSON'
-{"FIRECRAWL_API_KEY":"<key>","EXA_API_KEY":"<key>"}
-JSON
-node "$P/scripts/setup.mjs" verify
-```
-
-Leave out the key the user did not give. `save` checks each key's shape and refuses a bad one without writing
-anything. `verify` makes one cheap call per key: `ok`, `rejected` (ask for a fresh key), `unverified` (a network
-problem; carry on) or `missing`. Then tell the user, in one short message: the keys are saved, they need to
-**restart Claude Code (or reload plugins)**, and then run `/sneak <company>` again. Do not start the run.
-
-Never write a key into the report folder, `run.json`, a fragment, a log or any file other than the settings file
-via `setup.mjs`. Never repeat a key back, not even partly. Never create an account for the user or open the
-sign-up pages and fill them in: give the links and let them do it.
+If the user pastes a key into the chat anyway, do not save it or repeat it back (not even partly). Tell them it
+is now visible in this conversation, to create a fresh key after setup, and to enter it through `/plugin`
+instead. Never create an account for the user or open the sign-up pages and fill them in.
 
 ## 0. Resolve and set up
 
