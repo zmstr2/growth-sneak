@@ -10,3 +10,6 @@ tests/fixtures/*/report.html
 # working notes, not part of the published plugin
 docs/design-log.md
 .impeccable/
+
+# Browser tool output (screenshots, page snapshots)
+.playwright-mcp/
