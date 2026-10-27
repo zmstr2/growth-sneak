@@ -33,28 +33,29 @@ words, so the user can see progress: "Step 1 of 5: free first-party checks (site
 collector finishes ("Paid done: 63 Google ads, 6 Meta ads, 15 credits"), "Step 3 of 5: merging and checking the
 evidence", "Step 4 of 5: writing the short reads", "Step 5 of 5: building the report". Keep each to one line. Do not narrate tool calls.
 
-## Setup: API keys (first run only)
+## Setup: sign in to the two connections (first run only)
 
-The two API keys (Firecrawl and Exa) are plugin settings: Claude Code asks for them in a masked field when the
-plugin is enabled and keeps them in secure storage. They reach the Firecrawl and Exa connections directly; you
-never see them and must never ask for them. Do not look for them in the environment.
+Firecrawl and Exa are remote MCP servers that ship with this plugin (`firecrawl` and `exa`). They use browser
+sign-in (OAuth), not API keys: the user signs in once and Claude Code stores the login. You never see credentials
+and must never ask for them.
 
 Before step 0, check that the connections work, by tool name and one cheap call:
 - No tool ending in `firecrawl_scrape` in this session, or a Firecrawl call that fails with an auth error (401,
-  "unauthorized", "invalid API key"): the key is missing or wrong. Send the message below and stop. Do not start
-  the run.
+  "unauthorized", "invalid token"): Firecrawl is not signed in. Send the message below and stop. Do not start the
+  run.
 - Exa tools missing or failing with an auth error: carry on without Exa and say so in the closing message (step 6):
-  founders' posts, press and reviews are thinner without it.
+  founders' posts, press and reviews are thinner without it. Also add the Exa line from the message below.
 
-> Growth Sneak needs two API keys, and you paste them into Claude Code's own settings, not into this chat.
-> 1. Get a **Firecrawl** key (reads pages, ads and screenshots; free credits to start): https://www.firecrawl.dev/app/api-keys. It starts with `fc-`.
-> 2. Get an **Exa** key (finds founders' posts, press and reviews): https://dashboard.exa.ai/api-keys
-> 3. Type `/plugin`, open the **Installed** tab, choose **growth-sneak**, then **Configure options**, and paste each key into its field.
-> 4. Restart Claude Code (or type `/reload-plugins`), then run `/sneak <company>` again.
+> Growth Sneak uses two connections that you sign in to once, with no API keys.
+> 1. Type `/mcp`, select **firecrawl**, and choose **Authenticate**. Sign in to Firecrawl in the browser and approve a team (free credits to start).
+> 2. In `/mcp`, select **exa** and choose **Authenticate**. Sign in to Exa in the browser.
+> 3. Restart Claude Code (or type `/reload-plugins`), then run `/sneak <company>` again.
+> In the desktop app, open **Customize > Connectors**, or the plugin's **Connectors** tab, and use **Connect** on each one.
+> If a same-named `firecrawl` or `exa` server is already set up under your own settings, it can shadow the plugin's. Run `claude mcp list` to check, and remove or rename yours. Run Claude Code from a folder other than the plugin's own source repo.
 
-If the user pastes a key into the chat anyway, do not save it or repeat it back (not even partly). Tell them it
-is now visible in this conversation, to create a fresh key after setup, and to enter it through `/plugin`
-instead. Never create an account for the user or open the sign-up pages and fill them in.
+If the user pastes a key or token into the chat anyway, do not save it or repeat it back (not even partly). Tell
+them it is now visible in this conversation and to revoke it. Never create an account for the user or open the
+sign-up pages and fill them in.
 
 ## 0. Resolve and set up
 
