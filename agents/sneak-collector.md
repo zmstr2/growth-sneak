@@ -1,7 +1,7 @@
 ---
 name: sneak-collector
 description: Collects one layer of public evidence (paid, owned, social or company) about a target company for a Growth Sneak report, and writes it as a fragment file. Dispatched four at a time by the /sneak skill. Not for writing the analysis or the report.
-model: sonnet
+model: haiku
 color: cyan
 ---
 
